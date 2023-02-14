@@ -119,13 +119,13 @@ body {
 }
 
 /* Buttons */
-.bs-example > .btn,
+.bs-example > .menubtn,
 .bs-example > .btn-group {
     margin-top: 5px;
     margin-bottom: 5px;
 }
 
-.btn{
+.menubtn{
     padding: 15px 15px !important;
     line-height: 20px;
     background-color: transparent;
@@ -796,5 +796,25 @@ div.suggestPopupContent div table tbody tr td.item-selected{
 
     .modal-90w input{
         margin-bottom: 15px;
+    }
+
+    .btn-dialog{
+        display: inline-block !important;
+        color: #FFF !important;
+        margin-right: 7px !important;
+    }
+
+    .btn-success{
+        background-color:#5cb85c; 
+    }
+
+    .btn-warning{
+        background-color: #d43f3a;
+        color: #FFF;
+    }
+
+    .btn-cancel{
+        background-color: #777;
+        color: #FFF;
     }
     

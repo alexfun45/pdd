@@ -26,7 +26,7 @@ export default () => {
                     </div>
                     <div className="navbar-collapse collapse">
                         <Dropdown>
-                            <Dropdown.Toggle variant="light" id="dropdown-basic">
+                            <Dropdown.Toggle className="menubtn" variant="light" id="dropdown-basic">
                                 Dropdown Button
                             </Dropdown.Toggle>
 

@@ -1,50 +1,56 @@
-import React, {useState, useRef} from "react";
+import React, {useState, useEffect, MutableRefObject} from "react";
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import {useForm} from 'react-hook-form'
 import request from '../../utils/request'
 
-type InputSignInTypes = {
-    text: string; 
+type InputSignInTypes = { 
     answer: string;
     comment: string;
   };
 
-const Question = ({q, indx, handleChangeQuestions, setCorrect}: {q:InputSignInTypes, indx: number, handleChangeQuestions: Function, setCorrect: Function}) => {
-
-    const [correct, __setCorrect] = useState(indx);
+const Question = ({answer, indx, handleChangeQuestions, setCorrect}: {answer:InputSignInTypes, indx: number, handleChangeQuestions: Function, setCorrect: Function}) => {
 
     return (
         <div key={indx} className="variant-section">
             <div>
                 <input type="radio" onChange={setCorrect(indx)} name="correct[]" value={indx} style={{float: "left", marginRight: "3px", marginTop: "6px"}} />
-                <input type="text" onChange={(e)=>handleChangeQuestions(e.target.value, "answer", indx)} name={"answer"+indx} value={q.answer} className="text var_text required ui-widget-content ui-corner-all" />
+                <input type="text" onChange={(e)=>handleChangeQuestions(e.target.value, "answer", indx)} name={"answer"+indx} value={answer.answer} className="text var_text required ui-widget-content ui-corner-all" />
                 <div className="input-label">текст варианта ответа</div>
             </div>
             <div style={{paddingLeft: "16px"}}>
-                <input type="text" name="comment"  onChange={(e)=>handleChangeQuestions(e.target.value, "comment", indx)} id="comment" value={q.comment} className="text ui-widget-content ui-corner-all" />
+                <input type="text" name="comment"  onChange={(e)=>handleChangeQuestions(e.target.value, "comment", indx)} id="comment" value={answer.comment} className="text ui-widget-content ui-corner-all" />
                 <div className="input-label">комментарий к варианту ответа</div>
             </div>
         </div> 
     )
 }
 
-type questionType = {
-    correct: number;
+type answerType = {
     answer: string;
     comment: string;
   };
 
+type TicketDialog = {
+    text: string;
+    correct: number;
+    variants: answerType[]
+}
 
-export default (props: {show: boolean, setShow: Function}) => {
+export default ({show, ticket, editMode, setShow}: {show: boolean, ticket: MutableRefObject<TicketDialog>, editMode: boolean, setShow: Function}) => {
 
     let formData = new FormData();
-    const [text, setText] = useState(""),
-          [correct_id, setCorrect] = useState(0);
-    let [questions, setQuestions] = useState<any[]>([{answer: '', comment: ''}]);
+    const [text, setText] = useState(ticket.current.text),
+          [correct_id, setCorrect] = useState(ticket.current.correct);
+    let [answers, setAnswers] = useState<any[]>(ticket.current.variants);
+    
+    useEffect(()=>{
+        setText(ticket.current.text);
+        setAnswers(ticket.current.variants);
+    }, [ticket.current]);
 
     const handleClose = () => {
-        props.setShow(false);
+        setShow(false);
     }
 
     const uploadImage =(e: React.ChangeEvent<HTMLInputElement>) => {
@@ -58,21 +64,21 @@ export default (props: {show: boolean, setShow: Function}) => {
     }
 
     const handleChangeQuestions = (v:string, prop: string, indx: number) => {
-        let q = [...questions];
+        let q = [...answers];
         q[indx][prop] = v;
-        setQuestions(q);
+        setAnswers(q);
     }
 
     const addQuestion = () => {
-        let newQ = [...questions, {answer: '', comment: ''}];
-        setQuestions(newQ);
+        let newQ = [...answers, {answer: '', comment: ''}];
+        setAnswers(newQ);
     }
 
     const onSubmit = () => {
         formData.append("action", "addTicket");
         formData.append("text", text);
         formData.append("correct", correct_id.toString());
-        formData.append("variants", JSON.stringify(questions));
+        formData.append("variants", JSON.stringify(answers));
         request({method: "post", headers: {"Content-Type": "multipart/form-data"},  data: formData}).then(()=>{
             handleClose();
         })
@@ -82,7 +88,7 @@ export default (props: {show: boolean, setShow: Function}) => {
     
     return (
         <Modal
-                show={props.show}
+                show={show}
                 animation={false}
                 dialogClassName="modal-90w"
                 onHide={() => handleClose()}
@@ -104,15 +110,14 @@ export default (props: {show: boolean, setShow: Function}) => {
                             <label>Варианты ответов:</label>
                             <div className="answers_block">
                                {
-                                 questions.map((v, i)=>(
-                                   <Question q={questions[i]} handleChangeQuestions={handleChangeQuestions} indx={i} setCorrect={setCorrect} />
+                                 answers.map((v, i)=>(
+                                   <Question answer={answers[i]} handleChangeQuestions={handleChangeQuestions} indx={i} setCorrect={setCorrect} />
                                  ))
                                }
                                 <span id="add_var" onClick={addQuestion} style={{position: "absolute", right: "2px", color: "#76cf76", bottom: "10px", top: "auto", cursor: "pointer"}} className="glyphicon glyphicon-plus"></span>
-                            </div>
-                        
-                            <Button type="submit">Сохранить</Button>
+                            </div>   
                         </fieldset> 
+                        <div style={{textAlign: "right"}}><Button className="btn-dialog btn-success" type="submit">Сохранить</Button><Button className="btn-dialog btn-cancel" type="submit">Отмена</Button><Button className="btn-dialog btn-danger" type="submit">Удалить</Button></div>
                     </form>
                 </Modal.Body>
             </Modal>
