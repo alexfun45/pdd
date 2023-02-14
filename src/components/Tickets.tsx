@@ -25,7 +25,7 @@ export default () => {
                 )
             }
         });
-    }, []);
+    }, [show]);
     return (
         <div className='block-wrapper'>
             <CreateTicket setShow={setShow} show={show} />

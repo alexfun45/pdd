@@ -32,7 +32,7 @@
         }
         
         protected function getTickets($data){
-            $db = new SQLite3("../database/db.sqlite");
+            $db = new SQLite3(DB."db.sqlite");
             $current_page = $this->data->page;
             $offset = ($current_page-1) * PAGE_NUM;
             $res = $db->query("SELECT COUNT(*) as num FROM tickets");
@@ -51,7 +51,7 @@
 
 
     function getAllTickets(){
-        $db = new SQLite3("./database/db.sqlite");
+        $db = new SQLite3(DB."db.sqlite");
         $num = $_POST['num'];
         $max = $_POST['max'];
         $sql = "SELECT * FROM tickets LIMIT $num";
@@ -75,7 +75,7 @@
     }
 
     function getTicket(){
-        $db = new SQLite3("./database/db.sqlite");
+        $db = new SQLite3(DB."db.sqlite");
         $sql = "SELECT * FROM tickets WHERE id='{$_POST['ticket_id']}'";
         $res = $db->query($sql);
         $ticket = null;
@@ -91,14 +91,13 @@
         return array("ticket"=>$ticket, "variants"=>$variants);
     }
 
-    function uploadFile($fileUpload){
+    protected function uploadFile($fileUpload){
         $IMAGE_PATH = __DIR__ . '/img/';
         if (!isset($fileUpload['file'])) {
             $error = 'Не удалось загрузить файл.';
         } else {
             $file = $fileUpload['file'];
         }
-
         $allow = array('jpg', 'jpeg', 'png', 'svg', 'gif');
 
          if (!empty($file['error']) || empty($file['tmp_name'])) {
@@ -119,24 +118,25 @@
             }
             else {
                 // Перемещаем файл в директорию.
-                if (move_uploaded_file($file['tmp_name'], $IMAGE_PATH . $name)) {
+                if (move_uploaded_file($file['tmp_name'], IMG . $name)) {
                     return array("success"=>true, "filename"=>$name);
                 } else {
-                    $error = 'Не удалось загрузить файл.';
+                    $error = $_FILES["file"]["error"];
                 }
             }
         }
         return array("success"=>false, "error"=>$error);
     }
 
-    function addTicket(){
-        $uploadResult = uploadFile($_FILES);
+    protected function addTicket(){
+        $uploadResult = $this->uploadFile($_FILES);
         $image_name = ($uploadResult['success']) ? $uploadResult['filename'] : "";
         $text = $_POST['text'];
-        $correct_id = $_POST['correct_id'];
+        $correct = $_POST['correct'];
         $variants = json_decode($_POST['variants']);
-        $db = new SQLite3("./database/db.sqlite");
-        $db->exec("INSERT INTO tickets(text, image, correct_id) VALUES('$text', '$image_name', '$correct_id')");
+        sleep(1);
+        $db = new SQLite3(DB."db.sqlite");
+        $db->exec("INSERT INTO tickets(text, image, correct_id) VALUES('$text', '$image_name', '$correct')");
         $ticketId = $db->lastInsertRowID();
         for($i=0;$i<count($variants);$i++){
             $label = $variants[$i]->label;
@@ -148,7 +148,7 @@
     }
 
     function editTicket(){
-        $db = new SQLite3("./database/db.sqlite");
+        $db = new SQLite3(DB."db.sqlite");
         $text = $_POST['text'];
         $correct_id = $_POST['correct_id'];
         $ticketId = $_POST['ticket_id'];
@@ -170,7 +170,7 @@
     }
 
     function removeTicket(){
-        $db = new SQLite3("./database/db.sqlite");
+        $db = new SQLite3(DB."db.sqlite");
         $ticketId = $_POST['ticket_id'];
         $db->exec("DELETE FROM tickets WHERE id=$ticketId");
         $db->exec("DELETE FROM variants WHERE ticket_id='$ticketId'");
@@ -204,7 +204,7 @@
     function isLogin($data){
         if(isset($_SESSION['logged'])) return true;
         if (isset($_COOKIE["login"]) && isset($_COOKIE["password"])){
-            $db = new SQLite3("./database/db.sqlite");
+            $db = new SQLite3(DB."db.sqlite");
             $sql = "SELECT login, role FROM users WHERE login=:login AND password=:password";
             $stmt = $db->prepare($sql);
             $login = $_COOKIE["login"];
@@ -227,7 +227,7 @@
         $confirmed = ($token=='') ? 1:0;
         $role = (array_key_exists("role", $_POST)) ? $_POST['role'] : 3;
         if(isset($login) && isset($_POST['password']) && isset($role)){
-            $db = new SQLite3("./database/db.sqlite");
+            $db = new SQLite3(DB."db.sqlite");
             $password = md5($_POST['password']);
             $sql = "INSERT INTO users(login, password, email, role, token, confirmed) VALUES('$login', '$password', '$email', '$role', '$token', '$confirmed')";
             $db->exec($sql);
@@ -237,14 +237,14 @@
 
     function editUser(){
         $user = json_decode($_POST['user']);
-        $db = new SQLite3("./database/db.sqlite");
+        $db = new SQLite3(DB."db.sqlite");
         $db->exec("UPDATE users SET login='{$user->login}', role='{$user->role}', email='{$user->email}' WHERE id=$user->id");
         $db->close();
         return true;
     }
 
     function removeUser(){
-        $db = new SQLite3("./database/db.sqlite");
+        $db = new SQLite3(DB."db.sqlite");
         $db->exec("DELETE FROM users WHERE id='{$_POST['id']}'");
         $db->close();
         return true;
@@ -260,7 +260,7 @@
     }
 
     function getUsers(){
-        $db = new SQLite3("./database/db.sqlite");
+        $db = new SQLite3(DB."db.sqlite");
         $sql = "SELECT id, login, email, role FROM users";
         $res = $db->query($sql);
         while($user = $res->fetchArray(SQLITE3_ASSOC)){
@@ -276,7 +276,7 @@
 
     protected function login(){
         if(isset($this->data->login) && isset($this->data->password) && strlen($this->data->login)<128 && strlen($this->data->password)<128){
-            $db = new SQLite3("../database/db.sqlite");
+            $db = new SQLite3(DB."db.sqlite");
             $password = md5($this->data->password);
             $sql = "SELECT login, role FROM users WHERE login=:login AND password=:password";
             $stmt = $db->prepare($sql);

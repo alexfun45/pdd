@@ -26,8 +26,10 @@ export default () => {
     const onSubmit = (data: {login:string, password:string}) => { 
         request({method: "post", data: {action: "login", data: {login: data.login, password: data.password}}}).then((response)=>{
             const {data} = response;
-            if(data==true) 
+            if(data==true){
                 navigate("/");
+                document.location.href = "./";
+            }
             else{
                 setError('password', {
                     type: "server",

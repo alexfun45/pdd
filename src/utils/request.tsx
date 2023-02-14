@@ -18,7 +18,10 @@ import axios, {AxiosRequestConfig} from 'axios'
 
 const service = axios.create({
     baseURL: "./api/api.php",
-    timeout: 5000
+    timeout: 5000,
+    responseType: 'json',
+    maxContentLength: 100000,
+    maxBodyLength: 100000
   })
 
 
