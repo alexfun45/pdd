@@ -52,8 +52,8 @@
 
     function getAllTickets(){
         $db = new SQLite3(DB."db.sqlite");
-        $num = $_POST['num'];
-        $max = $_POST['max'];
+        $num = $this->data->num;
+        $max = $this->data->max;
         $sql = "SELECT * FROM tickets LIMIT $num";
         $res = $db->query($sql);
         $tickets = array();
@@ -74,15 +74,16 @@
         return $tickets;
     }
 
-    function getTicket(){
+    protected function getTicket(){
         $db = new SQLite3(DB."db.sqlite");
-        $sql = "SELECT * FROM tickets WHERE id='{$_POST['ticket_id']}'";
+        $ticket_id = $this->data->ticket_id;
+        $sql = "SELECT * FROM tickets WHERE id='$ticket_id'";
         $res = $db->query($sql);
         $ticket = null;
         if($res!==false)
             $ticket = $res->fetchArray(SQLITE3_ASSOC);
         $variants = array();
-        $sql = "SELECT * FROM variants WHERE ticket_id='{$_POST['ticket_id']}'";
+        $sql = "SELECT * FROM variants WHERE ticket_id='$ticket_id'";
         $res = $db->query($sql);
         while ($v = $res->fetchArray(SQLITE3_ASSOC)){
             array_push($variants, $v);
@@ -139,20 +140,20 @@
         $db->exec("INSERT INTO tickets(text, image, correct_id) VALUES('$text', '$image_name', '$correct')");
         $ticketId = $db->lastInsertRowID();
         for($i=0;$i<count($variants);$i++){
-            $label = $variants[$i]->label;
+            $label = $variants[$i]->answer;
             $comment = $variants[$i]->comment;
-            $db->exec("INSERT INTO variants(ticket_id, text, comment) VALUES('$ticketId', '$label', '$comment')");  
+            $db->exec("INSERT INTO variants(ticket_id, answer, comment) VALUES('$ticketId', '$label', '$comment')");  
         }
         $db->close();
         return $text;
     }
 
-    function editTicket(){
+    protected function editTicket(){
         $db = new SQLite3(DB."db.sqlite");
         $text = $_POST['text'];
-        $correct_id = $_POST['correct_id'];
+        $correct_id = $_POST['correct'];
         $ticketId = $_POST['ticket_id'];
-        $uploadResult = uploadFile($_FILES);
+        $uploadResult = $this->uploadFile($_FILES);
         $image_name = ($uploadResult['success']) ? $uploadResult['filename'] : "";
         $variants = json_decode($_POST['variants']);
         if($uploadResult['success']!==false)
@@ -161,22 +162,23 @@
             $db->exec("UPDATE tickets SET text='$text', correct_id='$correct_id' WHERE id=$ticketId"); 
         
         for($i=0;$i<count($variants);$i++){
-            $label = $variants[$i]->label;
+            $label = $variants[$i]->answer;
             $comment = $variants[$i]->comment;
             $var_id = $variants[$i]->id;
-            $db->exec("UPDATE variants SET text='$label', comment='$comment' WHERE ticket_id='$ticketId' AND id='$var_id'");  
+            $db->exec("UPDATE variants SET answer='$label', comment='$comment' WHERE ticket_id='$ticketId' AND id='$var_id'");  
             }
         $db->close();
+        return true;
     }
 
-    function removeTicket(){
+    protected function removeTicket(){
         $db = new SQLite3(DB."db.sqlite");
-        $ticketId = $_POST['ticket_id'];
+        $ticketId = $this->data->ticket_id;
         $db->exec("DELETE FROM tickets WHERE id=$ticketId");
         $db->exec("DELETE FROM variants WHERE ticket_id='$ticketId'");
     }
 
-    function getConfig(){
+    protected function getConfig(){
         $config_file = "./config/config.xml";
         $configs = array();
         $dom = new domDocument("1.0", "utf-8");
@@ -188,7 +190,7 @@
         return $configs;
     }
 
-    function saveConfig(){
+    protected function saveConfig(){
         $configs = $_POST['configs'];
         $config_file = "./config/config.xml";
         $dom = new domDocument("1.0", "utf-8");
@@ -201,7 +203,7 @@
         $dom->save($config_file);
     }
 
-    function isLogin($data){
+    protected function isLogin($data){
         if(isset($_SESSION['logged'])) return true;
         if (isset($_COOKIE["login"]) && isset($_COOKIE["password"])){
             $db = new SQLite3(DB."db.sqlite");

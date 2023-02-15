@@ -11,7 +11,7 @@ export default () => {
           [page, setPage] = useState(1),
           [isEdit, setEditMode] = useState(false),
           [show, setShow] = useState(false),
-          defaultTicket = {text: "", correct: 0, variants: [{answer: '', comment: ''}]};
+          defaultTicket = {text: "", id: 1, image: "", correct: 0, variants: [{answer: '', comment: ''}]};
           //[currentTicket, setCurrentTicket] = useState(defaultTicket);
     let currentTicket = useRef(defaultTicket);
     let items = Array(), active = 1;
@@ -52,7 +52,7 @@ export default () => {
 
     return (
         <div className='block-wrapper'>
-            <CreateTicket ticket={currentTicket} setShow={setShow} editMode={isEdit} show={show} />
+            <CreateTicket ticket={currentTicket.current} setShow={setShow} editMode={isEdit} show={show} />
             <div id='ticket-list'>
                 {
                     tickets.map((v: {text: string, id: number},i: number)=>{

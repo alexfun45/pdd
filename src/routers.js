@@ -1,6 +1,7 @@
 import Content from "./components/Content"
 import AdminPanel from "./components/AdminPanel"
 import Authorization from "./components/Authorization";
+import TestPdd from "./components/TestPdd"
 
 const routes = [
     {
@@ -22,6 +23,11 @@ const routes = [
         route: "auth",
         component: <Authorization />,
         key: "auth"
+    },
+    {
+        route: "pdd-online",
+        component: <TestPdd start={true} options={{num: 10, random: true, max: 1000}} />,
+        key: "textpdd"
     }
 ];
 

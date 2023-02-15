@@ -4,7 +4,7 @@ import { HashRouter } from "react-router-dom"
 import "@/css/docs18.css"
 import { Routes, Route } from "react-router-dom";
 import routes from './routers'
-import Header from "./components/Header"
+import Header from "./components/Header2"
 
 const getRoutes = (allRoutes: Array<{route:string, key: string, component: object}>) =>
     allRoutes.map((route) => {
@@ -21,11 +21,13 @@ export default function App(){
         <>  
           <HashRouter>
             <Header />
-            <Routes>
-                {
-                  getRoutes(routes)  
-                }
-            </Routes>
+            <div id="maincontainer" className="container">
+              <Routes>
+                  {
+                    getRoutes(routes)  
+                  }
+              </Routes>
+            </div>
           </HashRouter>
         </>
     )

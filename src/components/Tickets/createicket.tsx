@@ -9,12 +9,12 @@ type InputSignInTypes = {
     comment: string;
   };
 
-const Question = ({answer, indx, handleChangeQuestions, setCorrect}: {answer:InputSignInTypes, indx: number, handleChangeQuestions: Function, setCorrect: Function}) => {
+const Question = ({answer, indx, handleChangeQuestions, setCorrect, correct}: {answer:InputSignInTypes, indx: number, handleChangeQuestions: Function, setCorrect: Function, correct: number}) => {
 
     return (
         <div key={indx} className="variant-section">
             <div>
-                <input type="radio" onChange={setCorrect(indx)} name="correct[]" value={indx} style={{float: "left", marginRight: "3px", marginTop: "6px"}} />
+                <input type="radio" onChange={setCorrect(indx)} name="correct[]" value={indx} checked={indx==correct} style={{float: "left", marginRight: "3px", marginTop: "6px"}} />
                 <input type="text" onChange={(e)=>handleChangeQuestions(e.target.value, "answer", indx)} name={"answer"+indx} value={answer.answer} className="text var_text required ui-widget-content ui-corner-all" />
                 <div className="input-label">текст варианта ответа</div>
             </div>
@@ -33,21 +33,23 @@ type answerType = {
 
 type TicketDialog = {
     text: string;
+    id:number;
+    image:string;
     correct: number;
     variants: answerType[]
 }
 
-export default ({show, ticket, editMode, setShow}: {show: boolean, ticket: MutableRefObject<TicketDialog>, editMode: boolean, setShow: Function}) => {
+export default ({show, ticket, editMode, setShow}: {show: boolean, ticket: TicketDialog, editMode: boolean, setShow: Function}) => {
 
     let formData = new FormData();
-    const [text, setText] = useState(ticket.current.text),
-          [correct_id, setCorrect] = useState(ticket.current.correct);
-    let [answers, setAnswers] = useState<any[]>(ticket.current.variants);
-    
+    const [text, setText] = useState(ticket.text),
+          [correct_id, setCorrect] = useState(ticket.correct);
+    let [answers, setAnswers] = useState<any[]>(ticket.variants);
+
     useEffect(()=>{
-        setText(ticket.current.text);
-        setAnswers(ticket.current.variants);
-    }, [ticket.current]);
+        setText(ticket.text);
+        setAnswers(ticket.variants);
+    }, [ticket]);
 
     const handleClose = () => {
         setShow(false);
@@ -75,13 +77,23 @@ export default ({show, ticket, editMode, setShow}: {show: boolean, ticket: Mutab
     }
 
     const onSubmit = () => {
-        formData.append("action", "addTicket");
+        if(editMode){
+            formData.append("action", "editTicket");
+            formData.append("ticket_id", ticket.id.toString());
+        }
+        else
+            formData.append("action", "addTicket");
         formData.append("text", text);
         formData.append("correct", correct_id.toString());
         formData.append("variants", JSON.stringify(answers));
-        request({method: "post", headers: {"Content-Type": "multipart/form-data"},  data: formData}).then(()=>{
+        request({method: "post", headers: {"Content-Type": "multipart/form-data"}, data: formData}).then(()=>{
             handleClose();
         })
+    }
+
+    const handleRemove = () => {
+        request({method: "post", data: {action: "removeTicket", data: {ticket_id: ticket.id}}});
+        handleClose();
     }
 
     const { register, handleSubmit, setError, watch, setValue, formState: { errors } } = useForm<InputSignInTypes>({mode: 'onBlur'});
@@ -105,19 +117,19 @@ export default ({show, ticket, editMode, setShow}: {show: boolean, ticket: Mutab
                             <label >Текст вопроса</label>
                             <input onChange={handleInput} value={text} type="text" name="text" id="ticket_text" className="text required ui-widget-content ui-corner-all" />
                             <label>Изображение</label>
-                            <img style={{maxWidth: "90%"}} id="t_img" />
+                            <img style={{maxWidth: "90%"}} src={(ticket.image!="")?("./img/"+ticket.image):""} id="t_img" />
                             <input type="file" onChange={uploadImage} name="image" id="ticket_image" className="text ui-widget-content ui-corner-all" />
                             <label>Варианты ответов:</label>
                             <div className="answers_block">
                                {
                                  answers.map((v, i)=>(
-                                   <Question answer={answers[i]} handleChangeQuestions={handleChangeQuestions} indx={i} setCorrect={setCorrect} />
+                                   <Question answer={answers[i]} handleChangeQuestions={handleChangeQuestions} indx={i} setCorrect={setCorrect} correct={correct_id}/>
                                  ))
                                }
                                 <span id="add_var" onClick={addQuestion} style={{position: "absolute", right: "2px", color: "#76cf76", bottom: "10px", top: "auto", cursor: "pointer"}} className="glyphicon glyphicon-plus"></span>
                             </div>   
-                        </fieldset> 
-                        <div style={{textAlign: "right"}}><Button className="btn-dialog btn-success" type="submit">Сохранить</Button><Button className="btn-dialog btn-cancel" type="submit">Отмена</Button><Button className="btn-dialog btn-danger" type="submit">Удалить</Button></div>
+                        </fieldset>
+                        <div style={{textAlign: "right", marginTop: "15px"}}><Button className="btn-dialog btn-success" type="submit">Сохранить</Button><Button onClick={()=>handleClose()} className="btn-dialog btn-cancel">Отмена</Button><Button onClick={handleRemove} className={"btn-dialog btn-danger "+(editMode?"":"hide")} type="submit">Удалить</Button></div>
                     </form>
                 </Modal.Body>
             </Modal>

@@ -125,13 +125,79 @@ body {
     margin-bottom: 5px;
 }
 
+.myheader h1{
+    text-align: center;
+}
+
+.pull-left{
+    float: left;
+}
+
+.btn-group{
+    display: inline-block;
+}
+
+.top-level-menu{
+    width: 100%;
+    border-bottom: 1px solid #e7e7e7;
+    text-align: center;
+}
+
 .menubtn{
     padding: 15px 15px !important;
     line-height: 20px;
     background-color: transparent;
-    display: block !important;
+    display: inline-block !important;
+    color: #777 !important;
+    border-color: transparent !important;
+}
+
+.menubtn:hover{
+    background-color: transparent;
+}
+
+.group-menu-btn button{
+    padding: 15px 15px !important;
+    line-height: 20px;
+    background-color: transparent;
+    display: inline-block !important;
     color: #777 !important;
 }
+
+.pause-btn{
+    font-size: 16px;
+    color: #FFF !important;
+}
+
+.row{
+    margin-top: 20px;
+}
+
+.label{
+    display: inline;
+    padding: .2em .6em .3em;
+    font-size: 75%;
+    font-weight: 700;
+    line-height: 1;
+    color: #fff;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: baseline;
+    border-radius: .25em;
+}
+
+.label-primary{
+    background-color: #337ab7;
+}
+
+.label-info{
+    background-color: #5bc0de;
+}
+
+.btngroup{
+    display: inline-flex !important;
+}
+
 .bs-example > .btn-toolbar + .btn-toolbar {
     margin-top: 10px;
 }
@@ -174,6 +240,20 @@ body {
     }
 }
 
+.hide{
+    display: none !important;
+}
+
+
+.img-responsive{
+    display: inline-block;
+}
+
+button.list-group-item {
+    width: 100%;
+    text-align: left;
+  }
+
 @media screen and (max-width: 767px) {
 
     .myheader h1,
@@ -193,6 +273,7 @@ body {
         padding:4px;
         overflow-x: hidden;
     }
+   
 
     body {
         padding:0;
@@ -250,9 +331,8 @@ body {
     bottom: 0;
     right: 5px;
 }
-.themesize{
 
-}
+
 
 button.list-group-item.active, button.list-group-item.active:hover, button.list-group-item.active:focus {
     z-index: 2;
@@ -337,12 +417,7 @@ button.list-group-item.active, button.list-group-item.active:hover, button.list-
     padding: 5px 0px !important;
     margin-bottom: 5px !important;
 }*/
-#buttonPanel.btn-group-sm > button , #buttonPanel1 > button, #buttonPanel2 > button, #buttonPanel3 > button , #buttonPanel4 > button {
-    width: 35px;
-    height: 30px;
-    padding: 5px 0px !important;
-    margin-bottom: 5px !important;
-}
+
 
 
 .current-button{
@@ -818,3 +893,26 @@ div.suggestPopupContent div table tbody tr td.item-selected{
         color: #FFF;
     }
     
+    #buttonPanel.btn-group-sm > button , #buttonPanel1 > button, #buttonPanel2 > button, #buttonPanel3 > button , #buttonPanel4 > button {
+        width: 35px;
+        height: 30px;
+        padding: 5px 0px !important;
+        margin-bottom: 5px !important;
+    }
+
+    .btn-page{
+        font-weight: 400;
+        line-height: 1.42857143;
+        text-align: center;
+        white-space: nowrap;
+        vertical-align: middle;
+        -ms-touch-action: manipulation;
+        touch-action: manipulation;
+        cursor: pointer;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        background-image: none;
+        border: 1px solid transparent;
+    }
