@@ -26,7 +26,7 @@ const routes = [
     },
     {
         route: "pdd-online",
-        component: <TestPdd start={true} options={{num: 10, random: true, max: 1000}} />,
+        component: <TestPdd start={true} options={{num: 10, max_error:2, random: true, max: 1000}} />,
         key: "textpdd"
     }
 ];

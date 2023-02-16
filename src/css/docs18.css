@@ -916,3 +916,56 @@ div.suggestPopupContent div table tbody tr td.item-selected{
         background-image: none;
         border: 1px solid transparent;
     }
+
+    .panel-primary {
+        border-color: #337ab7;
+      }
+
+    .panel {
+        margin-bottom: 20px;
+        background-color: #fff;
+        border: 1px solid transparent;
+          border-top-color: transparent;
+          border-right-color: transparent;
+          border-bottom-color: transparent;
+          border-left-color: transparent;
+        border-radius: 4px;
+        -webkit-box-shadow: 0 1px 1px rgba(0,0,0,.05);
+        box-shadow: 0 1px 1px rgba(0,0,0,.05);
+      }
+
+    .panel-primary > .panel-heading {
+        color: #fff;
+        background-color: #337ab7;
+        border-color: #337ab7;
+      }
+
+    .panel-heading {
+        padding: 10px 15px;
+        border-bottom: 1px solid transparent;
+          border-bottom-color: transparent;
+        border-top-left-radius: 3px;
+        border-top-right-radius: 3px;
+      }
+
+    .lead {
+        font-size: 21px;
+      }
+
+    .lead {
+        margin-bottom: 20px;
+        font-weight: 300;
+        line-height: 1.4;
+      }
+
+    .panel-body {
+        padding: 15px;
+      }
+
+    .label-danger {
+        background-color: #d9534f;
+      }
+
+    .label-default {
+        background-color: #777;
+      }

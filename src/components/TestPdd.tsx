@@ -19,7 +19,9 @@ var  pdd_questions: TicketPdd[] = [],
      Timer:any = null,
      results:any = [],
      errors = 0,
+     question_answered = 0,
      timer = 0;
+     //time = "0:00";
      
 
 function getTickets(options: any, callback: Function){
@@ -47,15 +49,12 @@ function getTickets(options: any, callback: Function){
 
 const TestPdd = (props:any) => {
     
-    let errors_max = 2,
-     nums = 20,
-     max_questions = 1000;
-
     const [time, setTime] = useState("0:00"),
           [currentTicket, setCurrentTicket] = useState(0),
           [currentQuestion, setCurrentQuestion] = useState<TicketPdd>(),
           [start, setStart] = useState(props.start),
-          [opened, setOpened] = useState<number[]>([]);
+          [opened, setOpened] = useState<number[]>([]),
+          [endTest, setEndTest] = useState(false);
 
     function setQuestion(){
         if(pdd_questions.length>0 && pdd_questions.length-1>=currentTicket)
@@ -66,8 +65,8 @@ const TestPdd = (props:any) => {
         timer++;
         let minutes = Math.floor(timer/60),
             seconds = timer%60,
-            time = (seconds<10)?("0"+seconds):seconds.toString();
-        setTime(minutes+":"+time);
+            __time = (seconds<10)?("0"+seconds):seconds.toString();
+        setTime(minutes+":"+__time);
     }
 
     function startTest(){
@@ -82,21 +81,24 @@ const TestPdd = (props:any) => {
     }
 
     function continueTest(){
+        if(endTest==true) return;
         Timer = setInterval(startTimer, 1000);
         setStart(true);
     }
 
     function selectAnswer(selectedAnswer: number){
+        let _opened = [...opened];
+        _opened.push(selectedAnswer);
+        setOpened(_opened);
+       if(results[currentTicket]==1 || results[currentTicket]==0) return;
        if(selectedAnswer != parseInt(pdd_questions[currentTicket].success)){
             errors++;
-            results[selectedAnswer] = 1;
-            pdd_questions[selectedAnswer].isSuccess = 1;
+            results[currentTicket] = 1;
        }
        else
-        results[selectedAnswer] = 0;
-       let _opened = [...opened];
-       _opened.push(selectedAnswer);
-       setOpened(_opened);
+            results[currentTicket] = 0;
+        question_answered++;
+      
     }
 
     function showResult(indx: number){
@@ -104,7 +106,28 @@ const TestPdd = (props:any) => {
     }
 
     function nextTicket(){
-        setCurrentTicket(currentTicket+1);
+        if((currentTicket+1)<pdd_questions.length && (currentTicket+1)<=props.options.num)
+            setCurrentTicket(currentTicket+1);
+        else if(question_answered>=props.options.num || question_answered>=pdd_questions.length){
+            setEndTest(true);
+            testPause();
+        }
+    }
+
+    function getBtnpageClass(i: number){
+        let classname = "btn btn-page btn-default";
+        if(currentTicket==i && results[i]!=1 && results[i]!=0)
+            classname += " current-button";
+        if(results[i]==1)
+            classname += " btn-danger";
+        else if(results[i]==0)   
+             classname+= " btn-success";
+        return classname;        
+    }
+
+    function goToPage(qIndx: number){
+        if(qIndx<pdd_questions.length)
+            setCurrentTicket(qIndx);
     }
 
     useEffect(()=>{
@@ -122,7 +145,7 @@ const TestPdd = (props:any) => {
                 <div id="buttonPanel" className="btn-group btn-group-xs">
                     {
                         [...new Array(props.options.num)].map((v, i)=>(
-                           <button id={"btn_"+i} className={"btn btn-page btn-default "+((currentTicket==i)?"current-button":"")+(results[i]==0)?" btn-danger":( (results[i]==1)?" btn-success":" ")} type="button">{i+1}</button>
+                           <button onClick={()=>goToPage(i)} id={"btn_"+i} className={getBtnpageClass(i)} type="button">{i+1}</button>
                         ))
                     }
                 </div>
@@ -157,7 +180,7 @@ const TestPdd = (props:any) => {
                 <div className="col-lg-8 col-md-9 col-sm-12">
                     <div className="row">
                         <div className="col-md-12">
-                            <div id="questPanel" className={(start)?"":"hide"}>
+                            <div id="questPanel"  className={(start)?"":"hide"}>
                                 <img id="questImage" className="img-responsive" width="100%" style={{maxWidth: "100%"}}
                                         src={(currentQuestion!==undefined)?currentQuestion.image:""}
                                         alt="картинка вопроса" />
@@ -177,10 +200,30 @@ const TestPdd = (props:any) => {
                                     </div>
                                 </div>
                             </div>
+                            <div className={(endTest==true)?"row":"hide row"}>
+                                <div className="col-md-12">
+                                    <div className="panel panel-primary">
+                                        <div className="panel-heading lead">
+                                            ошибок <span id="resultErrors" className="label label-danger">{errors}</span> из <span id="resultCount" className="label label-default">{props.options.num}</span>
+                                        </div>
+                                        <div className="panel-body">
+                                            <p id="resultText" className="lead">
+                                                {(props.options.max_error<=errors) ?
+                                                    (<><i style={{color: "#222"}} className="bi bi-x-lg"></i> Экзамен не сдан. У вас более {props.options.max_error} ошибок</>)
+                                                    :
+                                                    (<><i style={{color: "green"}} className="bi bi-check-lg"></i> Экзамен сдан</>)
+                                                }
+                                            </p>
+                                        </div>
+                                    </div>      
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
+                
             </div>
+            
         </>
     )
 }
