@@ -209,7 +209,7 @@ const TestPdd = (props:any) => {
                                         <div className="panel-body">
                                             <p id="resultText" className="lead">
                                                 {(props.options.max_error<=errors) ?
-                                                    (<><i style={{color: "#222"}} className="bi bi-x-lg"></i> Экзамен не сдан. У вас более {props.options.max_error} ошибок</>)
+                                                    (<><i style={{color: "#222", fontSize: "18px"}} className="bi bi-x-lg"></i> Экзамен не сдан. У вас более {props.options.max_error} ошибок</>)
                                                     :
                                                     (<><i style={{color: "green"}} className="bi bi-check-lg"></i> Экзамен сдан</>)
                                                 }

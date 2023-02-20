@@ -1,4 +1,4 @@
-import React, {useState, useEffect, MutableRefObject} from "react";
+import React, {useState, useEffect, MutableRefObject, ReactEventHandler} from "react";
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import {useForm} from 'react-hook-form'
@@ -10,11 +10,11 @@ type InputSignInTypes = {
   };
 
 const Question = ({answer, indx, handleChangeQuestions, setCorrect, correct}: {answer:InputSignInTypes, indx: number, handleChangeQuestions: Function, setCorrect: Function, correct: number}) => {
-
+    console.log("correct_id", correct);
     return (
         <div key={indx} className="variant-section">
             <div>
-                <input type="radio" onChange={setCorrect(indx)} name="correct[]" value={indx} checked={indx==correct} style={{float: "left", marginRight: "3px", marginTop: "6px"}} />
+                <input type="radio" onChange={(e)=>setCorrect(e.target.value)} name="correct[]" value={indx} checked={indx==correct} style={{float: "left", marginRight: "3px", marginTop: "6px"}} />
                 <input type="text" onChange={(e)=>handleChangeQuestions(e.target.value, "answer", indx)} name={"answer"+indx} value={answer.answer} className="text var_text required ui-widget-content ui-corner-all" />
                 <div className="input-label">текст варианта ответа</div>
             </div>
@@ -35,7 +35,7 @@ type TicketDialog = {
     text: string;
     id:number;
     image:string;
-    correct: number;
+    correct_id: number;
     variants: answerType[]
 }
 
@@ -43,12 +43,13 @@ export default ({show, ticket, editMode, setShow}: {show: boolean, ticket: Ticke
 
     let formData = new FormData();
     const [text, setText] = useState(ticket.text),
-          [correct_id, setCorrect] = useState(ticket.correct);
+          [correct_id, setCorrect] = useState(ticket.correct_id);
     let [answers, setAnswers] = useState<any[]>(ticket.variants);
 
     useEffect(()=>{
         setText(ticket.text);
         setAnswers(ticket.variants);
+        setCorrect(ticket.correct_id);
     }, [ticket]);
 
     const handleClose = () => {
@@ -126,7 +127,7 @@ export default ({show, ticket, editMode, setShow}: {show: boolean, ticket: Ticke
                                    <Question answer={answers[i]} handleChangeQuestions={handleChangeQuestions} indx={i} setCorrect={setCorrect} correct={correct_id}/>
                                  ))
                                }
-                                <span id="add_var" onClick={addQuestion} style={{position: "absolute", right: "2px", color: "#76cf76", bottom: "10px", top: "auto", cursor: "pointer"}} className="glyphicon glyphicon-plus"></span>
+                                <span id="add_var" onClick={addQuestion} className="add-btn">+</span>
                             </div>   
                         </fieldset>
                         <div style={{textAlign: "right", marginTop: "15px"}}><Button className="btn-dialog btn-success" type="submit">Сохранить</Button><Button onClick={()=>handleClose()} className="btn-dialog btn-cancel">Отмена</Button><Button onClick={handleRemove} className={"btn-dialog btn-danger "+(editMode?"":"hide")} type="submit">Удалить</Button></div>

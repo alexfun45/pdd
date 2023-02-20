@@ -2,7 +2,7 @@
 import {useState, useEffect, useRef} from "react";
 import Pagination from 'react-bootstrap/Pagination';
 import request from "../utils/request";
-import CreateTicket from "./Tickets/createicket"
+import CreateTicket from "./Tickets/createTicketDialog"
 
 const MAX_TICKET_LENGTH = 64;
 
@@ -11,7 +11,7 @@ export default () => {
           [page, setPage] = useState(1),
           [isEdit, setEditMode] = useState(false),
           [show, setShow] = useState(false),
-          defaultTicket = {text: "", id: 1, image: "", correct: 0, variants: [{answer: '', comment: ''}]};
+          defaultTicket = {text: "", id: 1, image: "", correct_id: 0, variants: [{answer: '', comment: ''}]};
           //[currentTicket, setCurrentTicket] = useState(defaultTicket);
     let currentTicket = useRef(defaultTicket);
     let items = Array(), active = 1;
@@ -30,7 +30,7 @@ export default () => {
             const page_num = data.page_num;
             for(let number = 1; number <= page_num; number++) {
                 items.push(
-                    <Pagination.Item key={number} active={number === active}>
+                    <Pagination.Item key={number} active={number === page}>
                       {number}
                     </Pagination.Item>
                 )

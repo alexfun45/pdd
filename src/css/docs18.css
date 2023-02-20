@@ -14,9 +14,9 @@ body {
 
 }
 
-.container {
+/*.container {
     position: relative;
-}
+}*/
 
 .img-znak-comment{
     max-height: 40px;
@@ -478,11 +478,19 @@ div.suggestPopupContent div table tbody tr td.item-selected{
 }
 #admin_panel{
     cursor: pointer;
-    margin-top: 4px;
 }
 
 #admin_panel:hover{
     color:#428bca;
+}
+
+.add-btn{
+    font-size: 30px;
+    cursor: pointer;
+    position: absolute;
+    right: 2px;
+    color: #76cf76;
+    bottom: 0;
 }
 
 /*#login-form input[type='submit']{
@@ -497,12 +505,11 @@ div.suggestPopupContent div table tbody tr td.item-selected{
 
 .btn-auth{
     font-weight: 400;
-    color: #000 !important;
-    padding-top: 2px;
-    padding-bottom: 5px;
-    padding-left: 3px;
-    padding-right: 3px;
     font-size: 19px !important;
+}
+
+.btn-auth:hover{
+    color: #000;
 }
 
 .btn-reg{
