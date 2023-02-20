@@ -5,16 +5,39 @@ import request from "../utils/request";
 import CreateTicket from "./Tickets/createTicketDialog"
 
 const MAX_TICKET_LENGTH = 64;
+const screenHeight = window.screen.height*0.6;
+type pagesType = Array<any>;
+let page_num = 0;
 
 export default () => {
     const [tickets, setTickets] = useState([]),
-          [page, setPage] = useState(1),
+          [currentPage, setPage] = useState(1),
           [isEdit, setEditMode] = useState(false),
+          [pages, setPages] = useState<any>(),
           [show, setShow] = useState(false),
-          defaultTicket = {text: "", id: 1, image: "", correct_id: 0, variants: [{answer: '', comment: ''}]};
-          //[currentTicket, setCurrentTicket] = useState(defaultTicket);
+          defaultTicket = {text: "", id: 1, image: "", correct_id: 0, variants: [{answer: '', comment: ''}]};   
     let currentTicket = useRef(defaultTicket);
-    let items = Array(), active = 1;
+    var items: pagesType = [];
+
+    const renderPages = () => {
+        items = [];
+        for(let number = 1; number <= page_num; number++) {
+            items.push(
+                <Pagination.Item onClick={()=>gotToPage(number)} key={number} active={number === currentPage}>
+                  {number}
+                </Pagination.Item>
+            )
+        }
+        setPages(items);
+    }
+
+    const gotToPage = (selectedPage: number) => {
+        setPage(selectedPage);
+        request({method: 'post', data:{action: 'getTickets', data: {page: selectedPage}}}).then( response => {
+            const {data} = response;
+            setTickets(data.data);
+        });
+    }
 
     useEffect(()=>{
         if(show==false){
@@ -24,20 +47,18 @@ export default () => {
         else{
             return;
         }
-        request({method: 'post', data:{action: 'getTickets', data: {page: page}}}).then( response => {
+        request({method: 'post', data:{action: 'getTickets', data: {page: currentPage}}}).then( response => {
             const {data} = response;
+            page_num = data.page_num;
+            renderPages();
             setTickets(data.data);
-            const page_num = data.page_num;
-            for(let number = 1; number <= page_num; number++) {
-                items.push(
-                    <Pagination.Item key={number} active={number === page}>
-                      {number}
-                    </Pagination.Item>
-                )
-            }
         });
         
     }, [show]);
+
+    useEffect(()=>{
+        renderPages();
+    }, [currentPage]);
 
     const editTicket = (id: number) => {
         request({method: 'post', data:{action: 'getTicket', data: {ticket_id: id}}}).then( response => {
@@ -51,7 +72,7 @@ export default () => {
     }
 
     return (
-        <div className='block-wrapper'>
+        <div style={{height: screenHeight+"px"}} className='block-wrapper'>
             <CreateTicket ticket={currentTicket.current} setShow={setShow} editMode={isEdit} show={show} />
             <div id='ticket-list'>
                 {
@@ -65,7 +86,7 @@ export default () => {
                 <div onClick={() => setShow(true)} className="add-ticket" id="addTicket"><i className="addIcon">+</i></div>
             </div>
             <div className="page-wrapper">
-                <Pagination>{items}</Pagination>
+                <Pagination>{pages}</Pagination>
             </div>
         </div>
         )

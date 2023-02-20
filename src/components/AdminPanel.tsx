@@ -2,10 +2,10 @@ import {useState} from "react";
 import Tab from 'react-bootstrap/Tab';
 import Tabs from 'react-bootstrap/Tabs';
 import Tickets from './Tickets'
+import PageManager from './PageManager'
 
 export default () => {
     const [key, setKey] = useState('tickets');
-    console.log("admin panel");
     return (
         <div className="container admin-container">
             <div className="row">
@@ -21,7 +21,10 @@ export default () => {
                         <Tickets />
                     </Tab>
                     <Tab eventKey="settings" title="Параметры">
-                    Profile
+                        Profile
+                    </Tab>
+                    <Tab eventKey="pagemanager" title="Менеджер страниц">
+                        <PageManager />
                     </Tab>
                 </Tabs>
             </div>
