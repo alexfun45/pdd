@@ -10,7 +10,7 @@ type InputSignInTypes = {
   };
 
 const Question = ({answer, indx, handleChangeQuestions, setCorrect, correct}: {answer:InputSignInTypes, indx: number, handleChangeQuestions: Function, setCorrect: Function, correct: number}) => {
-    console.log("correct_id", correct);
+    
     return (
         <div key={indx} className="variant-section">
             <div>

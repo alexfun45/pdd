@@ -4,7 +4,7 @@
     require_once("../init.php");
     $IMAGE_PATH = __DIR__ . '/img/';
     $PAGE_DIR = __DIR__ . 'pages/';
-    const PAGE_NUM = 30;
+    const PAGE_NUM = 3;
 
     class Application{
 
@@ -37,7 +37,7 @@
             $offset = ($current_page-1) * PAGE_NUM;
             $res = $db->query("SELECT COUNT(*) as num FROM tickets");
             $page_num = $res->fetchArray(SQLITE3_ASSOC);
-            $page_num = (int) ($page_num["num"]/PAGE_NUM);
+            $page_num = ceil($page_num["num"]/PAGE_NUM);
             $page_num = ($page_num==0) ? 1:$page_num;
             $sql = "SELECT * FROM tickets LIMIT ".PAGE_NUM." OFFSET $offset";
             $res = $db->query($sql);
@@ -333,6 +333,22 @@
         //login();
         //header('Location: ./');
     }
+
+    protected function createPage(){
+        $files = $_FILES;
+        return $files;
+    }
+
+    protected function getMenuPages(){
+        $db = new SQLite3(DB."db.sqlite");
+        $res = $db->query("SELECT t2.name as 'menu_name', t3.name as 'page_name', t2.id as 'menu_id', t3.id as 'page_id' FROM menu_2_page as t1 INNER JOIN menus as t2 ON t1.menu_id=t2.id INNER JOIN pages as t3 ON t1.page_id=t3.id");
+        $menus = array();
+        while($row = $res->fetchArray(SQLITE3_ASSOC)){
+            $menus[$row['menu_name']][] = array("menu_id"=>$row["menu_id"], "page_id"=>$row["page_id"], "page_name"=>$row["page_name"]);   
+        }
+        return $menus;
+    }
+
 }
 
     $app = new Application();

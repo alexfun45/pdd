@@ -579,6 +579,20 @@ div.suggestPopupContent div table tbody tr td.item-selected{
     height: 100%;
 }
 
+.block-wrapper > .col-2{
+    width: 300px;
+    margin-right: 20px;
+    display: inline-block;
+}
+
+.col-title{
+    display: block;
+    text-align: center;
+    font-size: 18px;
+    color:#3c96e6;
+    margin-bottom: 15px;
+}
+
 .add-ticket{
     position: relative;
     float: right;
@@ -983,3 +997,19 @@ div.suggestPopupContent div table tbody tr td.item-selected{
     .label-default {
         background-color: #777;
       }
+
+    .right-panel{
+        display: inline-block;
+        float: right;
+    }
+
+    .right-panel i{
+        font-size: 12px;
+        color:#a5a3a3;
+        margin-right: 3px;
+    }
+
+    .right-panel i:hover{
+        color:rgb(34, 33, 33);
+        cursor: pointer;
+    }
