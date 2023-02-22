@@ -341,12 +341,35 @@
 
     protected function getMenuPages(){
         $db = new SQLite3(DB."db.sqlite");
-        $res = $db->query("SELECT t2.name as 'menu_name', t3.name as 'page_name', t2.id as 'menu_id', t3.id as 'page_id' FROM menu_2_page as t1 INNER JOIN menus as t2 ON t1.menu_id=t2.id INNER JOIN pages as t3 ON t1.page_id=t3.id");
+        $res = $db->query("SELECT t2.name as 'menu_name', t3.title as 'page_name', t2.id as 'menu_id', t3.id as 'page_id' FROM menu_2_page as t1 INNER JOIN menus as t2 ON t1.menu_id=t2.id INNER JOIN pages as t3 ON t1.page_id=t3.id");
         $menus = array();
+        $pages = array();
         while($row = $res->fetchArray(SQLITE3_ASSOC)){
             $menus[$row['menu_name']][] = array("menu_id"=>$row["menu_id"], "page_id"=>$row["page_id"], "page_name"=>$row["page_name"]);   
         }
-        return $menus;
+        $res = $db->query("SELECT * FROM pages");
+        while($row = $res->fetchArray(SQLITE3_ASSOC)){
+            $pages[] = $row;
+        }
+        return array("menus"=>$menus, "allpages"=>$pages);
+    }
+
+    protected function addPageMenu(){
+        $db = new SQLite3(DB."db.sqlite");
+        $menu_id = $this->data->menu_id;
+        $page_id = $this->data->page_id;
+        $db->exec("INSERT INTO menu_2_page(menu_id, page_id) VALUES($menu_id, $page_id)");
+        $db->close();
+        return true;
+    }
+
+    protected function removeMenuItem(){
+        $db = new SQLite3(DB."db.sqlite");
+        $menu_id = $this->data->menu_id;
+        $page_id = $this->data->page_id;
+        $db->exec("DELETE FROM menu_2_page WHERE menu_id=$menu_id AND page_id=$page_id");
+        $db->close();
+        return true;
     }
 
 }
