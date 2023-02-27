@@ -1,11 +1,11 @@
 import {useState, useEffect} from "react";
 import request from '../utils/request'
-import ListGroup from 'react-bootstrap/ListGroup';
+import {ListGroup, Button} from 'react-bootstrap';
 
 type PageItem = {
-    menu_id: number;
-    page_id: number;
-    page_name: string;
+    title: string;
+    id: number;
+    name: string;
 }
 
 type PageType = {
@@ -14,19 +14,24 @@ type PageType = {
     title: string;
 };
 
-export default function PageManager(){
+export default function PageManager({setpageTabtype}: any){
 
-    const [menuItems, setMenuItems] = useState<any>({}),
+    const [menuItems, setMenuItems] = useState<any>([]),
           [menuPages, setMenuPages] = useState<any>([]),
           [allPages, setAllPages] = useState<any>([]),
           [selectedMenuId, setSelectedMenuId] = useState<any>(),
           [selectedPage, setSelectedPage]= useState<PageType>(),
           [update, setUpdate] = useState(0);
 
-    const selectItem = (selectedMenuItemId:any, selectedMenuKey: string) => {
-        let pages = menuItems[selectedMenuKey];
-        setMenuPages(pages);
-        setSelectedMenuId(selectedMenuItemId);
+    const selectItem = (menu_id: number) => {
+        setSelectedMenuId(menu_id);
+        request({method: "post", data: {action: "getMenuPages", data: {menu_id: menu_id}}}).then(response=>{
+            const {data} = response;
+            setMenuPages(data);
+        });
+        //let pages = menuItems[selectedMenuKey];
+        //setMenuPages(pages);
+        //setSelectedMenuId(selectedMenuItemId);
     }
 
     // Select current page
@@ -48,29 +53,34 @@ export default function PageManager(){
             if(!isPageExists(selectedPage.id))
                 request({method: "post", data: {action: "addPageMenu", data: {menu_id: selectedMenuId, page_id: selectedPage.id}}}).then((response)=>{
                     setMenuPages(()=>{
-                        return [...menuPages, {page_name: selectedPage.title, page_id: selectedPage.id}]
+                        return [...menuPages, {...selectedPage}]
                     })
                 });
         }
       
     }
 
-    const removeMenuItem = (pageId: number) => {
+    // remove menuitem
+    const removeMenuItem = (pageId: number, menu_pages_index: number) => {
         if(selectedMenuId && pageId){
-
             request({method: "post", data: {action: "removeMenuItem", data:{menu_id: selectedMenuId, page_id: pageId}}}).then((response)=>{
-                setTimeout(()=>{
-                    setUpdate(update+1);
-                }, 1000);
+                let copyMenuPages = [...menuPages];
+                copyMenuPages.splice(menu_pages_index, 1);
+                setMenuPages(copyMenuPages);
             });
         }
     }
 
+    const createPage = () => {
+        setpageTabtype(1);
+    }
+
+    // getting all menu items and all pages
     useEffect(()=>{
-        request({method: "post", data: {action: "getMenuPages"}}).then((response)=>{
+        request({method: "post", data: {action: "getMenuItems"}}).then((response)=>{
             const {data} = response;
             setMenuItems(data.menus);
-            setAllPages(data.allpages);
+            setAllPages(data.pages);
         });
     }, [update]);
 
@@ -80,9 +90,9 @@ export default function PageManager(){
                 <div className="col-title">Элементы верхнего меню</div>
                 <ListGroup>
                     {
-                        Object.entries(menuItems).map(([key, value], i) => {
+                        menuItems.map((value:any) => {
                                 //return <div>{menuItems[key][0].menu_id}</div>
-                                return <ListGroup.Item action id={menuItems[key][0].menu_id} onClick={(e)=>selectItem(menuItems[key][0].menu_id, key)} eventKey={menuItems[key][0].menu_id}>{key}</ListGroup.Item> 
+                                return <ListGroup.Item action id={value.id} onClick={(e)=>selectItem(value.id)} eventKey={value.id}>{value.name}</ListGroup.Item> 
                         })
                    
                            
@@ -93,8 +103,8 @@ export default function PageManager(){
                 <div className="col-title">Страницы меню</div>
                 <ListGroup>
                    {
-                    menuPages.map((v:PageItem)=>(
-                        <ListGroup.Item eventKey={v.page_id}><div>{v.page_name}<div className="right-panel"><span><i className="bi bi-pencil-fill"></i><i onClick={()=>removeMenuItem(v.page_id)} className="bi bi-trash3-fill"></i></span></div></div></ListGroup.Item>
+                    menuPages.map((v:PageItem, i: number)=>(
+                        <ListGroup.Item eventKey={v.id}><div>{v.title}<div className="right-panel"><span><i className="bi bi-pencil-fill"></i><i onClick={()=>removeMenuItem(v.id, i)} className="bi bi-trash3-fill"></i></span></div></div></ListGroup.Item>
                     ))
                    }
                 </ListGroup>
@@ -103,7 +113,7 @@ export default function PageManager(){
                 <i onClick={addPageToMenu} className={"bi bi-arrow-left "+((selectedPage!==undefined || selectedMenuId!==undefined)?"":"hide")}></i>    
             </div>
             <div className="col-3">
-                <div className="col-title">Все страницы</div>
+                <div className="col-title">Все страницы <Button onClick={createPage} variant="outline-success">+ Создать</Button></div>
                 <ListGroup>
                     {
                         allPages.map((v:PageType)=>(

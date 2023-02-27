@@ -339,19 +339,29 @@
         return $files;
     }
 
-    protected function getMenuPages(){
+    protected function getMenuItems(){
         $db = new SQLite3(DB."db.sqlite");
-        $res = $db->query("SELECT t2.name as 'menu_name', t3.title as 'page_name', t2.id as 'menu_id', t3.id as 'page_id' FROM menu_2_page as t1 INNER JOIN menus as t2 ON t1.menu_id=t2.id INNER JOIN pages as t3 ON t1.page_id=t3.id");
+        // query for getting all menu items
+        $res = $db->query("SELECT * FROM menus");
         $menus = array();
         $pages = array();
-        while($row = $res->fetchArray(SQLITE3_ASSOC)){
-            $menus[$row['menu_name']][] = array("menu_id"=>$row["menu_id"], "page_id"=>$row["page_id"], "page_name"=>$row["page_name"]);   
-        }
+        while($row = $res->fetchArray(SQLITE3_ASSOC))
+            $menus[] = $row;
+        // query for getting all pages
         $res = $db->query("SELECT * FROM pages");
-        while($row = $res->fetchArray(SQLITE3_ASSOC)){
+        while($row = $res->fetchArray(SQLITE3_ASSOC))
             $pages[] = $row;
-        }
-        return array("menus"=>$menus, "allpages"=>$pages);
+        return array("menus"=>$menus, "pages"=>$pages);
+    }
+
+    protected function getMenuPages(){
+        $db = new SQLite3(DB."db.sqlite");
+        $menu_id = $this->data->menu_id;
+        $res = $db->query("SELECT t2.* FROM menu_2_page as t1 INNER JOIN pages as t2 ON t1.page_id=t2.id WHERE t1.menu_id=$menu_id");
+        $pages = array();
+        while($row = $res->fetchArray(SQLITE3_ASSOC))
+            $pages[] = $row;
+        return $pages;
     }
 
     protected function addPageMenu(){

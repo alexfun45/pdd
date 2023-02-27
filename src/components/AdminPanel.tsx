@@ -4,8 +4,16 @@ import Tabs from 'react-bootstrap/Tabs';
 import Tickets from './Tickets'
 import PageManager from './PageManager'
 
+function TabTitle({tab_type}:{tab_type: number}){
+    return (
+        <div>новая страница</div>
+    )
+}
+
 export default () => {
-    const [key, setKey] = useState('tickets');
+    const [key, setKey] = useState('tickets'),
+          [pageTabtype, setpageTabtype] = useState(0);
+
     return (
         <div className="container admin-container">
             <div className="row">
@@ -23,9 +31,10 @@ export default () => {
                     <Tab eventKey="settings" title="Параметры">
                         Profile
                     </Tab>
-                    <Tab eventKey="pagemanager" title="Менеджер страниц">
-                        <PageManager />
+                    <Tab eventKey="pagemanager" title="менеджер страниц">
+                        <PageManager setpageTabtype={setpageTabtype} />
                     </Tab>
+                    <Tab eventKey="newpage" tabClassName={(pageTabtype!=0)?'':'hide'} title={<TabTitle tab_type={pageTabtype} />}></Tab>
                 </Tabs>
             </div>
         </div>
