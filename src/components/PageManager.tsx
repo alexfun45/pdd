@@ -14,7 +14,7 @@ type PageType = {
     title: string;
 };
 
-export default function PageManager({setpageTabtype}: any){
+export default function PageManager({setpageTabtype, setKey, setEditPageName}: any){
 
     const [menuItems, setMenuItems] = useState<any>([]),
           [menuPages, setMenuPages] = useState<any>([]),
@@ -73,6 +73,7 @@ export default function PageManager({setpageTabtype}: any){
 
     const createPage = () => {
         setpageTabtype(1);
+        setKey("newpage");
     }
 
     // getting all menu items and all pages

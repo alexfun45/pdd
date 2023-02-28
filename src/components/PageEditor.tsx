@@ -1,6 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import Button from 'react-bootstrap/Button';
+import Form from 'react-bootstrap/Form';
+import Modal from 'react-bootstrap/Modal';
+import Spinner from 'react-bootstrap/Spinner';
 import {useState, useEffect} from "react";
 import request from '../utils/request'
 // Require Editor JS files.
@@ -24,6 +27,7 @@ import 'froala-editor/css/froala_editor.pkgd.min.css';
 // Require Font Awesome.
 import 'font-awesome/css/font-awesome.css';
 import FroalaEditor from 'react-froala-wysiwyg';
+import $ from 'jquery'
 
 
 const screenHeight = window.screen.height*0.6;
@@ -34,8 +38,20 @@ type typeImagesArrayrray = {
 var formData = new FormData(),
     Images:typeImagesArrayrray[] = [];
 
-export default function PageEditor(){
+var imageNames: Array<string> = [];
+export default function PageEditor({editPageName, setEditPageName}: {editPageName:string, setEditPageName: React.Dispatch<React.SetStateAction<string>>}){
 
+    const [show, setShow] = useState(false),
+          [pageName, setPageName] = useState(""),
+          [saving, setSaving] = useState(false);
+    const [validated, setValidated] = useState(false);
+    const handleClose = () => setShow(false);
+    const handleShow = () => setShow(true);
+    const changePageName = (e: any) => {
+        let value = e.target.value;
+       if(value.length<128)
+          setPageName((e.target.value) ? e.target.value:''); 
+      }
     let config = {
         placeholder: "Edit Me",
         height: screenHeight,
@@ -46,6 +62,7 @@ export default function PageEditor(){
         events:{
           'image.beforeUpload': function (images:any) {
             formData.append(images[0].name, images[0]);
+            imageNames.push(images[0].name);
           }
         },
         pluginsEnabled: [
@@ -98,15 +115,87 @@ export default function PageEditor(){
         setModel(data);
     }
 
-    const savePage = () => {
-        formData.append('content', model);
+    const savePage = (event: any) => {
+      
+        if(editPageName=="")
+          handleShow();
+        else
+          save();
+    }
+
+    const handleSubmit = (event: any) => {
+      const form = event.currentTarget;
+      event.preventDefault();
+      if (form.checkValidity() === false) {
+        event.stopPropagation();
+        return;
+      } 
+      else{
+        save();
+      } 
+      setValidated(true);
+    }
+
+    const save = () => {
+      setSaving(true);
+      setEditPageName(pageName);
+      handleClose();
+      let content = $(model),
+            i = 0;
+        content.find('img').each(function(){
+          $(this).attr('src', "./img/"+imageNames[i]);
+          i++;
+        });
+        formData.delete('content');
+        formData.delete('action');
+        formData.delete('pagename', );
+        formData.append('content', content.html());
         formData.append('action', 'createPage');
-        request({method: "post",headers: {"Content-Type": "multipart/form-data"}, data: formData});
+        formData.append('page', pageName);
+        request({method: "post", headers: {"Content-Type": "multipart/form-data"}, data: formData});
+        setTimeout(()=>{
+          setSaving(false);
+        }, 2000);
     }
 
     return (
         <div style={{height: screenHeight+"px"}} className="block-wrapper">
-            <Button onClick={savePage} className="btn-dialog btn-success editor-btn" type="submit">Сохранить</Button>
+            <Modal show={show} onHide={handleClose}>
+                  <Modal.Header closeButton>
+                    <Modal.Title>Имя страницы</Modal.Title>
+                  </Modal.Header>
+                  <Modal.Body>
+                    <Form validated={validated} onSubmit={handleSubmit}>
+                      <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
+                        <Form.Label>Введите имя новой страницы</Form.Label>
+                        <Form.Control
+                          required
+                          type="text"
+                          placeholder=""
+                          onChange={changePageName}
+                          autoFocus
+                        />
+                      </Form.Group>
+                      <Button type="submit" variant="primary">
+                      Сохранить
+                    </Button>
+                    <Button variant="secondary" onClick={handleClose}>
+                      Отмена
+                    </Button>
+                    </Form>
+                  </Modal.Body>
+                  <Modal.Footer>
+                  </Modal.Footer>
+                </Modal>
+            <Button onClick={savePage} className="btn-dialog btn-success editor-btn" disabled={saving} type="submit">
+              <Spinner
+                className={(!saving)?"hide":""}
+                as="span"
+                animation="border"
+                size="sm"
+                role="status"
+                aria-hidden="true"
+              />Сохранить</Button>
             <FroalaEditor
                 tag='textarea'
                 config={config}
