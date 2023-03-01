@@ -45,7 +45,7 @@ export default () => {
                         <PageManager setpageTabtype={setpageTabtype} setKey={setKey} setEditPageName={setEditPageName} />
                     </Tab>
                     <Tab eventKey="newpage" tabClassName={(pageTabtype!=0)?'':'hide'} title={<TabTitle tab_type={pageTabtype} editPageName={editPageName} setpageTabtype={setpageTabtype} setKey={setKey}/>}>
-                        <PageEditor editPageName={editPageName} setEditPageName={setEditPageName} />
+                        <PageEditor editPageName={editPageName} setEditPageName={setEditPageName} mode={pageTabtype}/>
                     </Tab>
                 </Tabs>
             </div>

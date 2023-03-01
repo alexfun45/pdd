@@ -1,6 +1,8 @@
 import {useState, useEffect} from "react";
 import request from '../utils/request'
 import {ListGroup, Button} from 'react-bootstrap';
+import Form from 'react-bootstrap/Form';
+import Modal from 'react-bootstrap/Modal';
 
 type PageItem = {
     title: string;
@@ -21,6 +23,10 @@ export default function PageManager({setpageTabtype, setKey, setEditPageName}: a
           [allPages, setAllPages] = useState<any>([]),
           [selectedMenuId, setSelectedMenuId] = useState<any>(),
           [selectedPage, setSelectedPage]= useState<PageType>(),
+          [showModal, setShowModal] = useState(false),
+          [validated, setValidated] = useState(false),
+          [menuName, setMenuName] = useState(""),
+          [menuTitle, setMenuTitle] = useState(""),
           [update, setUpdate] = useState(0);
 
     const selectItem = (menu_id: number) => {
@@ -29,14 +35,38 @@ export default function PageManager({setpageTabtype, setKey, setEditPageName}: a
             const {data} = response;
             setMenuPages(data);
         });
-        //let pages = menuItems[selectedMenuKey];
-        //setMenuPages(pages);
-        //setSelectedMenuId(selectedMenuItemId);
     }
+
+    // handle for close modal of menu creation
+    const handleClose = () => setShowModal(false);
+
+    // handle for show modal of menu creation
+    const handleShow = () => setShowModal(true);
+
+    const handleSubmit = (event: any) => {
+        const form = event.currentTarget;
+        event.preventDefault();
+        if (form.checkValidity() === false) {
+          event.stopPropagation();
+          return;
+        } 
+        else{
+            createMenuItem();
+        } 
+        setValidated(true);
+      }
 
     // Select current page
     const selectPage = (pageItem: PageType) => {
         setSelectedPage(pageItem);
+    }
+
+    const removePage = (pageItem: PageType) => {
+        request({method: "post", data: {action: "removePage", data: {page_id: pageItem.id, page_name: pageItem.name}}});
+        let pages = [...allPages];
+        let indx = pages.findIndex(x => x.id === pageItem.id);
+        pages.splice(indx, 1);
+        setAllPages(pages);
     }
 
     const isPageExists = (page_id: number) => {
@@ -57,7 +87,14 @@ export default function PageManager({setpageTabtype, setKey, setEditPageName}: a
                     })
                 });
         }
-      
+    }
+
+    const createMenuItem = () => {
+        request({method: "post", data: {action: "createMenuItem", data: {menu_name: menuName, menu_title: menuTitle}}}).then(response=>{
+            const {data} = response;
+            setMenuItems([...menuItems, data]);
+            handleClose();
+        });
     }
 
     // remove menuitem
@@ -71,8 +108,21 @@ export default function PageManager({setpageTabtype, setKey, setEditPageName}: a
         }
     }
 
+    const removeMenu = (menuId: number, indx: number) => {
+        request({method: "post", data: {action: "removeMenu", data: {menu_id: menuId}}});
+        let copymenuItems = [...menuItems];
+        copymenuItems.splice(indx, 1);
+        setMenuItems(copymenuItems);
+    }
+
     const createPage = () => {
         setpageTabtype(1);
+        setKey("newpage");
+    }
+
+    const handleEditPage = (v: PageType) => {
+        setEditPageName(v.name);
+        setpageTabtype(2);
         setKey("newpage");
     }
 
@@ -85,27 +135,34 @@ export default function PageManager({setpageTabtype, setKey, setEditPageName}: a
         });
     }, [update]);
 
+    const handleChangeName = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setMenuName((event.currentTarget.value) ? event.currentTarget.value:"");
+    }
+
+    const handleChangeTitle = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setMenuTitle((event.currentTarget.value) ? event.currentTarget.value:"");
+    }
+
     return (
         <div className="block-wrapper">
-            <div className="col-3">
-                <div className="col-title">Элементы верхнего меню</div>
+            <div className="col-30">
+                <div className="col-title">Элементы верхнего меню <Button onClick={handleShow} variant="outline-success">+ Создать</Button></div>
                 <ListGroup>
                     {
-                        menuItems.map((value:any) => {
-                                //return <div>{menuItems[key][0].menu_id}</div>
-                                return <ListGroup.Item action id={value.id} onClick={(e)=>selectItem(value.id)} eventKey={value.id}>{value.name}</ListGroup.Item> 
+                        menuItems.map((value:any, i: number) => {
+                                return <ListGroup.Item action id={value.id} onClick={(e)=>selectItem(value.id)} eventKey={value.id}>{value.title}<div className="right-panel"><span><i onClick={()=>removeMenu(value.id, i)} className="bi bi-trash3-fill"></i></span></div></ListGroup.Item> 
                         })
                    
                            
                     }
                 </ListGroup>
             </div>
-            <div className="col-3">
+            <div className="col-30">
                 <div className="col-title">Страницы меню</div>
                 <ListGroup>
                    {
                     menuPages.map((v:PageItem, i: number)=>(
-                        <ListGroup.Item eventKey={v.id}><div>{v.title}<div className="right-panel"><span><i className="bi bi-pencil-fill"></i><i onClick={()=>removeMenuItem(v.id, i)} className="bi bi-trash3-fill"></i></span></div></div></ListGroup.Item>
+                        <ListGroup.Item eventKey={v.id}><div>{v.title}<div className="right-panel"><span><i onClick={()=>removeMenuItem(v.id, i)} className="bi bi-trash3-fill"></i></span></div></div></ListGroup.Item>
                     ))
                    }
                 </ListGroup>
@@ -113,16 +170,52 @@ export default function PageManager({setpageTabtype, setKey, setEditPageName}: a
             <div className="middle-column">
                 <i onClick={addPageToMenu} className={"bi bi-arrow-left "+((selectedPage!==undefined || selectedMenuId!==undefined)?"":"hide")}></i>    
             </div>
-            <div className="col-3">
+            <div className="col-30">
                 <div className="col-title">Все страницы <Button onClick={createPage} variant="outline-success">+ Создать</Button></div>
                 <ListGroup>
                     {
                         allPages.map((v:PageType)=>(
-                            <ListGroup.Item action onClick={(e)=>selectPage(v)} eventKey={v.name}>{v.title}</ListGroup.Item> 
+                            <ListGroup.Item action onClick={(e)=>selectPage(v)} eventKey={v.name}>{v.title}<div className="right-panel"><span><i onClick={()=>handleEditPage(v)} className="bi bi-pencil-fill"></i><i onClick={()=>removePage(v)} className="bi bi-trash3-fill"></i></span></div></ListGroup.Item> 
                         ))
                     }
                 </ListGroup>
             </div>
+            <Modal show={showModal} onHide={handleClose}>
+                  <Modal.Header closeButton>
+                    <Modal.Title>Новое меню</Modal.Title>
+                  </Modal.Header>
+                  <Modal.Body>
+                    <Form validated={validated} onSubmit={handleSubmit}>
+                      <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
+                        <Form.Label>Введите имя нового меню</Form.Label>
+                        <Form.Control
+                          required
+                          type="text"
+                          onChange={handleChangeName}
+                          placeholder=""
+                          autoFocus
+                        />
+                      </Form.Group>
+                      <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
+                        <Form.Label>Введите видимый заголовок меню</Form.Label>
+                        <Form.Control
+                          required
+                          type="text"
+                          onChange={handleChangeTitle}
+                          placeholder=""
+                        />
+                      </Form.Group>
+                      <Button type="submit" variant="primary">
+                      Сохранить
+                    </Button>
+                    <Button variant="secondary" onClick={handleClose}>
+                      Отмена
+                    </Button>
+                    </Form>
+                  </Modal.Body>
+                  <Modal.Footer>
+                  </Modal.Footer>
+                </Modal>
         </div>
     )
 }

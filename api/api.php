@@ -30,6 +30,32 @@
             $page_filename = PAGES . $id . ".html";
             return file_get_contents($page_filename);
         }
+
+        protected function editPage(){
+            $page_name = $_POST['page'];
+            $page_filename = PAGES . $page_name . ".html";
+            $files = $_FILES;
+            foreach($files as $file){
+                $uploadFile = array("file"=>$file);
+                $this->uploadFile($uploadFile);
+            }
+            file_put_contents($page_filename, $_POST['content']);
+        }
+
+        protected function removePage(){
+            $page_id = $this->data->page_id;
+            $page_name = $this->data->page_name;
+            $page_filename = PAGES . $page_name . ".html";
+            unlink($page_filename);
+            $db = new SQLite3(DB."db.sqlite");
+            $db->exec("DELETE FROM pages WHERE id=$page_id");
+        }
+
+        protected function removeMenu(){
+            $menu_id = $this->data->menu_id;
+            $db = new SQLite3(DB."db.sqlite");
+            $db->exec("DELETE FROM menus WHERE id=$menu_id");
+        }
         
         protected function getTickets($data){
             $db = new SQLite3(DB."db.sqlite");
@@ -362,6 +388,36 @@
         $db->close();
     }
 
+    // getting top menu
+    protected function getMenu(){
+        $db = new SQLite3(DB."db.sqlite");
+        $res = $db->query("SELECT t1.name, t1.title as menu_title, t3.name as page_name, t3.title FROM menus as t1 LEFT JOIN menu_2_page as t2 ON t1.id=t2.menu_id LEFT JOIN pages as t3 ON t2.page_id=t3.id");
+        $menu = array();
+        while($row = $res->fetchArray(SQLITE3_ASSOC)){
+            if($row['page_name']!=null){
+                $menu[$row['name']]['title'] = $row['menu_title'];
+                $menu[$row['name']]['submenu'][] = $row;
+                
+            }
+            else{
+               $menu[$row['name']]['title'] = $row['menu_title'];
+               $menu[$row['name']]['name'] = $row['name'];
+            }
+        }
+        $db->close();
+        return $menu;
+    }
+
+    protected function createMenuItem(){
+        $db = new SQLite3(DB."db.sqlite");
+        $menu_name = $this->data->menu_name;
+        $menu_title = $this->data->menu_title;
+        $db->exec("INSERT INTO menus(name, title) VALUES('$menu_name', '$menu_title')");
+        $menuId = $db->lastInsertRowID();
+        $db->close();
+        return array("title"=>$menu_title, "id"=>$menuId);
+    }
+
     protected function getMenuItems(){
         $db = new SQLite3(DB."db.sqlite");
         // query for getting all menu items
@@ -374,6 +430,7 @@
         $res = $db->query("SELECT * FROM pages");
         while($row = $res->fetchArray(SQLITE3_ASSOC))
             $pages[] = $row;
+        $db->close();
         return array("menus"=>$menus, "pages"=>$pages);
     }
 

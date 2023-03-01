@@ -579,13 +579,14 @@ div.suggestPopupContent div table tbody tr td.item-selected{
     height: 100%;
 }
 
-.block-wrapper > .col-3{
-    width: 300px;
+.block-wrapper > .col-30{
+    min-width: 300px;
+    max-width: 30%;
     margin-right: 20px;
     display: inline-block;
 }
 
-.block-wrapper > .col-3, .middle-column{
+.block-wrapper > .col-30, .middle-column{
     min-height: 300px;
     max-height: 500px;
     overflow-y: hidden;

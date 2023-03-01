@@ -1,5 +1,4 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import Modal from 'react-bootstrap/Modal';
@@ -39,11 +38,12 @@ var formData = new FormData(),
     Images:typeImagesArrayrray[] = [];
 
 var imageNames: Array<string> = [];
-export default function PageEditor({editPageName, setEditPageName}: {editPageName:string, setEditPageName: React.Dispatch<React.SetStateAction<string>>}){
+export default function PageEditor({editPageName, setEditPageName, mode}: {editPageName:string, setEditPageName: React.Dispatch<React.SetStateAction<string>>, mode: number}){
 
     const [show, setShow] = useState(false),
           [pageName, setPageName] = useState(""),
           [saving, setSaving] = useState(false);
+    const [model, setModel] = useState("");             // content of Froala editor
     const [validated, setValidated] = useState(false);
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
@@ -52,6 +52,18 @@ export default function PageEditor({editPageName, setEditPageName}: {editPageNam
        if(value.length<128)
           setPageName((e.target.value) ? e.target.value:''); 
       }
+    
+      useEffect(()=>{
+        if(mode==2){
+          request({method: "post", data:{action: "getPage", data: {page_id: editPageName}}}).then(response => {
+            const {data} = response;
+            setModel(data);
+          });
+        }
+        else
+          setModel("");
+      }, [mode]);
+
     let config = {
         placeholder: "Edit Me",
         height: screenHeight,
@@ -109,7 +121,7 @@ export default function PageEditor({editPageName, setEditPageName}: {editPageNam
             }
           
           }}
-    const [model, setModel] = useState("");
+    
 
     const handleModelChange = (data: string) => {
         setModel(data);
@@ -138,24 +150,43 @@ export default function PageEditor({editPageName, setEditPageName}: {editPageNam
 
     const save = () => {
       setSaving(true);
-      setEditPageName(pageName);
       handleClose();
       let content = $(model),
             i = 0;
+      content.wrap("<div class='wrapContent'></div>");
         content.find('img').each(function(){
-          $(this).attr('src', "./img/"+imageNames[i]);
-          i++;
+          if(imageNames[i]){
+            if($(this).attr('src')?.indexOf("./img/")==-1){
+              $(this).attr('src', "./img/"+imageNames[i]);
+              i++;
+            }
+          }
         });
         formData.delete('content');
         formData.delete('action');
-        formData.delete('pagename', );
-        formData.append('content', content.html());
-        formData.append('action', 'createPage');
-        formData.append('page', pageName);
-        request({method: "post", headers: {"Content-Type": "multipart/form-data"}, data: formData});
+        formData.delete('pagename');
+        var html = $("<div />").append(content.clone()).html();
+        formData.append('content', html);
+        if(mode==1)
+          createPage();
+        else
+          editPage();
         setTimeout(()=>{
           setSaving(false);
         }, 2000);
+    }
+
+    const editPage = () => {
+      formData.append('action', 'editPage');
+      formData.append('page', editPageName);
+      request({method: "post", headers: {"Content-Type": "multipart/form-data"}, data: formData});
+    }
+
+    const createPage = () => {
+      setEditPageName(pageName);
+      formData.append('action', 'createPage');
+      formData.append('page', pageName);
+      request({method: "post", headers: {"Content-Type": "multipart/form-data"}, data: formData});
     }
 
     return (
