@@ -1,16 +1,15 @@
-import {useState} from "react";
+import {useState, useEffect} from "react";
 import Tab from 'react-bootstrap/Tab';
 import Tabs from 'react-bootstrap/Tabs';
 import Tickets from './Tickets'
 import PageManager from './PageManager'
 import PageEditor from './PageEditor'
 import CloseButton from 'react-bootstrap/CloseButton';
-
+import UsersManager from './Users'
 
 function TabTitle({tab_type, setpageTabtype, setKey, editPageName}:{tab_type: number, setpageTabtype: React.Dispatch<React.SetStateAction<number>>, setKey: React.Dispatch<React.SetStateAction<string>>,  editPageName: string}){
 
     const closeTab = () => {
-        setKey("newpage");
         setpageTabtype(0);
     }
 
@@ -23,6 +22,11 @@ export default () => {
     const [key, setKey] = useState('tickets'),
           [pageTabtype, setpageTabtype] = useState(0),
           [editPageName, setEditPageName] = useState("");
+
+    useEffect(()=>{
+        if(pageTabtype==0)
+            setKey("pagemanager");
+    }, [pageTabtype]);
 
     return (
         <div className="container admin-container">
@@ -41,12 +45,17 @@ export default () => {
                     <Tab eventKey="settings" title="Параметры">
                         Profile
                     </Tab>
+                    <Tab eventKey="users" title="Пользователи">
+                        <UsersManager />
+                    </Tab>
                     <Tab eventKey="pagemanager" title="Менеджер страниц">
                         <PageManager setpageTabtype={setpageTabtype} setKey={setKey} setEditPageName={setEditPageName} />
                     </Tab>
-                    <Tab eventKey="newpage" tabClassName={(pageTabtype!=0)?'':'hide'} title={<TabTitle tab_type={pageTabtype} editPageName={editPageName} setpageTabtype={setpageTabtype} setKey={setKey}/>}>
-                        <PageEditor editPageName={editPageName} setEditPageName={setEditPageName} mode={pageTabtype}/>
-                    </Tab>
+                    { (pageTabtype!=0) && (
+                        <Tab eventKey="newpage" tabClassName={(pageTabtype!=0)?'':'hide'} title={<TabTitle tab_type={pageTabtype} editPageName={editPageName} setpageTabtype={setpageTabtype} setKey={setKey}/>}>
+                            <PageEditor editPageName={editPageName} setEditPageName={setEditPageName} mode={pageTabtype}/>
+                        </Tab>
+                    )}
                 </Tabs>
             </div>
         </div>

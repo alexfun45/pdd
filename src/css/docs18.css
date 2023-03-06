@@ -784,6 +784,11 @@ div.suggestPopupContent div table tbody tr td.item-selected{
     margin-left: 40px;
     border-spacing: 10px;
     text-align: left;
+    color: #333;
+}
+
+.users-table tr{
+    border: none;
 }
 
 .users-table th{
@@ -792,7 +797,8 @@ div.suggestPopupContent div table tbody tr td.item-selected{
 }
 
 .users-table th, td{
-    padding: 12px 17px;
+    padding: 12px 17px !important;
+    border: none;
 }
 
 .users-table td{
@@ -1038,5 +1044,41 @@ div.suggestPopupContent div table tbody tr td.item-selected{
 
     .right-panel i:hover{
         color:rgb(34, 33, 33);
+        cursor: pointer;
+    }
+
+    .fr-wrapper > div:first-child > a{
+        display: none !important;
+    }
+
+    .input_field{
+        display: block;
+        padding: 10 15px;
+        margin-bottom: 15px;
+    }
+
+    .input_field > input{
+        width: 100%;
+        height: 30px;
+        font-size: 16px;
+        padding: 4px;
+        border-radius: 5px;
+    }
+
+    .btn-wrapper{
+        text-align: right;
+    }
+
+    .btn-wrapper > button{
+        margin-right: 7px;
+    }
+
+    .btn-panel > i{
+        margin-right: 4px;
+        color: #333;
+    }
+
+    .btn-panel > i:hover{
+        color:#337ab7;
         cursor: pointer;
     }

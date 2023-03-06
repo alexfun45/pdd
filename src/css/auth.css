@@ -35,7 +35,7 @@
   color:rgb(223, 45, 45);
   font-size: 12px;
   margin: 3px 4px;
-  height: 12px;
+  height: auto;
 }
 
 .mainContainer{

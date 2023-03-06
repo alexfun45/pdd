@@ -250,30 +250,37 @@
     }
 
     function addNewUser($token = ''){
-        $login = $_POST['login'];
-        $email = $_POST['email'];
+        $login = $this->data->login;
+        $name = $this->data->name;
+        $email = $this->data->email;
+        $role = $this->data->role;
         $confirmed = ($token=='') ? 1:0;
         $role = (array_key_exists("role", $_POST)) ? $_POST['role'] : 3;
-        if(isset($login) && isset($_POST['password']) && isset($role)){
+        if(isset($login) && isset($this->data->password) && isset($role)){
             $db = new SQLite3(DB."db.sqlite");
-            $password = md5($_POST['password']);
-            $sql = "INSERT INTO users(login, password, email, role, token, confirmed) VALUES('$login', '$password', '$email', '$role', '$token', '$confirmed')";
+            $password = md5($this->data->password);
+            $sql = "INSERT INTO users(login, name, password, email, role, token, confirmed) VALUES('$login', '$name', '$password', '$email', '$role', '$token', '$confirmed')";
             $db->exec($sql);
             $db->close();
         }
     }
 
     function editUser(){
-        $user = json_decode($_POST['user']);
+        $login = $this->data->login;
+        $name = $this->data->name;
+        $email = $this->data->email;
+        $id = $this->data->id;
+        $role = $this->data->role;
         $db = new SQLite3(DB."db.sqlite");
-        $db->exec("UPDATE users SET login='{$user->login}', role='{$user->role}', email='{$user->email}' WHERE id=$user->id");
+        $db->exec("UPDATE users SET login='$login', name='$name', role=$role, email='$email' WHERE id=$id");
         $db->close();
         return true;
     }
 
     function removeUser(){
         $db = new SQLite3(DB."db.sqlite");
-        $db->exec("DELETE FROM users WHERE id='{$_POST['id']}'");
+        $user_id = $this->data->user_id;
+        $db->exec("DELETE FROM users WHERE id=$user_id");
         $db->close();
         return true;
     }
@@ -289,7 +296,7 @@
 
     function getUsers(){
         $db = new SQLite3(DB."db.sqlite");
-        $sql = "SELECT id, login, email, role FROM users";
+        $sql = "SELECT id, name, login, email, role FROM users";
         $res = $db->query($sql);
         while($user = $res->fetchArray(SQLITE3_ASSOC)){
             $users[] = $user;

@@ -35,7 +35,7 @@ type typeImagesArrayrray = {
   type: string;
 };
 var formData = new FormData(),
-    Images:typeImagesArrayrray[] = [];
+Images:typeImagesArrayrray[] = [];
 
 var imageNames: Array<string> = [];
 export default function PageEditor({editPageName, setEditPageName, mode}: {editPageName:string, setEditPageName: React.Dispatch<React.SetStateAction<string>>, mode: number}){
