@@ -34,11 +34,15 @@ export default () => {
           [showPasswordDialog, setPasswordDialog] = useState(false),
           [showUserDialog, setUserDialog] = useState('hide');
 
-    useEffect(()=>{
+    const getUsers = () => {
         request({method: 'post', data: {action: 'getUsers'}}).then(response => {
             const {data} = response;
             setUsers(data);
         });
+    }
+
+    useEffect(()=>{
+        getUsers();
     }, []);
 
     // show create new user dialog
@@ -59,7 +63,7 @@ export default () => {
 
     const deleteUser = () => {
         request({method: 'post', data: {action: 'removeUser', data: {user_id: selUser.id}}}).then(response=>{
-            setReset(!reset);
+            getUsers();
         });
         setShowDeleteModal(false);
     }

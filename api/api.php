@@ -376,7 +376,7 @@
     protected function signup(){
         $token = $this->gen_token();
         $user_id = $this->addNewUser($token);
-        $link = "https://dev.traffic-rules.ru/#/authorize_confirmation/".$user_id ."/".$token;
+        $link = "https://dev.traffic-rules.ru/#/confirmation/".$user_id ."/".$token;
         $to      = $this->data->email;
         $subject = 'Подтверждение регистрации';
         $message = 'Для подтверждения регистрации перейдите по ссылке:<br/>';
@@ -386,7 +386,7 @@
         $headers .= "MIME-Version: 1.0\r\n";
         $headers .= "Content-Type: text/html; charset=UTF-8\r\n";
         $message = '<p>Для подтверждения регистрации перейдите по ссылке: '.$link.' </p>';
-        //mail($to, $subject, $message, $headers);
+        mail($to, $subject, $message, $headers);
     }
 
     protected function checkToken(){
