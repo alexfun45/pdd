@@ -13,7 +13,8 @@ type InputSingInTypes = {
 
 type InputSignUpTypes = {
     login2: string;
-    email: string;
+    name2: string;
+    email2: string;
     password2: string;
     cppassword: string;
 }
@@ -38,9 +39,12 @@ export default () => {
             }
         });
      } 
-    const onSubmit2 = (data: {login2:string, password2:string, email: string}) => {
-        console.log("data", data);
-    }
+    const onSubmit2 = (data: {login2:string, name2: string, password2:string, email2: string}) => {
+        request({method: "post", data: {action: "signup", data: {
+                    login: data.login2, password: data.password2, name: data.name2, email: data.email2}}}).then((response)=>{
+                        document.location.href = "./#/confirm";
+                });
+        }
 
     return (
         <>
@@ -91,8 +95,20 @@ export default () => {
                                 {<p className="error-msg">{errors2.login2 && errors2.login2.message}</p>}
                             </div>
                             <div className="input_field">
-                                <input type="email" {
-                                    ...register2("email", {
+                                <input type="name2" {
+                                    ...register2("name2", {
+                                        required: "Поле обязательно",
+                                        maxLength: 50,
+                                        pattern: {
+                                            value: /[а-яА-Яa-zA-Z]+$/i,
+                                            message: "допустимы только символы",
+                                            },
+                                        })}  placeholder="имя" className="input" />
+                                {<p className="error-msg">{errors2.name2 && errors2.name2.message}</p>}
+                            </div>
+                            <div className="input_field">
+                                <input type="email2" {
+                                    ...register2("email2", {
                                         required: "Поле обязательно",
                                         maxLength: 50,
                                         pattern: {
@@ -105,7 +121,7 @@ export default () => {
                                     }
                                 )}
                                     placeholder="e-mail" id="email" className="input" />
-                                    {<p className="error-msg">{errors2.email && errors2.email.message}</p>}
+                                    {<p className="error-msg">{errors2.email2 && errors2.email2.message}</p>}
                             </div>
                             <div className="input_field">
                                 <input type="password2"

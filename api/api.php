@@ -256,7 +256,7 @@
     protected function getProfile(){
         $db = new SQLite3(DB."db.sqlite");
         $id = $_SESSION['userId'];
-        $sql = "SELECT id, login, name, email, role FROM users WHERE id=$id";
+        $sql = "SELECT id, login, name, email, role, confirmed FROM users WHERE id=$id";
         $res = $db->query($sql);
         $result = $res->fetchArray(SQLITE3_ASSOC);
         $db->close();
@@ -275,7 +275,9 @@
             $password = md5($this->data->password);
             $sql = "INSERT INTO users(login, name, password, email, role, token, confirmed) VALUES('$login', '$name', '$password', '$email', '$role', '$token', '$confirmed')";
             $db->exec($sql);
+            $userId = $db->lastInsertRowID();
             $db->close();
+            return $userId;
         }
     }
 
@@ -355,7 +357,7 @@
         }
     }
 
-    function gen_token(){
+    protected function gen_token(){
         $token = md5(microtime() . 'salt' . time());
         return $token;
     }
@@ -371,11 +373,11 @@
 
     }
 
-    function signup(){
-        $token = gen_token();
-        addNewUser($token);
-        $link = "https://dev.traffic-rules.ru/?call=authorize_confirmation&key=".$token;
-        $to      = 'alexfun45@gmail.com';
+    protected function signup(){
+        $token = $this->gen_token();
+        $user_id = $this->addNewUser($token);
+        $link = "https://dev.traffic-rules.ru/#/authorize_confirmation/".$user_id ."/".$token;
+        $to      = $this->data->email;
         $subject = 'Подтверждение регистрации';
         $message = 'Для подтверждения регистрации перейдите по ссылке:<br/>';
         $headers  = "From: server\r\n";
@@ -384,9 +386,25 @@
         $headers .= "MIME-Version: 1.0\r\n";
         $headers .= "Content-Type: text/html; charset=UTF-8\r\n";
         $message = '<p>Для подтверждения регистрации перейдите по ссылке: '.$link.' </p>';
-        mail($to, $subject, $message, $headers);
-        //login();
-        //header('Location: ./');
+        //mail($to, $subject, $message, $headers);
+    }
+
+    protected function checkToken(){
+        $token = $this->data->token;
+        $userId = $this->data->userId;
+        $db = new SQLite3(DB."db.sqlite");
+        $sql = "SELECT id FROM users WHERE id=:id AND token=:token";
+        $stmt = $db->prepare($sql);
+        $stmt->bindParam(':id', $userId);
+        $stmt->bindParam(':token', $token);
+        $result = $stmt->execute();
+        $res = $result->fetchArray();
+        if($res!=false && $res!=null){
+            $db->exec("UPDATE users SET confirmed='1' WHERE id=$userId");
+            return true;
+        }
+        else
+            return false;
     }
 
     protected function transliterate($textcyr = null, $textlat = null) {

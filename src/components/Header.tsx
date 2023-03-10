@@ -44,7 +44,8 @@ function TopMenu() {
   const Logout = (e: React.MouseEvent) => {
     request({method: 'post', data:{ action: 'Logout'}});
     //setLogin(false);
-    navigate("/");
+    //navigate("/");
+    document.location.href = "./";
   }
 
   const topLevelMenu = [{title: "ПДД 2023", submenu:[{title: "Общие положения", href: "pdd1"}, {title: "Общие обязанности водителей", href:"pdd2"}]}, 
@@ -52,7 +53,7 @@ function TopMenu() {
     {title: "Изменения", submenu:[{title: "1 января 2022", href:""}]}, {title: "Экзамен", href: "pdd-online"}];
   
   return (
-    <div className={"top-level-menu "+(location.pathname=='/auth'?'hide':'')}>
+    <div className={"top-level-menu "+((location.pathname=='/auth' || location.pathname=='/confirm')?'hide':'')}>
       <Admin Logout={Logout} isLogin={context.logged} role={context.userRole}/>
       {Object.entries(TopMenu).map(
         (item: any, i: number) => {

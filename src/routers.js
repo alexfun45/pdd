@@ -3,6 +3,8 @@ import AdminPanel from "./components/AdminPanel"
 import Authorization from "./components/Authorization";
 import TestPdd from "./components/TestPdd"
 import Profile from "./components/Profile"
+import Confirmation from "./components/Confirmation"
+import AuthConfirm from "./components/AuthConfirm"
 
 const routes = [
     {
@@ -34,6 +36,16 @@ const routes = [
         route: "profile/",
         component: <Profile />,
         key: "profile"
+    },
+    {
+        route: "confirm/",
+        component: <Confirmation />,
+        key: "confirmation"
+    },
+    {
+        route: "confirmation/:userid/:secret",
+        component: <AuthConfirm />,
+        key: "authorize_confirmation"
     }
 ];
 
