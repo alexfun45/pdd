@@ -2,6 +2,7 @@ import {useState, useEffect} from 'react'
 import Table from 'react-bootstrap/Table'
 import {Modal, Button} from 'react-bootstrap';
 import DialogUser from './Tickets/EditUserDialog'
+import PasswordDialog from './Tickets/ChangePasswordDialog'
 import request from '../utils/request'
 
 type userType = {
@@ -22,12 +23,15 @@ const defaultEmptyUser = {
     role: 3,
     password: ""
 }
-let selUser = defaultEmptyUser;
+let selUser = defaultEmptyUser,
+    userId = 0;
 
 export default () => {
 
     const [users, setUsers] = useState<userType[]>([]),
+          [reset, setReset] = useState(false),
           [showDeleteModal, setShowDeleteModal] = useState(false),
+          [showPasswordDialog, setPasswordDialog] = useState(false),
           [showUserDialog, setUserDialog] = useState('hide');
 
     useEffect(()=>{
@@ -35,7 +39,7 @@ export default () => {
             const {data} = response;
             setUsers(data);
         });
-    }, [users]);
+    }, []);
 
     // show create new user dialog
     const handleDialog = () => {
@@ -55,15 +59,21 @@ export default () => {
 
     const deleteUser = () => {
         request({method: 'post', data: {action: 'removeUser', data: {user_id: selUser.id}}}).then(response=>{
-            setUsers([]);
+            setReset(!reset);
         });
         setShowDeleteModal(false);
+    }
+
+    const changePassword = (user_id: number) => {
+        userId = user_id;
+        setPasswordDialog(true);
     }
 
     return (
         <div style={{textAlign: 'left'}}>
             <DialogUser showUserDialog={showUserDialog} setUserDialog={setUserDialog} selectedUser={selUser} users={users} setUsers={setUsers} />
-            <Button onClick={handleDialog} style={{marginLeft: '20px'}} variant="primary" >Добавить пользователя</Button>
+            <PasswordDialog userId={userId} showPasswordDialog={showPasswordDialog} setShow={setPasswordDialog}  />
+            <Button onClick={handleDialog} style={{marginLeft: '20px'}} variant="primary">Добавить пользователя</Button>
             <Table className="users-table" responsive>
                 <thead>
                     <tr>
@@ -83,7 +93,7 @@ export default () => {
                                     <td>{v.login}</td>
                                     <td>{v.email}</td>
                                     <td className="role-cell">{roleNames[v.role-1]}</td>
-                                    <td><span className='btn-panel'><i onClick={(e)=>handleEditUser(v)} className="bi bi-pencil-fill"></i><i onClick={()=>{ selUser = v; setShowDeleteModal(true)}} className="bi bi-trash3-fill"></i></span></td>
+                                    <td><span className='btn-panel'><i onClick={(e)=>handleEditUser(v)} className="bi bi-pencil-fill"></i><i onClick={()=>{ selUser = v; if(v.id!=1) setShowDeleteModal(true)}} className="bi bi-trash3-fill"></i><i onClick={()=>changePassword(v.id)} title="изменить пароль" className="bi bi-key-fill"></i></span></td>
                                 </tr>
                              </>  
                         )

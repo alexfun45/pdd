@@ -1,4 +1,4 @@
-import {useState, useEffect} from "react";
+import React, {useState, useEffect} from "react";
 import Tab from 'react-bootstrap/Tab';
 import Tabs from 'react-bootstrap/Tabs';
 import Tickets from './Tickets'
@@ -6,8 +6,10 @@ import PageManager from './PageManager'
 import PageEditor from './PageEditor'
 import CloseButton from 'react-bootstrap/CloseButton';
 import UsersManager from './Users'
+import Settings from './Settings'
+import {AppContext} from '../app'
 
-function TabTitle({tab_type, setpageTabtype, setKey, editPageName}:{tab_type: number, setpageTabtype: React.Dispatch<React.SetStateAction<number>>, setKey: React.Dispatch<React.SetStateAction<string>>,  editPageName: string}){
+function TabTitle({tab_type, setpageTabtype, setKey, editPageName}:{tab_type: number, setpageTabtype: React.Dispatch<React.SetStateAction<number>>, setKey: React.Dispatch<React.SetStateAction<string>>, editPageName: string}){
 
     const closeTab = () => {
         setpageTabtype(0);
@@ -19,6 +21,7 @@ function TabTitle({tab_type, setpageTabtype, setKey, editPageName}:{tab_type: nu
 }
 
 export default () => {
+    const context = React.useContext(AppContext);
     const [key, setKey] = useState('tickets'),
           [pageTabtype, setpageTabtype] = useState(0),
           [editPageName, setEditPageName] = useState("");
@@ -42,12 +45,16 @@ export default () => {
                     <Tab eventKey="tickets" title="Билеты">
                         <Tickets />
                     </Tab>
-                    <Tab eventKey="settings" title="Параметры">
-                        Profile
-                    </Tab>
-                    <Tab eventKey="users" title="Пользователи">
-                        <UsersManager />
-                    </Tab>
+                    {(context.userRole==1) && (
+                        <Tab eventKey="settings" title="Настройки">
+                            <Settings />
+                        </Tab>
+                    )}
+                    {(context.userRole==1) && (
+                        <Tab eventKey="users" title="Пользователи">
+                            <UsersManager />
+                        </Tab>
+                    )}
                     <Tab eventKey="pagemanager" title="Менеджер страниц">
                         <PageManager setpageTabtype={setpageTabtype} setKey={setKey} setEditPageName={setEditPageName} />
                     </Tab>

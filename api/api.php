@@ -229,11 +229,11 @@
         $dom->save($config_file);
     }
 
-    protected function isLogin($data){
-        if(isset($_SESSION['logged'])) return true;
-        if (isset($_COOKIE["login"]) && isset($_COOKIE["password"])){
+    protected function getUserRole($data){
+       if(isset($_SESSION['logged'])) return array("logged"=>true, "id"=>$_SESSION['userId'], "role"=>$_SESSION['role'], "login"=>$_SESSION["login"], "name"=>$_SESSION["name"], "email"=>$_SESSION["email"]);
+        if(isset($_COOKIE["login"]) && isset($_COOKIE["password"])){
             $db = new SQLite3(DB."db.sqlite");
-            $sql = "SELECT login, role FROM users WHERE login=:login AND password=:password";
+            $sql = "SELECT id, login, name, email, role FROM users WHERE login=:login AND password=:password";
             $stmt = $db->prepare($sql);
             $login = $_COOKIE["login"];
             $stmt->bindParam(':login', $login);
@@ -242,11 +242,25 @@
             $row = $result->fetchArray(SQLITE3_ASSOC);
             $_SESSION['logged'] = 1;
             $_SESSION['role'] = $row['role'];
+            $_SESSION['login'] = $row['login'];
+            $_SESSION['name'] = $row['name'];
+            $_SESSION['email'] = $row['email'];
+            $_SESSION['id'] = $row['id'];
             $stmt->close();
-            return ($row['login']!=null);
+            return array("logged"=>($row['login']!=null), "id"=>$row["id"], "role"=>$row["role"], "login"=>$row["login"], "name"=>$row["name"], "email"=>$row["email"]);
         }
         else
-            return false; 
+            return false;
+    }
+
+    protected function getProfile(){
+        $db = new SQLite3(DB."db.sqlite");
+        $id = $_SESSION['userId'];
+        $sql = "SELECT id, login, name, email, role FROM users WHERE id=$id";
+        $res = $db->query($sql);
+        $result = $res->fetchArray(SQLITE3_ASSOC);
+        $db->close();
+        return $result;
     }
 
     function addNewUser($token = ''){
@@ -285,6 +299,16 @@
         return true;
     }
 
+    protected function changePassword(){
+        $db = new SQLite3(DB."db.sqlite");
+        $userId = $this->data->userId;
+        $password = md5($this->data->password);
+        $sql = "UPDATE users SET password='$password' WHERE id=$userId";
+        $db->exec($sql);
+        $db->close(); 
+        return $password;
+    }
+
     function logout(){
         setcookie("login", null, -1);
         setcookie("password", null, -1);
@@ -305,15 +329,11 @@
         return $users;
     }
 
-    function getUserRole(){
-        return $_SESSION['role'];
-    }
-
     protected function login(){
         if(isset($this->data->login) && isset($this->data->password) && strlen($this->data->login)<128 && strlen($this->data->password)<128){
             $db = new SQLite3(DB."db.sqlite");
             $password = md5($this->data->password);
-            $sql = "SELECT login, role FROM users WHERE login=:login AND password=:password";
+            $sql = "SELECT id, login, role FROM users WHERE login=:login AND password=:password";
             $stmt = $db->prepare($sql);
             $stmt->bindParam(':login', $this->data->login);
             $stmt->bindParam(':password', $password);
@@ -325,7 +345,9 @@
                 setcookie("password", $password, time() + 30*24*3600);
                 $_SESSION['logged'] = 1;
                 $_SESSION['role'] = $user['role'];
+                $_SESSION['userId'] = $user['id'];
                 $stmt->close();
+                //return $password;
                 return ($user!==false);
             }
             else
@@ -469,8 +491,33 @@
         return true;
     }
 
-}
+    protected function getSettings(){
+        $db = new SQLite3(DB."db.sqlite");
+        $res = $db->query("SELECT * FROM settings");
+        while($row = $res->fetchArray(SQLITE3_ASSOC))
+            $settings[$row['config_name']] = $row['value'];
+        $db->close();
+        return $settings;
+    }
 
+    protected function save_settings(){
+        $db = new SQLite3(DB."db.sqlite");
+        $uploadResult = $this->uploadFile($_FILES);
+        $image_name = ($uploadResult['success']) ? $uploadResult['filename'] : "";
+        $bgcolor = $_POST['bgcolor'];
+        if($bgcolor)
+            $db->exec("UPDATE settings SET value='$bgcolor' WHERE config_name='background-color'");
+        if($image_name)
+            $db->exec("UPDATE settings SET value='$image_name' WHERE config_name='background-image'");
+        $db->close();
+        }
+
+    protected function removeBgImage(){
+        $db = new SQLite3(DB."db.sqlite");
+        $db->exec("UPDATE settings SET value='' WHERE config_name='background-image'");
+        $db->close();
+        }
+    }
     $app = new Application();
     $app->run();
 ?>

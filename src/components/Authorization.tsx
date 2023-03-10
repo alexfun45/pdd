@@ -39,7 +39,7 @@ export default () => {
         });
      } 
     const onSubmit2 = (data: {login2:string, password2:string, email: string}) => {
-        
+        console.log("data", data);
     }
 
     return (
@@ -59,7 +59,7 @@ export default () => {
                                         required: "Field is required",
                                         maxLength: 50,
                                         pattern: {
-                                            value: /^[A-Za-z]+$/i,
+                                            value: /^[A-Za-z0-9]+$/i,
                                             message: "Пробелы недопустимы",
                                             },
                                         })} 
@@ -84,7 +84,7 @@ export default () => {
                                         required: "Поле обязательно",
                                         maxLength: 50,
                                         pattern: {
-                                            value: /^[A-Za-z]+$/i,
+                                            value: /^[A-Za-z0-9]+$/i,
                                             message: "Пробелы недопустимы",
                                             },
                                         })}  placeholder="логин" className="input" />
@@ -96,7 +96,7 @@ export default () => {
                                         required: "Поле обязательно",
                                         maxLength: 50,
                                         pattern: {
-                                            value: /^[A-Za-zа-яА-Я@\.]+$/i,
+                                            value: /^[A-Za-zа-яА-Я0-9@\.]+$/i,
                                             message: "Пробелы недопустимы",
                                         },
                                         validate: {
