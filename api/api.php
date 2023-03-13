@@ -303,9 +303,13 @@
 
     protected function changePassword(){
         $db = new SQLite3(DB."db.sqlite");
-        $userId = $this->data->userId;
+        $isUserId = (array_key_exists("userId", $this->data));
+        $id = ($isUserId) ? $this->data->userId : $this->data->email;
         $password = md5($this->data->password);
-        $sql = "UPDATE users SET password='$password' WHERE id=$userId";
+        if($isUserId)
+            $sql = "UPDATE users SET password='$password' WHERE id=$id";
+        else
+            $sql = "UPDATE users SET password='$password', token='' WHERE email='$id'"; 
         $db->exec($sql);
         $db->close(); 
         return $password;
@@ -381,12 +385,47 @@
         $subject = 'Подтверждение регистрации';
         $message = 'Для подтверждения регистрации перейдите по ссылке:<br/>';
         $headers  = "From: server\r\n";
-        //$headers .= "Reply-To: " . strip_tags($_POST['req-email']) . "\r\n";
-        //$headers .= "CC: susan@example.com\r\n";
         $headers .= "MIME-Version: 1.0\r\n";
         $headers .= "Content-Type: text/html; charset=UTF-8\r\n";
         $message = '<p>Для подтверждения регистрации перейдите по ссылке: '.$link.' </p>';
         mail($to, $subject, $message, $headers);
+    }
+
+    protected function email_recovery(){
+        $token = $this->gen_token();
+        $email = $this->data->email;
+        $db = new SQLite3(DB."db.sqlite");
+        $db->exec("UPDATE users SET token='$token' WHERE email='$email'");
+        $db->close();
+        $link = "https://dev.traffic-rules.ru/#/passwordrecovery/".$email ."/".$token;
+        $to      = $email;
+        $subject = 'Восстановление пароля';
+        $headers  = "From: server\r\n";
+        $headers .= "MIME-Version: 1.0\r\n";
+        $headers .= "Content-Type: text/html; charset=UTF-8\r\n";
+        $message = '<p>Для восстановления пароля перейдите по ссылке: '.$link.' </p>';
+        mail($to, $subject, $message, $headers);
+    }
+
+    protected function checkEmailToken(){
+        $token = $this->data->token;
+        $email = $this->data->email;
+        $db = new SQLite3(DB."db.sqlite");
+        $sql = "SELECT id FROM users WHERE email=:email AND token=:token AND token!=''";
+        $stmt = $db->prepare($sql);
+        $stmt->bindParam(':email', $email);
+        $stmt->bindParam(':token', $token);
+        $result = $stmt->execute();
+        $res = $result->fetchArray();
+        if($res!=false && $res!=null){
+            //$db->exec("UPDATE users SET token='' WHERE email=$email");
+            $db->close();
+            return true;
+        }
+        else{
+            $db->close();
+            return false;
+        }
     }
 
     protected function checkToken(){

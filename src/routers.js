@@ -5,6 +5,7 @@ import TestPdd from "./components/TestPdd"
 import Profile from "./components/Profile"
 import Confirmation from "./components/Confirmation"
 import AuthConfirm from "./components/AuthConfirm"
+import PasswordRecovery from "./components/PasswordRecovery"
 
 const routes = [
     {
@@ -26,6 +27,11 @@ const routes = [
         route: "auth",
         component: <Authorization />,
         key: "auth"
+    },
+    {
+        route: "passwordrecovery/:email/:secret",
+        component: <PasswordRecovery  />,
+        key: "passwordrecovery"
     },
     {
         route: "pdd-online",

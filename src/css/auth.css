@@ -165,3 +165,35 @@
   font-size: 25px;
    
 }
+
+.btn-control{
+  background: none;
+  color:rgba(5, 138, 199, 0.596);
+  cursor: pointer;
+  padding: 5px 12px;
+  font-weight: 500;
+  font-size: 18px;
+  border: none;
+}
+
+.btn-control:hover{
+  background-color: #68c9f0;
+}
+
+.top-btn-panel{
+  display: block;
+  position: absolute;
+  top: 5px;
+  left: 5px;
+}
+
+.tab-content{
+  margin-top: 20px;
+  font-size: 16px;
+  font-weight: 400;
+}
+
+.tab-content .form-label{
+  font-size: 16px;
+  font-weight: 400;
+}

@@ -67,7 +67,7 @@ export default function App(){
       <AppContext.Provider value={{user: user, logged: isLogin, userRole: role}}>
           <HashRouter>
             <Header />
-            <div id="maincontainer" className="container">
+            <div id="maincontainer" className="containerWrapper">
               <Routes>
                   {
                     getRoutes(routes)  

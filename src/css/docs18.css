@@ -1,3 +1,6 @@
+html{
+    height: 100%;
+}
 body {
     font-family: Lato,Helvetica,Arial,sans-serif;
     font-size: 15px;
@@ -5,6 +8,8 @@ body {
     color: #333;
     background-color: #fff;
     font-weight: 300;
+    height: 100%;
+    overflow: hidden;
 }
 
 .punkframe{
@@ -14,9 +19,24 @@ body {
 
 }
 
-/*.container {
-    position: relative;
-}*/
+.containerWrapper{
+    height: 100%;
+    overflow: hidden;
+}
+
+.container {
+    max-height: 90%;
+    overflow-y: scroll;
+    padding-right: 17px;
+    box-sizing: content-box;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.container::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+}
 
 .img-znak-comment{
     max-height: 40px;
@@ -139,7 +159,7 @@ body {
 
 .top-level-menu{
     width: 100%;
-    border-bottom: 1px solid #e7e7e7;
+    /*border-bottom: 1px solid #e7e7e7;*/
     text-align: center;
 }
 
@@ -981,6 +1001,10 @@ div.suggestPopupContent div table tbody tr td.item-selected{
     .btn-cancel{
         background-color: #777;
         color: #FFF;
+    }
+
+    .btn{
+        margin-right: 5px;
     }
     
     #buttonPanel.btn-group-sm > button , #buttonPanel1 > button, #buttonPanel2 > button, #buttonPanel3 > button , #buttonPanel4 > button {
