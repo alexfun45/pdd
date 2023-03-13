@@ -15,7 +15,7 @@ export default () => {
     const [isSuccess, setResult] = useState(false),
           params = useParams(),
           {register, handleSubmit, watch, formState: { errors } } = useForm<PasswordRecoveryType>({mode: 'onBlur'});
-
+    let navigate = useNavigate();
     useEffect(()=>{
             request({method: "post", data: {action: "checkEmailToken", data: {email: params.email, token: params.secret}}}).then(response=>{
                 const {data} = response;
@@ -27,9 +27,7 @@ export default () => {
     const onSubmit = (data: PasswordRecoveryType) => { 
         
             request({method: "post", data: {action: "changePassword", data: {email: params.email, password: data.password}}}).then(()=>{
-                setTimeout(()=>{
-                    //document.location.href = "./";
-                }, 3000);
+                document.location.href = "./#/auth";
             });        
     };
 

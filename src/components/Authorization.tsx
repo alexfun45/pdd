@@ -84,12 +84,6 @@ export default () => {
         setForgot(false);
     }
 
-    const isLoginExists = (v: string) => {
-        let isExist = users.find(user => {return user.login==v});
-        console.log("isExist", (isExist!==undefined));
-        return (isExist!==undefined);
-    }
-
     useEffect(()=>{
         request({method: 'post', data: {action: 'getUsers'}}).then(response => {
             const {data} = response;
