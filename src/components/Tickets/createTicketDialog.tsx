@@ -2,6 +2,7 @@ import React, {useState, useEffect, MutableRefObject, ReactEventHandler} from "r
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import {useForm} from 'react-hook-form'
+import $ from 'jquery'
 import request from '../../utils/request'
 
 type InputSignInTypes = { 
@@ -39,10 +40,13 @@ type TicketDialog = {
     variants: answerType[]
 }
 
+var formData = new FormData();
+
 export default ({show, ticket, editMode, setShow}: {show: boolean, ticket: TicketDialog, editMode: boolean, setShow: Function}) => {
 
-    let formData = new FormData();
+    
     const [text, setText] = useState(ticket.text),
+          [img, setImg] = useState(ticket.image),
           [correct_id, setCorrect] = useState(ticket.correct_id);
     let [answers, setAnswers] = useState<any[]>(ticket.variants);
 
@@ -50,6 +54,7 @@ export default ({show, ticket, editMode, setShow}: {show: boolean, ticket: Ticke
         setText(ticket.text);
         setAnswers(ticket.variants);
         setCorrect(ticket.correct_id);
+        setImg(ticket.image);
     }, [ticket]);
 
     const handleClose = () => {
@@ -59,6 +64,8 @@ export default ({show, ticket, editMode, setShow}: {show: boolean, ticket: Ticke
     const uploadImage =(e: React.ChangeEvent<HTMLInputElement>) => {
         let file = (e.target.files) ? e.target.files[0]:'';
         formData.append('file', file);
+        //console.log("file", file);
+        //console.log("formData", formData);
     }
 
     const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -78,6 +85,43 @@ export default ({show, ticket, editMode, setShow}: {show: boolean, ticket: Ticke
     }
 
     const onSubmit = () => {
+        console.log("formData1", formData);
+        if(editMode){
+            formData.append("action", "editTicket");
+            formData.append("ticket_id", ticket.id.toString());
+        }
+        else
+            formData.append("action", "addTicket");
+        formData.append("text", text);
+        formData.append("correct", correct_id.toString());
+        formData.append("variants", JSON.stringify(answers));
+
+        $.ajax({
+            type: "POST",
+            enctype: 'multipart/form-data',
+            url: './api/api.php',
+            data: formData,
+            cache: false,
+            processData: false,
+            contentType: false,
+            timeout: 800000,
+            success: function(data) {
+                handleClose();
+                formData.delete('action');
+                formData.delete('ticket_id');
+                formData.delete('text');
+                formData.delete('variants');
+                formData.delete('correct');
+                formData.delete('file');
+            },
+            error: function(e) {
+              console.log("ERROR : ", e);
+            }
+          });
+    }
+
+    const onSubmit2 = () => {
+        
         if(editMode){
             formData.append("action", "editTicket");
             formData.append("ticket_id", ticket.id.toString());
@@ -89,7 +133,14 @@ export default ({show, ticket, editMode, setShow}: {show: boolean, ticket: Ticke
         formData.append("variants", JSON.stringify(answers));
         request({method: "post", headers: {"Content-Type": "multipart/form-data"}, data: formData}).then(()=>{
             handleClose();
+            formData.delete('action');
+            formData.delete('ticket_id');
+            formData.delete('text');
+            formData.delete('variants');
+            formData.delete('correct');
+            formData.delete('file');
         })
+        
     }
 
     const handleRemove = () => {
@@ -119,7 +170,7 @@ export default ({show, ticket, editMode, setShow}: {show: boolean, ticket: Ticke
                             <input onChange={handleInput} value={text} type="text" name="text" id="ticket_text" className="text required ui-widget-content ui-corner-all" />
                             <label>Изображение</label>
                             <img style={{maxWidth: "90%"}} src={(ticket.image!="")?("./img/"+ticket.image):""} id="t_img" />
-                            <input type="file" onChange={uploadImage} name="image" id="ticket_image" className="text ui-widget-content ui-corner-all" />
+                            <input type="file" accept="image/*" onChange={uploadImage} name="files[]" id="ticket_image" className="text ui-widget-content ui-corner-all" />
                             <label>Варианты ответов:</label>
                             <div className="answers_block">
                                {

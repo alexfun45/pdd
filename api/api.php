@@ -4,7 +4,7 @@
     require_once("../init.php");
     $IMAGE_PATH = __DIR__ . '/img/';
     $PAGE_DIR = __DIR__ . 'pages/';
-    const PAGE_NUM = 3;
+    const PAGE_NUM = 30;
 
     class Application{
 

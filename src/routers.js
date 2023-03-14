@@ -35,8 +35,13 @@ const routes = [
     },
     {
         route: "pdd-online",
-        component: <TestPdd start={true} options={{num: 10, max_error:2, random: true, max: 1000}} />,
+        component: <TestPdd start={true} options={{num: 10, max_error:2, random: true, max: 1000, dblclick: false, settings: false}} />,
         key: "textpdd"
+    },
+    {
+        route: "pdd_for_school",
+        component: <TestPdd start={false} options={{num: 20, max_error: 2, random: false, max: 1000, dblclick: false, settings: true}} />,
+        key: "pdd_for_school"
     },
     {
         route: "profile/",

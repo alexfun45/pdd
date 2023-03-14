@@ -1,10 +1,17 @@
 
-import {useState, useEffect, useRef} from "react";
+import {useState, useEffect} from "react";
+import {useForm} from 'react-hook-form'
 import request from "../utils/request";
 
 type answersType = {
     answer: string;
     comment: string;
+}
+
+type InputSettings = {
+    surname: string;
+    name: string;
+    name2: string;
 }
 
 type TicketPdd = {
@@ -13,6 +20,15 @@ type TicketPdd = {
     success: string;
     variants: answersType[];
     isSuccess: number;
+}
+
+type testOptionsType = {
+    num: number;
+    max_error: number;
+    random: boolean;
+    max: number;
+    settings: boolean;
+    dblclick: boolean;
 }
 
 var  pdd_questions: TicketPdd[] = [],
@@ -47,14 +63,25 @@ function getTickets(options: any, callback: Function){
 
 
 
-const TestPdd = (props:any) => {
-    
+const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
+
     const [time, setTime] = useState("0:00"),
+          [options, setOptions] = useState({...props.options}),
           [currentTicket, setCurrentTicket] = useState(0),
           [currentQuestion, setCurrentQuestion] = useState<TicketPdd>(),
           [start, setStart] = useState(props.start),
           [opened, setOpened] = useState<number[]>([]),
           [endTest, setEndTest] = useState(false);
+
+    useEffect(()=>{
+        setEndTest(false);
+    }, [options])
+
+    const {register, handleSubmit, setError, watch, setValue, formState: {errors: errors2} } = useForm<InputSettings>({mode: 'onBlur'});
+
+    const onSubmit = (data: InputSettings) => {
+
+    };
 
     function setQuestion(){
         if(pdd_questions.length>0 && pdd_questions.length-1>=currentTicket)
@@ -130,17 +157,95 @@ const TestPdd = (props:any) => {
             setCurrentTicket(qIndx);
     }
 
+    // handle change test options
+    const handleChangeOption = (event: React.ChangeEvent<HTMLInputElement>, optionName: any) => {
+        setOptions({...options, [optionName]: event.target.value});
+    }
+
     useEffect(()=>{
         setOpened([]);
         setQuestion();
     }, [currentTicket]);
     
     useEffect(()=>{
-        startTest();
+        if(!props.options.settings)
+            startTest();
     }, []);
 
+
     return (
-        <>
+        <div className="container">
+            <div className={(props.options.settings===true)?"row":"hide"}>
+                <div className="col-md-12">
+            <form onSubmit={handleSubmit(onSubmit)} className="form-inline">
+                <div className="form-group">
+                    <label>Фамилия&nbsp;</label>
+                    <input {...register("surname", {
+                                            required: "Field is required",
+                                            maxLength: 50} 
+                            )}
+                        type="text" className="form-control" id="textSchoolName1" placeholder="Фамилия" />
+                </div>
+                <div className="form-group">
+                    <label>Имя&nbsp;</label>
+                    <input {...register("name", {
+                                            required: "Field is required",
+                                            maxLength: 50} 
+                            )} type="text" className="form-control" id="textSchoolName2" placeholder="Имя" />
+                </div>
+                <div className="form-group">
+                    <label>Отчество&nbsp;</label>
+                    <input {...register("name2", {
+                                            required: "Field is required",
+                                            maxLength: 50} 
+                            )} type="text" className="form-control" id="textSchoolName3" placeholder="Отчество" />
+                </div>
+
+                <button id="buttonSchoolSetName" type="button" className="btn btn-success">Начать</button>
+                <a className="btn" data-toggle="collapse" data-target="#collapseConf"
+                aria-expanded="false" aria-controls="collapseConf">
+                    <span className="glyphicon glyphicon-cog"></span> Настройки экзамена
+                </a>
+            </form>
+        <form id="collapseConf">
+            
+            <div id="examSizePanel" className="form-group">
+
+                <label>Вопросов</label>
+                <label className="radio-inline">
+                    <input onChange={(e)=>handleChangeOption(e, 'num')} type="radio" checked={options.num==20} name="examSize" id="examSize20" value="20"/>20
+                </label>
+                <label className="radio-inline">
+                    <input onChange={(e)=>handleChangeOption(e, 'num')} type="radio" checked={options.num==40} name="examSize" id="examSize40" value="40"/>40
+                </label>
+                <label className="radio-inline">
+                    <input onChange={(e)=>handleChangeOption(e, 'num')} type="radio"  checked={options.num==60} name="examSize" id="examSize60" value="60"/>60
+                </label>
+                <label className="radio-inline">
+                    <input onChange={(e)=>handleChangeOption(e, 'num')} type="radio"  checked={options.num==80} name="examSize" id="examSize80" value="80"/>80
+                </label>
+                <label className="radio-inline">
+                    <input onChange={(e)=>handleChangeOption(e, 'num')} type="radio"  checked={options.num==100} name="examSize" id="examSize100" value="100"/>100
+                </label>
+                &nbsp;&nbsp;&nbsp;
+            </div>
+            <div className="form-group">
+                <label style={{display: "inline-block !important"}}>Ошибок &nbsp; </label>
+                <input id="examErrorSize" onChange={(e)=>handleChangeOption(e, 'max_error')} value={options.max_error} type="text" />&nbsp;&nbsp;&nbsp;
+            </div>
+            <div className="checkbox">
+                <label>
+                    <input id="btnConfDoubleClick" onChange={(e)=>handleChangeOption(e, 'dblclick')} defaultChecked={options.dblclick} type="checkbox"/> Двойной клик
+                </label>&nbsp;&nbsp;&nbsp;
+            </div>
+            <div className="checkbox">
+                <label>
+                    <input id="btnConfRandomVariants" onChange={(e)=>handleChangeOption(e, 'random')} defaultChecked={options.random} type="checkbox"/> Перемешивать ответы
+                </label>
+            </div>
+        </form>
+    </div>
+            </div>
             <div className="row">
                 <div id="buttonPanel" className="btn-group btn-group-xs">
                     {
@@ -184,7 +289,7 @@ const TestPdd = (props:any) => {
                                 <img id="questImage" className="img-responsive" width="100%" style={{maxWidth: "100%"}}
                                         src={(currentQuestion!==undefined)?currentQuestion.image:""}
                                         alt="картинка вопроса" />
-                                <div id="questText" className="questtext"></div>
+                                <div id="questText" className="questtext">{(currentQuestion!==undefined)?currentQuestion.text:""}</div>
                                 <div className="list-group">
                                     <div id="qlist">
                                         { (currentQuestion!=undefined) && (
@@ -224,7 +329,7 @@ const TestPdd = (props:any) => {
                 
             </div>
             
-        </>
+        </div>
     )
 }
 
