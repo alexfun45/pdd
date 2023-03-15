@@ -1219,6 +1219,7 @@ div.suggestPopupContent div table tbody tr td.item-selected{
  }
 
  .error-msg{
+    height: 20px !important;
     font-size: 11px;
     margin-top: 2px;
     color: rgb(218, 55, 55);
@@ -1298,4 +1299,12 @@ div.suggestPopupContent div table tbody tr td.item-selected{
     background-color: #fff;
     background-image: none;
     border: 1px solid #ccc;
+  }
+
+  .current-finished-button.btn-success{
+    background-color: #32a832 !important;
+  }
+
+  .current-finished-button.btn-danger{
+    background-color: #df1226 !important;
   }

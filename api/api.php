@@ -93,7 +93,8 @@
                 $_v[] = $v;
             }
             $tickets[$i]["variants"] = $_v;
-            shuffle($tickets);
+            if($this->data->random=="on" || $this->data->random)
+                shuffle($tickets);
             array_splice($tickets, $num);
             $i++;
         }
