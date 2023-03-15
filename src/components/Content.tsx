@@ -15,7 +15,7 @@ function Content(){
             const {data} = response;
             setContent(data);
         });
-    }, []);
+    }, [id]);
 
     return (
         <div className="container">
