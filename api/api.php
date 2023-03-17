@@ -447,16 +447,27 @@
             return false;
     }
 
-    protected function transliterate($textcyr = null, $textlat = null) {
-        $cyr = array(
-        'ж',  'ч',  'щ',   'ш',  'ю',  'а', 'б', 'в', 'г', 'д', 'е', 'з', 'и', 'й', 'к', 'л', 'м', 'н', 'о', 'п', 'р', 'с', 'т', 'у', 'ф', 'х', 'ц', 'ъ', 'ь', 'я',
-        'Ж',  'Ч',  'Щ',   'Ш',  'Ю',  'А', 'Б', 'В', 'Г', 'Д', 'Е', 'З', 'И', 'Й', 'К', 'Л', 'М', 'Н', 'О', 'П', 'Р', 'С', 'Т', 'У', 'Ф', 'Х', 'Ц', 'Ъ', 'Ь', 'Я');
-        $lat = array(
-        'zh', 'ch', 'sht', 'sh', 'yu', 'a', 'b', 'v', 'g', 'd', 'e', 'z', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'r', 's', 't', 'u', 'f', 'h', 'c', 'y', 'x', 'q',
-        'Zh', 'Ch', 'Sht', 'Sh', 'Yu', 'A', 'B', 'V', 'G', 'D', 'E', 'Z', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'R', 'S', 'T', 'U', 'F', 'H', 'c', 'Y', 'X', 'Q');
-        if($textcyr) return str_replace($cyr, $lat, $textcyr);
-        else if($textlat) return str_replace($lat, $cyr, $textlat);
-        else return null;
+    protected function transliterate($value) {
+        $converter = array(
+            'а' => 'a',    'б' => 'b',    'в' => 'v',    'г' => 'g',    'д' => 'd',
+            'е' => 'e',    'ё' => 'e',    'ж' => 'zh',   'з' => 'z',    'и' => 'i',
+            'й' => 'y',    'к' => 'k',    'л' => 'l',    'м' => 'm',    'н' => 'n',
+            'о' => 'o',    'п' => 'p',    'р' => 'r',    'с' => 's',    'т' => 't',
+            'у' => 'u',    'ф' => 'f',    'х' => 'h',    'ц' => 'c',    'ч' => 'ch',
+            'ш' => 'sh',   'щ' => 'sch',  'ь' => '',     'ы' => 'y',    'ъ' => '',
+            'э' => 'e',    'ю' => 'yu',   'я' => 'ya',
+     
+            'А' => 'A',    'Б' => 'B',    'В' => 'V',    'Г' => 'G',    'Д' => 'D',
+            'Е' => 'E',    'Ё' => 'E',    'Ж' => 'Zh',   'З' => 'Z',    'И' => 'I',
+            'Й' => 'Y',    'К' => 'K',    'Л' => 'L',    'М' => 'M',    'Н' => 'N',
+            'О' => 'O',    'П' => 'P',    'Р' => 'R',    'С' => 'S',    'Т' => 'T',
+            'У' => 'U',    'Ф' => 'F',    'Х' => 'H',    'Ц' => 'C',    'Ч' => 'Ch',
+            'Ш' => 'Sh',   'Щ' => 'Sch',  'Ь' => '',     'Ы' => 'Y',    'Ъ' => '',
+            'Э' => 'E',    'Ю' => 'Yu',   'Я' => 'Ya',
+        );
+     
+        $value = strtr($value, $converter);
+        return $value;
     }
 
     protected function createPage(){
@@ -556,6 +567,22 @@
             $settings[$row['config_name']] = $row['value'];
         $db->close();
         return $settings;
+    }
+
+    protected function setHomeIcon(){
+        $db = new SQLite3(DB."db.sqlite");
+        $uploadResult = $this->uploadFile($_FILES);
+        $image_name = ($uploadResult['success']) ? $uploadResult['filename'] : "default_home.png";
+        $db->exec("UPDATE settings SET value='$image_name' WHERE config_name='home_icon'");
+        $db->close();
+    }
+
+    protected function getHomeIcon(){
+        $db = new SQLite3(DB."db.sqlite");
+        $res = $db->query("SELECT value FROM settings where config_name='home_icon'");
+        $result = $res->fetchArray(SQLITE3_ASSOC);
+        $db->close();
+        return './img/'.$result['value'];
     }
 
     protected function save_settings(){

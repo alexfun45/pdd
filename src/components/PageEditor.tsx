@@ -6,7 +6,7 @@ import Spinner from 'react-bootstrap/Spinner';
 import {useState, useEffect} from "react";
 import request from '../utils/request'
 // Require Editor JS files.
-import 'froala-editor/js/froala_editor.pkgd.min.js';
+/*import 'froala-editor/js/froala_editor.pkgd.min.js';
 import 'froala-editor/js/plugins/align.min.js';
 import 'froala-editor/js/plugins/fullscreen.min.js';       
 import 'froala-editor/js/plugins/code_beautifier.min.js';
@@ -25,8 +25,10 @@ import 'froala-editor/css/froala_editor.pkgd.min.css';
   
 // Require Font Awesome.
 import 'font-awesome/css/font-awesome.css';
-import FroalaEditor from 'react-froala-wysiwyg';
+import FroalaEditor from 'react-froala-wysiwyg';*/
 import $ from 'jquery'
+
+import SummerEditor from './SummerEditor'
 
 
 const screenHeight = window.screen.height*0.6;
@@ -128,7 +130,6 @@ export default function PageEditor({editPageName, setEditPageName, mode}: {editP
     }
 
     const savePage = (event: any) => {
-      
         if(editPageName=="")
           handleShow();
         else
@@ -227,12 +228,15 @@ export default function PageEditor({editPageName, setEditPageName, mode}: {editP
                 role="status"
                 aria-hidden="true"
               />Сохранить</Button>
-            <FroalaEditor
+              <div className="editorWrapper">
+                <SummerEditor model={model} setModel={setModel} formData={formData} imageNames={imageNames} />
+              </div>
+            {/*<FroalaEditor
                 tag='textarea'
                 config={config}
                 model={model}
                 onModelChange={handleModelChange}
-            />
+            />*/}
         </div>
     )
 }

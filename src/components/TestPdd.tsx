@@ -247,7 +247,7 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
 
     return (
         <div className="container">
-            <div className={(options.settings===true)?"row":"hide"}>
+            <div className={(options.settings===true)?"row testrow":"hide"}>
                 <div className="col-md-12">
             <form onSubmit={handleSubmit(onSubmit)} className="form-inline">
                 <div className="form-group">
@@ -313,7 +313,7 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
         </form>
     </div>
             </div>
-            <div className="row">
+            <div className="row testrow">
                 <div id="buttonPanel" className={(start)?"btn-group btn-group-xs":"hide"}>
                     {
                         [...new Array(qNum)].map((v, i)=>(
@@ -322,10 +322,10 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
                     }
                 </div>
             </div>
-            <div className="row">
+            <div className="row testrow centered-row">
                 <div className="col-lg-8 col-md-8 col-sm-8">    
 
-                    <div className="row">
+                    <div className="row testrow">
                         <div className="col-md-12 col-sm-12 myheader">
                             
                                 <img className="img-responsive pull-left hidden-xs" style={{width: "75px"}} alt="логотип" src="./img/gibddlogo_pdd24.png" />
@@ -348,11 +348,11 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
                     </div>
                 </div>
             </div>
-            <div className="row">
-                <div className="col-lg-8 col-md-9 col-sm-12">
-                    <div className="row">
+            <div className="row testrow">
+                <div className="col-lg-8 col-md-9 col-sm-12 mini-wrapper">
+                    <div className="block-ticket">
                         <div className="col-md-12">
-                            <div id="questPanel"  className={(start)?"":"hide"}>
+                            <div id="questPanel" className={(start)?"":"hide"}>
                                 <img id="questImage" className="img-responsive" width="100%" style={{maxWidth: "100%"}}
                                         src={(currentQuestion!==undefined)?currentQuestion.image:""}
                                         alt="картинка вопроса" />

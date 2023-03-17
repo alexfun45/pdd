@@ -4,19 +4,19 @@ import Tabs from 'react-bootstrap/Tabs';
 import Tickets from './Tickets'
 import PageManager from './PageManager'
 import PageEditor from './PageEditor'
-import CloseButton from 'react-bootstrap/CloseButton';
 import UsersManager from './Users'
 import Settings from './Settings'
 import {AppContext} from '../app'
 
-function TabTitle({tab_type, setpageTabtype, setKey, editPageName}:{tab_type: number, setpageTabtype: React.Dispatch<React.SetStateAction<number>>, setKey: React.Dispatch<React.SetStateAction<string>>, editPageName: string}){
+function TabTitle({tab_type, setpageTabtype, setKey, editPageName, setEditPageName}:{tab_type: number, setpageTabtype: React.Dispatch<React.SetStateAction<number>>, setKey: React.Dispatch<React.SetStateAction<string>>, editPageName: string, setEditPageName:React.Dispatch<React.SetStateAction<string>>}){
 
     const closeTab = () => {
         setpageTabtype(0);
+        setEditPageName("");
     }
 
     return (
-        <div style={{position: 'relative'}}>{editPageName || 'новая страница'} <CloseButton onClick={closeTab} color='#FFF' style={{width: '0.2em', height: '0.2em', position: 'absolute', top: '-7px', right: '-12px'}} /></div>
+        <div style={{position: 'relative'}}>{editPageName || 'новая страница'} <i onClick={closeTab} color='#FFF' style={{width: '0.2em', height: '0.2em', position: 'absolute', top: '-12px', right: '-5px'}} className="bi bi-x"></i></div>
     )
 }
 
@@ -59,7 +59,7 @@ export default () => {
                         <PageManager setpageTabtype={setpageTabtype} setKey={setKey} setEditPageName={setEditPageName} />
                     </Tab>
                     { (pageTabtype!=0) && (
-                        <Tab eventKey="newpage" tabClassName={(pageTabtype!=0)?'':'hide'} title={<TabTitle tab_type={pageTabtype} editPageName={editPageName} setpageTabtype={setpageTabtype} setKey={setKey}/>}>
+                        <Tab eventKey="newpage" tabClassName={(pageTabtype!=0)?'':'hide'} title={<TabTitle tab_type={pageTabtype} editPageName={editPageName} setpageTabtype={setpageTabtype} setKey={setKey} setEditPageName={setEditPageName}/>}>
                             <PageEditor editPageName={editPageName} setEditPageName={setEditPageName} mode={pageTabtype}/>
                         </Tab>
                     )}
