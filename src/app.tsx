@@ -5,6 +5,7 @@ import "@/css/docs18.css"
 import { Routes, Route } from "react-router-dom";
 import routes from './routers'
 import Header from "./components/Header"
+import MobileHeader from './components/MobileHeader'
 import request from './utils/request'
 
 const getRoutes = (allRoutes: Array<{route:string, key: string, component: object}>) =>
@@ -42,7 +43,8 @@ export default function App(){
   
   const [isLogin, setLogin] = useState(false),
         [user, setUser] = useState<userType>(defaultUser),
-        [role, setRole] = useState(3);
+        [role, setRole] = useState(3),
+        [displayWidth, setDisplayWidth] = useState(window.innerWidth);
 
   useEffect(()=>{
     request({method: "post", data: {action: "getSettings"}}).then(response=>{
@@ -61,12 +63,27 @@ export default function App(){
         setLogin(data.logged);
         setUser(data);
       });
+      window.addEventListener('resize', handleWindowSizeChange);
     }, []);
 
-    return (
+    const handleWindowSizeChange = () => {
+      setDisplayWidth(window.innerWidth);
+    }
+
+    const width = displayWidth;
+    const isMobile = width <= 1000;
+
+    return (  
+      
+      // the rest is the same...
       <AppContext.Provider value={{user: user, logged: isLogin, userRole: role}}>
           <HashRouter>
-            <Header />
+            { (isMobile) ?  
+              <MobileHeader />
+              :
+              <Header />
+
+            }
             <div id="maincontainer" className="containerWrapper">
               <Routes>
                   {

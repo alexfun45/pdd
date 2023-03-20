@@ -21,8 +21,7 @@ type TopMenuType = {
   submenu?: menuItem[]
 }
 
-var formData = new FormData(),
-    clickCount = 0;
+var formData = new FormData();
 
 function TopMenu() {
   const context = React.useContext(AppContext);
@@ -63,11 +62,6 @@ function TopMenu() {
     formData.append("file", file);
     formData.append("action", "setHomeIcon");
     request({method: "post", headers: {"Content-Type": "multipart/form-data"}, data: formData});
-  }
-
-  const handlePrevent = (event:any) => {
-      if(context.userRole==1)
-        event.preventDefault();
   }
 
   const triggerUpload = (event:any) => {
