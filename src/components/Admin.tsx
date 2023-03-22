@@ -1,12 +1,17 @@
 import { Link } from "react-router-dom" 
+import { Button } from "react-bootstrap"
 
-export default ({Logout, isLogin, role}: {Logout: React.MouseEventHandler, isLogin: boolean, role: number}) => {
+export default ({Logout, isLogin, role, isMobile}: {Logout: React.MouseEventHandler, isLogin: boolean, role: number, isMobile: boolean}) => {
     return (
         <div className="admin-panel-wrapper">
             {(!isLogin) ? (
             <div id="login-block">
                 <form id="login-form" method="POST">
-                    <a href="#/auth" className="adminpanel-btn btn btn-primary btn-auth">Войти</a>
+                    {(isMobile) ? 
+                        (<Button className="blue-btn" variant="primary">Войти</Button>)
+                        :
+                        (<a href="#/auth" className="adminpanel-btn btn btn-primary btn-auth">Войти</a>)
+                    }
                 </form>
             </div>
             ) :

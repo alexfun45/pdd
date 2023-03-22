@@ -82,7 +82,7 @@ function TopMenu() {
   return (
     <div className={"top-level-menu "+((location.pathname=='/auth' || location.pathname=='/confirm')?'hide':'')}>
       <div className="homeIcon" onClick={handleHomeLink}><a href="./"></a><input onClick={triggerUpload} id="homeIcon" onChange={changeHomeIcon} type="file" /><img src={homeIcon}></img></div>
-      <Admin Logout={Logout} isLogin={context.logged} role={context.userRole}/>
+      <Admin Logout={Logout} isLogin={context.logged} role={context.userRole} isMobile={false}/>
       {Object.entries(TopMenu).map(
         (item: any, i: number) => {
           return ( item[1].submenu ? (

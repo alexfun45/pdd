@@ -79,12 +79,11 @@ export default function App(){
       <AppContext.Provider value={{user: user, logged: isLogin, userRole: role}}>
           <HashRouter>
             { (isMobile) ?  
-              <MobileHeader />
+                <MobileHeader />
               :
-              <Header />
-
+                <Header />
             }
-            <div id="maincontainer" className="containerWrapper">
+            <div id="maincontainer" className={(isMobile)?"containerWrapper mobileWrapper":"containerWrapper"}>
               <Routes>
                   {
                     getRoutes(routes)  

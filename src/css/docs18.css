@@ -3,7 +3,7 @@ html{
 }
 body {
     font-family: Lato,Helvetica,Arial,sans-serif;
-    font-size: 3vw;
+    font-size: 2vh;
     line-height: 1.42857143;
     color: #333;
     background-color: #fff;
@@ -12,11 +12,42 @@ body {
     overflow: hidden;
 }
 
+.editorWrapper{
+    all: unset;
+}
+
+.editorWrapper ol, ul, dl{
+    padding-left: 13px;
+    display: inline-block;
+}
+
+.editorWrapper ol li{
+    display: list-item;
+    list-style: decimal !important;
+}
+.pageWrapper ol, ul{
+    padding-left: 20px;
+}
+
+.pageWrapper ol li{
+    display: list-item;
+    list-style: decimal;
+}
+
+.pageWrapper ul li{
+    display: list-item;
+    list-style: disc;
+}
+
+.editorWrapper ul li{
+   display: list-item;
+   list-style: disc;
+}
+
 .punkframe{
     width: 100%;
     border:0;
     height: 500px;
-
 }
 
 .containerWrapper{
@@ -212,6 +243,11 @@ body {
     max-height: 7vh !important;
   }
 
+  .mobileHeader .blue-btn{
+    font-size: 3vh;
+    padding: 5px 2vw;
+  }
+
   .mobileHeader .homeIcon > input{
     opacity: 0;
     position: absolute;
@@ -339,6 +375,42 @@ button.list-group-item {
     width: 100%;
     text-align: left;
   }
+
+.mobileWrapper{
+    padding-top: 8vh;
+}
+
+.mobileWrapper .col-md-9{
+    width: 100% !important;
+    max-width: 100% !important;
+}
+
+.mobileWrapper .container{
+    max-width: 95%;
+    max-height: 100%;
+}
+
+.mobileWrapper .myheader h1,
+.myheader .h1{
+    font-size: 4.5vh;
+}
+
+.mobileWrapper p{
+    line-height: 1.1;
+    font-size: 3.5vh;
+}
+
+.mobileWrapper .myheader p.lead{
+    font-size: 3.5vh;
+}
+
+.mobileWrapper .myheader span{
+    font-size: 3.5vh;
+}
+
+.mobileWrapper .container{
+    font-size: 3.5vh;
+}
 
 @media screen and (max-width: 767px) {
 
@@ -552,8 +624,8 @@ div.suggestPopupContent div table tbody tr td.item-selected{
     top: 0px;
     display: flex;
     z-index: 100000;
-    height: 50px;
-    line-height: 50px;
+    height: 8vh;
+    line-height: 8vh;
     justify-content: center;
 }
 
@@ -601,7 +673,11 @@ div.suggestPopupContent div table tbody tr td.item-selected{
 
 .btn-auth{
     font-weight: 400;
-    font-size: 19px !important;
+    font-size: 19px;
+}
+
+.mobileHeader .btn-auth{
+    font-size: 2.5vh;
 }
 
 .btn-auth:hover{
@@ -840,6 +916,10 @@ div.suggestPopupContent div table tbody tr td.item-selected{
 
 .btn-primary{
      background-color: transparent;
+}
+
+.blue-btn{
+    background-color: #1f82d8;
 }
 
 .row > h2{
@@ -1420,7 +1500,6 @@ div.suggestPopupContent div table tbody tr td.item-selected{
 
   .list-group-item{
     height: auto !important;
-    min-height: 47px;
   }
   
   .MuiDrawer-paperAnchorDockedLeft{
@@ -1431,6 +1510,7 @@ div.suggestPopupContent div table tbody tr td.item-selected{
     display: inline-block;
     height: 30px;
     vertical-align: middle;
+    font-size: 2.5vh;
   }
 
   

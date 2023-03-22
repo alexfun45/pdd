@@ -26,7 +26,7 @@ import {AppContext} from '../app'
 const useStyles = makeStyles({
     drawerPaper: {
       marginTop: "8vh",
-      width: "45vw"
+      width: "80vw"
     }
   });
 
@@ -42,10 +42,11 @@ export default () => {
           [TopMenu, setTopMenu] = useState<any>({});
     const open = Boolean(anchorEl);
     const context = React.useContext(AppContext);
-    const [openSubmenu, setOpen] = useState(false);
+    const [openSubmenu, setOpen] = useState<any>({});
 
-    const handleSubmenuClick = () => {
-        setOpen(!openSubmenu);
+    const handleSubmenuClick = (name: string) => {
+        let arr = {...openSubmenu, [name]: !openSubmenu[name]};
+        setOpen(arr);
     };
 
     useEffect(()=>{
@@ -87,26 +88,28 @@ export default () => {
     const list = () => (
         <Box
           role="presentation"
-          
           onKeyDown={toggleDrawer(false)}
+          sx={{"& .MuiList-root":{width: "100%"}}}
         >
-          <List>
+          <List sx={{"& .MuiTypography-root":{fontSize: "2.5vh", color: "#333", fontWeight: "500"}, "& .MuiButtonBase-root":{width: "100%", paddingLeft: "3vw", paddingRight: "15px", paddingTop: "2vh", paddingBottom: "2vh"}}}>
             {Object.entries(TopMenu).map(
                 (item: any, i: number) => {
-                    
+                    if(item[1].submenu && !openSubmenu[item[1].name])
+                        openSubmenu[item[1].name] = false;
                     return ( item[1].submenu ? (
                         <>
-                            <ListItemButton>
-                                <ListItemText onClick={handleSubmenuClick} primary={item[1].title} />
-                                {openSubmenu ? <ExpandLess /> : <ExpandMore />}
+                            <ListItemButton divider={true}>
+                                <ListItemText onClick={()=>handleSubmenuClick(item[1].name)} primary={item[1].title} />
+                                {openSubmenu[item[1].name] ? <ExpandLess sx={{fontSize: "5vh"}} /> : <ExpandMore sx={{fontSize: "5vh"}} />}
                             </ListItemButton>  
-                            <Collapse in={openSubmenu} timeout="auto" unmountOnExit>
+                            <Collapse in={openSubmenu[item[1].name]} timeout="auto" unmountOnExit>
                                 <List component="div" disablePadding>
                                     {
+                                        
                                         item[1].submenu.map((submenuItem: any, j: number)=>(
-                                            <ListItemButton sx={{ pl: 4 }}>
+                                            <ListItemButton component="a" href={"#/"+submenuItem.page_name} divider={true} sx={{ pl: 4}}>
                                                 <ListItemText primary={submenuItem.title} />
-                                            </ListItemButton>
+                                            </ListItemButton> 
                                         ))                                
                                     }
                                 </List>
@@ -115,7 +118,7 @@ export default () => {
                     )
                     :
                     (
-                      <ListItemButton>
+                      <ListItemButton component="a" href={"#/"+item[1].page_name} divider={true}>
                             <ListItemText primary={item[1].title} />
                       </ListItemButton>   
                     )
@@ -157,7 +160,7 @@ export default () => {
 
     return (
         <div className="mobileHeader">
-            <Admin Logout={Logout} isLogin={context.logged} role={context.userRole}/>
+            <Admin Logout={Logout} isLogin={context.logged} role={context.userRole} isMobile={true}/>
              <IconButton
                 aria-label="more"
                 id="long-button"
