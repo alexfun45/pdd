@@ -1,5 +1,6 @@
 html{
     height: 100%;
+    width: 100%;
 }
 body {
     font-family: Lato,Helvetica,Arial,sans-serif;
@@ -9,11 +10,25 @@ body {
     background-color: #fff;
     font-weight: 300;
     height: 100%;
+    width: 100%;
+    max-width: 100%;
     overflow: hidden;
 }
 
 .editorWrapper{
     all: unset;
+}
+
+.content{
+    width: 95%;
+    max-width: 90%;
+}
+
+.pageWrapper{
+    max-width: 96%;
+    display: flex;
+    flex-wrap: wrap;
+    padding-left: 15px;
 }
 
 .editorWrapper ol, ul, dl{
@@ -52,7 +67,13 @@ body {
 
 .containerWrapper{
     height: 100%;
+    width: 99%;
     overflow: hidden;
+    word-wrap: break-word;
+}
+
+.containerWrapper img{
+    max-width: 100%;
 }
 
 .container {
@@ -227,7 +248,7 @@ body {
     left: 0;
     height: 8vh;
     background-color: #FFF;
-    width: 100%;
+    width: 100vw;
     z-index: 10000;
   }
 
@@ -1123,8 +1144,12 @@ div.suggestPopupContent div table tbody tr td.item-selected{
     .nav-link{
         background-color: #f6f6f6 !important;
         color:#454545 !important;
-        font-size: 18px !important;
+        font-size: 2.5vh !important;
         font-weight: 400 !important;
+    }
+
+    .auth_container{
+        width: 100%;
     }
 
     .nav-item > .active{

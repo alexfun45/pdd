@@ -21,13 +21,15 @@ let defaultUser = {
       login: "",
       name: "",
       email: "",
-      role: 3
+      role: 3,
+      isMobile: false
     }
 
 const AppContext = createContext({
   user: defaultUser,
   userRole: 3,
-  logged: false
+  logged: false,
+  isMobile: false
 });
 
 type userType = {
@@ -35,6 +37,7 @@ type userType = {
   name: string;
   email: string;
   role: number;
+  isMobile: boolean;
 };
 
 
@@ -76,7 +79,7 @@ export default function App(){
     return (  
       
       // the rest is the same...
-      <AppContext.Provider value={{user: user, logged: isLogin, userRole: role}}>
+      <AppContext.Provider value={{user: user, logged: isLogin, userRole: role, isMobile: isMobile}}>
           <HashRouter>
             { (isMobile) ?  
                 <MobileHeader />

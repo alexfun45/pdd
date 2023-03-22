@@ -6,7 +6,9 @@ import Button from "react-bootstrap/Button"
 import {useForm} from 'react-hook-form'
 import Form from 'react-bootstrap/Form';
 import { useParams, useNavigate } from "react-router-dom";
+import LoginMobile from './LoginMobile'
 import request from '../utils/request'
+import {AppContext} from '../app'
 
 type InputSingInTypes = {
     login: string; 
@@ -35,7 +37,7 @@ type userType = {
 };
 
 export default () => {
-
+    const context = React.useContext(AppContext);
     let navigate = useNavigate();
     const [users, setUsers] = useState<userType[]>([]),
           [isForgot, setForgot] = useState(false),
@@ -95,6 +97,7 @@ export default () => {
         <>
         <div className="wrapper">
             <div className="mainContainer">
+               
                 <div className={(!isForgot)?"hide":""}>
                     <div className="top-btn-panel"><input onClick={handlePrev} className="btn-control" value="< Назад" type="button" /></div>
                     <div className="tab-content">
@@ -119,7 +122,7 @@ export default () => {
                         </Form>
                     </div>
                 </div>
-                <div className={(isForgot)?"hide":""}>
+                <div className={(isForgot)?"hide":"auth_container"}>
                     <Tabs
                         defaultActiveKey="signin"
                         id="justify-tab-example"

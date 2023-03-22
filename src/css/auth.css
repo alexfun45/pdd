@@ -26,6 +26,15 @@
   box-shadow: -3px -3px 7px rgba(68, 75, 87, 0.356),
               2px 2px 5px rgba(68, 75, 87, 0.356);
 }
+.mobileWrapper .wrapper{
+  min-width: 80%;
+  height: auto;
+  width: 100%;
+  max-width: 80%;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%,-50%);
+}
 
 .tab-content{
   border: none !important;

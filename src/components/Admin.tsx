@@ -8,7 +8,7 @@ export default ({Logout, isLogin, role, isMobile}: {Logout: React.MouseEventHand
             <div id="login-block">
                 <form id="login-form" method="POST">
                     {(isMobile) ? 
-                        (<Button className="blue-btn" variant="primary">Войти</Button>)
+                        (<Button href="#/auth" className="blue-btn" variant="primary">Войти</Button>)
                         :
                         (<a href="#/auth" className="adminpanel-btn btn btn-primary btn-auth">Войти</a>)
                     }

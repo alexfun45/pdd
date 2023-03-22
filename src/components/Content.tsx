@@ -13,16 +13,15 @@ function Content(){
     useEffect(()=>{
         request({method: "post", data:{action: "getPage", data: {page_id: id}}}).then( response =>{
             const {data} = response;
-            let regexp = /(font\-)?size[=\:][\'\"]?\s?(.*?)[\'\"]?/sg;
-            //let regexp = /size=[\'\"]?\s?(\d{1,2})[\'\"]?/sg;
+            let regexp = /(font\-)?size[=\:][\'\"]?\s?([^\'\";]*)[\'\"]?/sg;
             let result = data.replace(regexp, (match: string, fullform: string, fontsize: string)=>{ 
-                console.log("fontsize", fontsize);
+                let fontStyleName = (fullform!==undefined) ? "font-size:":"size=";
                 if(parseInt(fontsize)<14)
-                    return "font-size: 3vh";
-                else if(parseInt(fontsize)<18)
-                    return "font-size: 4vh";
+                    return fontStyleName+"2vh";
+                else if(parseInt(fontsize)<=18)
+                    return fontStyleName+"2.5vh";
                 else
-                    return "font-size: 4.5vh";
+                    return fontStyleName+"3vh";
              });
             setContent(result);
         });
