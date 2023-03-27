@@ -121,29 +121,6 @@ export default ({show, ticket, editMode, setShow, removeTicket, getTickets}: {sh
           });
     }
 
-    const onSubmit2 = () => {
-        
-        if(editMode){
-            formData.append("action", "editTicket");
-            formData.append("ticket_id", ticket.id.toString());
-        }
-        else
-            formData.append("action", "addTicket");
-        formData.append("text", text);
-        formData.append("correct", correct_id.toString());
-        formData.append("variants", JSON.stringify(answers));
-        request({method: "post", headers: {"Content-Type": "multipart/form-data"}, data: formData}).then(()=>{
-            handleClose();
-            formData.delete('action');
-            formData.delete('ticket_id');
-            formData.delete('text');
-            formData.delete('variants');
-            formData.delete('correct');
-            formData.delete('file');
-        })
-        
-    }
-
     const handleRemove = () => {
         setDeleteShow(true);
     }

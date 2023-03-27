@@ -3,6 +3,7 @@ import request from '../utils/request'
 import {ListGroup, Button} from 'react-bootstrap';
 import Form from 'react-bootstrap/Form';
 import Modal from 'react-bootstrap/Modal';
+import DeleteDialog from './TIckets/DeleteDialog'
 
 type PageItem = {
     title: string;
@@ -16,11 +17,15 @@ type PageType = {
     title: string;
 };
 
+var currentRemoveItem:any,
+    removeMethod: Function;
+
 export default function PageManager({setpageTabtype, setKey, setEditPageName}: any){
 
     const [menuItems, setMenuItems] = useState<any>([]),
           [menuPages, setMenuPages] = useState<any>([]),
           [allPages, setAllPages] = useState<any>([]),
+          [showRemovePageDialog, setRemovePageDialog] = useState(false),
           [selectedMenuId, setSelectedMenuId] = useState<any>(),
           [selectedPage, setSelectedPage]= useState<PageType>(),
           [showModal, setShowModal] = useState(false),
@@ -61,12 +66,13 @@ export default function PageManager({setpageTabtype, setKey, setEditPageName}: a
         setSelectedPage(pageItem);
     }
 
-    const removePage = (pageItem: PageType) => {
-        request({method: "post", data: {action: "removePage", data: {page_id: pageItem.id, page_name: pageItem.name}}});
+    const removePage = () => {
+        request({method: "post", data: {action: "removePage", data: {page_id: currentRemoveItem.id, page_name: currentRemoveItem.name}}});
         let pages = [...allPages];
-        let indx = pages.findIndex(x => x.id === pageItem.id);
+        let indx = pages.findIndex(x => x.id === currentRemoveItem.id);
         pages.splice(indx, 1);
         setAllPages(pages);
+        setRemovePageDialog(false);
     }
 
     const isPageExists = (page_id: number) => {
@@ -98,21 +104,23 @@ export default function PageManager({setpageTabtype, setKey, setEditPageName}: a
     }
 
     // remove menuitem
-    const removeMenuItem = (pageId: number, menu_pages_index: number) => {
-        if(selectedMenuId && pageId){
-            request({method: "post", data: {action: "removeMenuItem", data:{menu_id: selectedMenuId, page_id: pageId}}}).then((response)=>{
+    const removeMenuItem = () => {
+        if(selectedMenuId && currentRemoveItem.pageId){
+            request({method: "post", data: {action: "removeMenuItem", data:{menu_id: selectedMenuId, page_id: currentRemoveItem.pageId}}}).then((response)=>{
                 let copyMenuPages = [...menuPages];
-                copyMenuPages.splice(menu_pages_index, 1);
+                copyMenuPages.splice(currentRemoveItem.menu_pages_index, 1);
                 setMenuPages(copyMenuPages);
             });
         }
+        setRemovePageDialog(false);
     }
 
-    const removeMenu = (menuId: number, indx: number) => {
-        request({method: "post", data: {action: "removeMenu", data: {menu_id: menuId}}});
+    const removeMenu = () => {
+        request({method: "post", data: {action: "removeMenu", data: {menu_id: currentRemoveItem.menuId}}});
         let copymenuItems = [...menuItems];
-        copymenuItems.splice(indx, 1);
+        copymenuItems.splice(currentRemoveItem.indx, 1);
         setMenuItems(copymenuItems);
+        setRemovePageDialog(false);
     }
 
     const createPage = () => {
@@ -143,14 +151,33 @@ export default function PageManager({setpageTabtype, setKey, setEditPageName}: a
         setMenuTitle((event.currentTarget.value) ? event.currentTarget.value:"");
     }
 
+    const handleRemovePage = (v: PageType) => {
+        currentRemoveItem = v;
+        removeMethod = removePage;
+        setRemovePageDialog(true);
+    }
+
+    const handleRemoveTopMenu = (v: any, indx: number) => {
+        currentRemoveItem = {indx: indx, menuId: v};
+        removeMethod = removeMenu;
+        setRemovePageDialog(true);
+    }
+
+    const handleRemoveMenuItem = (v: any, i: number) => {
+        currentRemoveItem = {pageId: v, menu_pages_index: i};
+        removeMethod = removeMenuItem;
+        setRemovePageDialog(true);
+    }
+
     return (
         <div className="block-wrapper">
+            <DeleteDialog show={showRemovePageDialog} setShow={setRemovePageDialog} removeMethod={removeMethod}/>
             <div className="col-30">
                 <div className="col-title">Элементы верхнего меню <Button onClick={handleShow} variant="outline-success">+ Создать</Button></div>
                 <ListGroup>
                     {
                         menuItems.map((value:any, i: number) => {
-                                return <ListGroup.Item action id={value.id} onClick={(e)=>selectItem(value.id)} eventKey={value.id}>{value.title}<div className="right-panel"><span><i onClick={()=>removeMenu(value.id, i)} className="bi bi-trash3-fill"></i></span></div></ListGroup.Item> 
+                                return <ListGroup.Item action id={value.id} onClick={(e)=>selectItem(value.id)} eventKey={value.id}>{value.title}<div className="right-panel"><span><i onClick={()=>handleRemoveTopMenu(value.id, i)} className="bi bi-trash3-fill"></i></span></div></ListGroup.Item> 
                         })
                    
                            
@@ -162,7 +189,7 @@ export default function PageManager({setpageTabtype, setKey, setEditPageName}: a
                 <ListGroup>
                    {
                     menuPages.map((v:PageItem, i: number)=>(
-                        <ListGroup.Item eventKey={v.id}><div>{v.title}<div className="right-panel"><span><i onClick={()=>removeMenuItem(v.id, i)} className="bi bi-trash3-fill"></i></span></div></div></ListGroup.Item>
+                        <ListGroup.Item eventKey={v.id}><div>{v.title}<div className="right-panel"><span><i onClick={()=>handleRemoveMenuItem(v.id, i)} className="bi bi-trash3-fill"></i></span></div></div></ListGroup.Item>
                     ))
                    }
                 </ListGroup>
@@ -175,7 +202,7 @@ export default function PageManager({setpageTabtype, setKey, setEditPageName}: a
                 <ListGroup>
                     {
                         allPages.map((v:PageType)=>(
-                            <ListGroup.Item action onClick={(e)=>selectPage(v)} eventKey={v.name}>{v.title}<div className="right-panel"><span><i onClick={()=>handleEditPage(v)} className="bi bi-pencil-fill"></i><i onClick={()=>removePage(v)} className="bi bi-trash3-fill"></i></span></div></ListGroup.Item> 
+                            <ListGroup.Item action onClick={(e)=>selectPage(v)} eventKey={v.name}>{v.title}<div className="right-panel"><span><i onClick={()=>handleEditPage(v)} className="bi bi-pencil-fill"></i><i onClick={()=>handleRemovePage(v)} className="bi bi-trash3-fill"></i></span></div></ListGroup.Item> 
                         ))
                     }
                 </ListGroup>
