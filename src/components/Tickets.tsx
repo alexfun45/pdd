@@ -31,6 +31,17 @@ export default () => {
         setPages(items);
     }
 
+    const getTickets = () => {
+        request({method: 'post', data:{action: 'getTickets', data: {page: currentPage}}}).then( response => {
+            const {data} = response;
+            page_num = data.page_num;
+            renderPages();
+            setTickets(data.data);
+            currentTicket.current = defaultTicket;
+            setEditMode(false);
+        });
+    }
+
     const gotToPage = (selectedPage: number) => {
         setPage(selectedPage);
         request({method: 'post', data:{action: 'getTickets', data: {page: selectedPage}}}).then( response => {
@@ -47,14 +58,8 @@ export default () => {
         else{
             return;
         }
-        request({method: 'post', data:{action: 'getTickets', data: {page: currentPage}}}).then( response => {
-            const {data} = response;
-            page_num = data.page_num;
-            renderPages();
-            setTickets(data.data);
-        });
-        
-    }, [show]);
+        getTickets();
+    }, []);
 
     useEffect(()=>{
         renderPages();
@@ -71,9 +76,15 @@ export default () => {
         });
     }
 
+    const removeTicket = () => {
+        request({method: "post", data: {action: "removeTicket", data: {ticket_id: currentTicket.current.id}}}).then(()=>{
+            getTickets();
+        });
+    }
+
     return (
         <div style={{height: screenHeight+"px"}} className='block-wrapper'>
-            <CreateTicket ticket={currentTicket.current} setShow={setShow} editMode={isEdit} show={show} />
+            <CreateTicket ticket={currentTicket.current} setShow={setShow} editMode={isEdit} show={show} removeTicket={removeTicket} getTickets={getTickets}/>
             <div id='ticket-list'>
                 {
                     tickets.map((v: {text: string, id: number},i: number)=>{

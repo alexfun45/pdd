@@ -20,8 +20,8 @@ body {
 }
 
 .content{
-    width: 95%;
-    max-width: 90%;
+    width: 100%;
+    max-width: 100%;
 }
 
 .pageWrapper{
@@ -67,7 +67,7 @@ body {
 
 .containerWrapper{
     height: 100%;
-    width: 99%;
+    width: 100%;
     overflow: hidden;
     word-wrap: break-word;
 }
@@ -78,11 +78,16 @@ body {
 
 .container {
     max-height: 90%;
+    width: 90%;
+    margin: 0 auto;
     overflow-y: scroll;
     padding-right: 17px;
     box-sizing: content-box;
     -ms-overflow-style: none;
     scrollbar-width: none;
+}
+.mobileWrapper .container{
+    width: 100%;
 }
 
 .container::-webkit-scrollbar {
@@ -407,18 +412,39 @@ button.list-group-item {
 }
 
 .mobileWrapper .container{
-    max-width: 95%;
+    max-width: 100%;
     max-height: 100%;
 }
 
 .mobileWrapper .myheader h1,
 .myheader .h1{
-    font-size: 4.5vh;
+    font-size: 3.5vh;
 }
 
+.mobileWrapper .form-inline .form-group{
+    display: inline-table;
+}
+
+.mobileWrapper .form-inline label{
+    display: table-column;
+}
+
+.mobileWrapper .form-inline input{
+    display: table-cell;
+}
+
+.mobileWrapper #buttonSchoolSetName{
+    display: block;
+}
+
+@media screen and (max-width: 400px) {
+    .mobileWrapper #buttonSchoolSetName{
+        width: 100%;
+    }
+}
 .mobileWrapper p{
     line-height: 1.1;
-    font-size: 3.5vh;
+    font-size: 3vh;
 }
 
 .mobileWrapper .myheader p.lead{
@@ -426,11 +452,19 @@ button.list-group-item {
 }
 
 .mobileWrapper .myheader span{
-    font-size: 3.5vh;
+    font-size: 2vh;
 }
 
 .mobileWrapper .container{
-    font-size: 3.5vh;
+    font-size: 3vh;
+}
+
+.mobileWrapper #commentPanel button{
+    font-size: 2.5vh;
+}
+
+.mobileWrapper small{
+    display: none;
 }
 
 @media screen and (max-width: 767px) {
@@ -1491,6 +1525,18 @@ div.suggestPopupContent div table tbody tr td.item-selected{
     background-color: #df1226 !important;
   }
 
+  .visually-hidden{
+    display: none;
+  }
+  
+  .btn-danger{
+    background-color: #dc3545 !important;
+  }
+
+  .btn-danger:hover{
+    background-color: #c82333 !important;
+  }
+
   .fr-second-toolbar{
     display: none !important;
   }
@@ -1503,6 +1549,8 @@ div.suggestPopupContent div table tbody tr td.item-selected{
     display: block !important;
     text-align: center !important;
     width: 100% !important;
+    margin-right: 0;
+    margin-left: 0;
   }
 
   .col-lg-8.col-md-8.col-sm-8{

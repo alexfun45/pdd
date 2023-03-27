@@ -42,11 +42,11 @@ type TicketDialog = {
 
 var formData = new FormData();
 
-export default ({show, ticket, editMode, setShow}: {show: boolean, ticket: TicketDialog, editMode: boolean, setShow: Function}) => {
+export default ({show, ticket, editMode, setShow, removeTicket, getTickets}: {show: boolean, ticket: TicketDialog, editMode: boolean, setShow: Function, removeTicket: Function, getTickets: Function}) => {
 
-    
     const [text, setText] = useState(ticket.text),
           [img, setImg] = useState(ticket.image),
+          [deleteShow, setDeleteShow] = useState(false),
           [correct_id, setCorrect] = useState(ticket.correct_id);
     let [answers, setAnswers] = useState<any[]>(ticket.variants);
 
@@ -61,11 +61,13 @@ export default ({show, ticket, editMode, setShow}: {show: boolean, ticket: Ticke
         setShow(false);
     }
 
+    const handleCloseDeleteDialog = () => {
+        setDeleteShow(false);
+    }
+
     const uploadImage =(e: React.ChangeEvent<HTMLInputElement>) => {
         let file = (e.target.files) ? e.target.files[0]:'';
         formData.append('file', file);
-        //console.log("file", file);
-        //console.log("formData", formData);
     }
 
     const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -85,7 +87,6 @@ export default ({show, ticket, editMode, setShow}: {show: boolean, ticket: Ticke
     }
 
     const onSubmit = () => {
-        console.log("formData1", formData);
         if(editMode){
             formData.append("action", "editTicket");
             formData.append("ticket_id", ticket.id.toString());
@@ -144,46 +145,71 @@ export default ({show, ticket, editMode, setShow}: {show: boolean, ticket: Ticke
     }
 
     const handleRemove = () => {
-        request({method: "post", data: {action: "removeTicket", data: {ticket_id: ticket.id}}});
-        handleClose();
+        setDeleteShow(true);
     }
+
+    const remove = () => {
+        removeTicket();
+        setDeleteShow(false);
+    }
+
 
     const { register, handleSubmit, setError, watch, setValue, formState: { errors } } = useForm<InputSignInTypes>({mode: 'onBlur'});
     
     return (
-        <Modal
+        <>
+            <Modal
+                show={deleteShow}
+                animation={true}
+                onHide={() => handleCloseDeleteDialog()}
+                >
+                  <Modal.Header closeButton>
+                    <Modal.Title id="example-custom-modal-styling-title">
+                        Удаление
+                    </Modal.Title>
+                    </Modal.Header>  
+                    <Modal.Body>
+                        <div>Вы действительно хотите удалить билет?</div>
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <Button onClick={remove} variant="primary" className="btn-danger">Да</Button>
+                        <Button onClick={()=>setDeleteShow(false)} variant="secondary">Отмена</Button>
+                    </Modal.Footer>
+            </Modal>
+            <Modal
                 show={show}
                 animation={false}
                 dialogClassName="modal-90w"
                 onHide={() => handleClose()}
                 aria-labelledby="example-custom-modal-styling-title"
-            >
-                <Modal.Header closeButton>
-                <Modal.Title id="example-custom-modal-styling-title">
-                    Создание нового вопроса
-                </Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    <form onSubmit={handleSubmit(onSubmit)}>
-                        <fieldset>
-                            <label >Текст вопроса</label>
-                            <input onChange={handleInput} value={text} type="text" name="text" id="ticket_text" className="text required ui-widget-content ui-corner-all" />
-                            <label>Изображение</label>
-                            <img style={{maxWidth: "90%"}} src={(ticket.image!="")?("./img/"+ticket.image):""} id="t_img" />
-                            <input type="file" accept="image/*" onChange={uploadImage} name="files[]" id="ticket_image" className="text ui-widget-content ui-corner-all" />
-                            <label>Варианты ответов:</label>
-                            <div className="answers_block">
-                               {
-                                 answers.map((v, i)=>(
-                                   <Question answer={answers[i]} handleChangeQuestions={handleChangeQuestions} indx={i} setCorrect={setCorrect} correct={correct_id}/>
-                                 ))
-                               }
-                                <span id="add_var" onClick={addQuestion} className="add-btn">+</span>
-                            </div>   
-                        </fieldset>
-                        <div style={{textAlign: "right", marginTop: "15px"}}><Button className="btn-dialog btn-success" type="submit">Сохранить</Button><Button onClick={()=>handleClose()} className="btn-dialog btn-cancel">Отмена</Button><Button onClick={handleRemove} className={"btn-dialog btn-danger "+(editMode?"":"hide")} type="submit">Удалить</Button></div>
-                    </form>
-                </Modal.Body>
-            </Modal>
+                >
+                    <Modal.Header closeButton>
+                    <Modal.Title id="example-custom-modal-styling-title">
+                        Создание нового вопроса
+                    </Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        <form onSubmit={handleSubmit(onSubmit)}>
+                            <fieldset>
+                                <label >Текст вопроса</label>
+                                <input onChange={handleInput} value={text} type="text" name="text" id="ticket_text" className="text required ui-widget-content ui-corner-all" />
+                                <label>Изображение</label>
+                                <img style={{maxWidth: "90%"}} src={(ticket.image!="")?("./img/"+ticket.image):""} id="t_img" />
+                                <input type="file" accept="image/*" onChange={uploadImage} name="files[]" id="ticket_image" className="text ui-widget-content ui-corner-all" />
+                                <label>Варианты ответов:</label>
+                                <div className="answers_block">
+                                {
+                                    answers.map((v, i)=>(
+                                        <Question answer={answers[i]} handleChangeQuestions={handleChangeQuestions} indx={i} setCorrect={setCorrect} correct={correct_id}/>
+                                    ))
+                                }
+                                    <span id="add_var" onClick={addQuestion} className="add-btn">+</span>
+                                </div>   
+                            </fieldset>
+                            <div style={{textAlign: "right", marginTop: "15px"}}><Button className="btn-dialog btn-success" type="submit">Сохранить</Button><Button onClick={()=>handleClose()} className="btn-dialog btn-cancel">Отмена</Button><Button onClick={handleRemove} className={"btn-dialog btn-danger "+(editMode?"":"hide")} type="submit">Удалить</Button></div>
+                        </form>
+                    </Modal.Body>
+                </Modal>
+            </>
     )
 }

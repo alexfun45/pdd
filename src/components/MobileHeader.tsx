@@ -98,9 +98,9 @@ export default () => {
                         openSubmenu[item[1].name] = false;
                     return ( item[1].submenu ? (
                         <>
-                            <ListItemButton divider={true}>
-                                <ListItemText onClick={()=>handleSubmenuClick(item[1].name)} primary={item[1].title} />
-                                {openSubmenu[item[1].name] ? <ExpandLess sx={{fontSize: "5vh"}} /> : <ExpandMore sx={{fontSize: "5vh"}} />}
+                            <ListItemButton  onClick={()=>handleSubmenuClick(item[1].name)} divider={true}>
+                                <ListItemText primary={item[1].title} />
+                                {openSubmenu[item[1].name] ? <ExpandLess onClick={()=>handleSubmenuClick(item[1].name)} sx={{fontSize: "5vh"}} /> : <ExpandMore  onClick={()=>handleSubmenuClick(item[1].name)} sx={{fontSize: "5vh"}} />}
                             </ListItemButton>  
                             <Collapse in={openSubmenu[item[1].name]} timeout="auto" unmountOnExit>
                                 <List component="div" disablePadding>
@@ -118,7 +118,7 @@ export default () => {
                     )
                     :
                     (
-                      <ListItemButton component="a" href={"#/"+item[1].page_name} divider={true}>
+                      <ListItemButton component="a" href={"#/"+item[1].name} divider={true}>
                             <ListItemText primary={item[1].title} />
                       </ListItemButton>   
                     )
