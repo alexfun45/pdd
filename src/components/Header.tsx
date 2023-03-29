@@ -23,7 +23,7 @@ type TopMenuType = {
 
 var formData = new FormData();
 
-function TopMenu() {
+function TopMenu({showLogo}:{showLogo: string}) {
   const context = React.useContext(AppContext);
   const //[isLogin, setLogin] = useState(false),
         //[role, setRole] = useState<number>(0),
@@ -81,7 +81,7 @@ function TopMenu() {
   
   return (
     <div className={"top-level-menu "+((location.pathname=='/auth' || location.pathname=='/confirm')?'hide':'')}>
-      <div className="homeIcon" onClick={handleHomeLink}><a href="./"></a><input onClick={triggerUpload} id="homeIcon" onChange={changeHomeIcon} type="file" /><img src={homeIcon}></img></div>
+      <div className={(showLogo=="0")?"hide":"homeIcon"} onClick={handleHomeLink}><a href="./"></a><input onClick={triggerUpload} id="homeIcon" onChange={changeHomeIcon} type="file" /><img src={homeIcon}></img></div>
       <Admin Logout={Logout} isLogin={context.logged} role={context.userRole} isMobile={false}/>
       {Object.entries(TopMenu).map(
         (item: any, i: number) => {

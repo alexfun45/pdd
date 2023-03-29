@@ -11,7 +11,8 @@ export default () => {
     const
         [settings, setSettings] = useState({
             'background-color': '#FFF',
-            'background-image': ''
+            'background-image': '',
+            'showLogo': '1'
         }),    
         [state, setState] = useState<any>({
             displayColorPicker: false,
@@ -98,6 +99,12 @@ export default () => {
           formData.append('action', 'save_settings');
           request({method: "post", headers: {"Content-Type": "multipart/form-data"}, data: formData});
         }
+
+        const setShowLogo = (e: any) => {
+          let checked = (e.target.checked)?'1':'0';
+          formData.append('showLogo', checked);
+          setSettings({...settings, 'showLogo':checked});
+        }
    
     return (
         <div className="block-wrapper">
@@ -121,7 +128,12 @@ export default () => {
                 <Button onClick={removeBgImage} variant="warning">Удалить</Button>
               </td>
             </tr>
-            
+            <tr>
+              <td>Показывать лого</td>
+              <td>
+                <input onChange={setShowLogo} type="checkbox" checked={(settings['showLogo']=='1')} />
+              </td>
+            </tr>
           </table>
             <div><Button variant="success" onClick={saveSettings}>Сохранить</Button></div>
         </div> 

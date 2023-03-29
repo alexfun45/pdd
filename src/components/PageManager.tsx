@@ -3,7 +3,7 @@ import request from '../utils/request'
 import {ListGroup, Button} from 'react-bootstrap';
 import Form from 'react-bootstrap/Form';
 import Modal from 'react-bootstrap/Modal';
-import DeleteDialog from './TIckets/DeleteDialog'
+import DeleteDialog from './Tickets/DeleteDialog'
 
 type PageItem = {
     title: string;

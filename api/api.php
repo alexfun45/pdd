@@ -1,10 +1,9 @@
 <?php
-    
     //ini_set('display_errors', TRUE);
     require_once("../init.php");
     $IMAGE_PATH = __DIR__ . '/img/';
     $PAGE_DIR = __DIR__ . 'pages/';
-    const PAGE_NUM = 30;
+    const PAGE_NUM = 2;
 
     class Application{
 
@@ -589,11 +588,16 @@
         $db = new SQLite3(DB."db.sqlite");
         $uploadResult = $this->uploadFile($_FILES);
         $image_name = ($uploadResult['success']) ? $uploadResult['filename'] : "";
+        $showLogo = $_POST['showLogo'];
         $bgcolor = $_POST['bgcolor'];
         if($bgcolor)
             $db->exec("UPDATE settings SET value='$bgcolor' WHERE config_name='background-color'");
         if($image_name)
             $db->exec("UPDATE settings SET value='$image_name' WHERE config_name='background-image'");
+        if($showLogo=="0" || $showLogo=="1"){
+            echo "show";
+            $db->exec("UPDATE settings SET value='$showLogo' WHERE config_name='showLogo'");
+        }
         $db->close();
         }
 

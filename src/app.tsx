@@ -47,11 +47,13 @@ export default function App(){
   const [isLogin, setLogin] = useState(false),
         [user, setUser] = useState<userType>(defaultUser),
         [role, setRole] = useState(3),
+        [settings, setSettings] = useState({showLogo: '1'}),
         [displayWidth, setDisplayWidth] = useState(window.innerWidth);
 
   useEffect(()=>{
     request({method: "post", data: {action: "getSettings"}}).then(response=>{
       const {data} = response;
+      setSettings(data);
       if(data['background-color'])
         document.body.style.backgroundColor = data['background-color'];
       if(data['background-image']){
@@ -84,7 +86,7 @@ export default function App(){
             { (isMobile) ?  
                 <MobileHeader />
               :
-                <Header />
+                <Header showLogo={settings.showLogo} />
             }
             <div id="maincontainer" className={(isMobile)?"containerWrapper mobileWrapper":"containerWrapper"}>
               <Routes>
