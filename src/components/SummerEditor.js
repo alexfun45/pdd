@@ -56,7 +56,7 @@ export default (props) => {
             ['fontname', ['fontname']],
             ['para', ['ul', 'ol', 'paragraph', 'height']],
             ['table', ['table']],
-            ['insert', ['link', 'picture']],
+            ['insert', ['link', 'picture', 'video']],
             ['view', ['fullscreen', 'codeview']],
             ['height', ['height']],
             ['misc', ['undo', 'redo']]
