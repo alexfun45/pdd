@@ -15,6 +15,10 @@ body {
     overflow: hidden;
 }
 
+p{
+    width: 100% !important;
+}
+
 .editorWrapper{
     all: unset;
 }
@@ -1625,4 +1629,8 @@ div.suggestPopupContent div table tbody tr td.item-selected{
   .adminpanel-btn > i{
     font-size: 22px;
     color:rgba(0, 0, 0, 0.35) !important;
+  }
+
+  .note-video-clip{
+    max-width: 100%;
   }

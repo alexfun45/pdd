@@ -68,6 +68,7 @@ function getTickets(options: any, callback: Function){
 const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
 
     const [time, setTime] = useState("0:00"),
+          [selectedVariant, setSelectedVar] = useState(0),
           [options, setOptions] = useState({...props.options}),
           [currentTicket, setCurrentTicket] = useState<number>(0),
           [currentQuestion, setCurrentQuestion] = useState<TicketPdd>(),
@@ -153,16 +154,18 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
         setStart(true);
     }
 
-    function selectAnswer(selectedAnswer: any){
+    function selectAnswer(selectedVar: any){
         if(options.settings && currentTicket<question_answered) return;
         let _opened = [...opened];
-        _opened.push(selectedAnswer);
+        _opened.push(selectedVar);
+        setSelectedVar(selectedVar);
+        selectedAnswer = selectedVar
         // save selected answer
         selected[currentTicket] = [..._opened];
         // current opened answers
         setOpened(_opened);
        if(results[currentTicket]==1 || results[currentTicket]==0) return;
-       if(selectedAnswer != parseInt(pdd_questions[currentTicket].success)){
+       if(selectedVar != parseInt(pdd_questions[currentTicket].success)){
             errors++;
             results[currentTicket] = 1;
        }
@@ -368,7 +371,7 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
                                     </div>
                                     <div id="commentPanel" className={(opened.length>0)?"":"hide"}>
                                         <button onClick={next} id="questNext" type="button" className="list-group-item active">Далее <small className="text-warning small hidden-xs"> - Enter &nbsp;&nbsp;&nbsp; 1,2,3 - выбор &nbsp;&nbsp;&nbsp; &larr; назад &nbsp; вперед &rarr;</small></button>
-                                        <div id="questComment" className="list-group-item"></div>
+                                        <div id="questComment" className="list-group-item">{(currentQuestion)?currentQuestion.variants[selectedVariant].comment:""}</div>
                                     </div>
                                 </div>
                             </div>

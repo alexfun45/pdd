@@ -3,7 +3,7 @@
     require_once("../init.php");
     $IMAGE_PATH = __DIR__ . '/img/';
     $PAGE_DIR = __DIR__ . 'pages/';
-    const PAGE_NUM = 2;
+    const PAGE_NUM = 30;
 
     class Application{
 
@@ -462,8 +462,9 @@
             'О' => 'O',    'П' => 'P',    'Р' => 'R',    'С' => 'S',    'Т' => 'T',
             'У' => 'U',    'Ф' => 'F',    'Х' => 'H',    'Ц' => 'C',    'Ч' => 'Ch',
             'Ш' => 'Sh',   'Щ' => 'Sch',  'Ь' => '',     'Ы' => 'Y',    'Ъ' => '',
-            'Э' => 'E',    'Ю' => 'Yu',   'Я' => 'Ya',
-        );
+            'Э' => 'E',    'Ю' => 'Yu',   'Я' => 'Ya','0'=>'0','1'=>'1','2'=>'2','3'=>'3',
+            '4'=>'4','5'=>'5','6'=>'6','7'=>'7','8'=>'8','9'=>'9', '('=>'(', ')'=>')', '-'=>'-', ' '=>' '
+             );
      
         $value = strtr($value, $converter);
         return $value;
@@ -478,7 +479,7 @@
         $pageContent = $_POST['content'];
         $pageTitle = $_POST['page'];
         $pageName = $this->transliterate($_POST['page']);
-        $pageName = substr($pageName, 0, 16);
+        $pageName = substr($pageName, 0, 64);
         file_put_contents(PAGES.$pageName.".html", $pageContent);
         $db = new SQLite3(DB."db.sqlite");
         $db->exec("INSERT INTO pages(name, title) VALUES('$pageName', '$pageTitle')");
