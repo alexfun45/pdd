@@ -1,14 +1,23 @@
-import {useState, useEffect} from "react";
+import React, {useState, useEffect} from "react";
 import { useParams } from "react-router-dom";
 import request from '../utils/request'
+import {AppContext} from '../app'
+import { useNavigate } from "react-router-dom";
 
 interface ContentProps {
     id: string
 } 
 
 function Content(){
-    const {id = 'pdd1'} = useParams(),
+    const context = React.useContext(AppContext);
+    const {id = ''} = useParams(),
           [__content, setContent] = useState("");
+    let navigate = useNavigate();
+    
+    useEffect(()=>{
+        if(context.settings.hasOwnProperty("start_page") && context.settings.start_page.name!="" && id=="")
+            navigate("/"+context.settings.start_page.name);
+    }, [context]);
 
     useEffect(()=>{
         request({method: "post", data:{action: "getPage", data: {page_id: id}}}).then( response =>{

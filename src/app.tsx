@@ -1,11 +1,13 @@
 import React, {useState, useEffect} from "react";
-import { HashRouter } from "react-router-dom" 
+import { HashRouter, useLocation } from "react-router-dom" 
 import { createContext} from "react";
 import "@/css/docs18.css"
 import { Routes, Route } from "react-router-dom";
 import routes from './routers'
 import Header from "./components/Header"
 import MobileHeader from './components/MobileHeader'
+import Footer from './components/Footer'
+import $ from 'jquery'
 import request from './utils/request'
 
 const getRoutes = (allRoutes: Array<{route:string, key: string, component: object}>) =>
@@ -22,14 +24,16 @@ let defaultUser = {
       name: "",
       email: "",
       role: 3,
-      isMobile: false
+      isMobile: false,
+      settings: {}
     }
 
 const AppContext = createContext({
   user: defaultUser,
   userRole: 3,
   logged: false,
-  isMobile: false
+  isMobile: false,
+  settings: {start_page:{name:""}, exam_title: "",'background-color':'', 'background-image':'', 'background-color-tickets': '', 'background-image-tickets': ''}
 });
 
 type userType = {
@@ -38,6 +42,7 @@ type userType = {
   email: string;
   role: number;
   isMobile: boolean;
+  settings: object;
 };
 
 
@@ -47,10 +52,12 @@ export default function App(){
   const [isLogin, setLogin] = useState(false),
         [user, setUser] = useState<userType>(defaultUser),
         [role, setRole] = useState(3),
-        [settings, setSettings] = useState({showLogo: '1'}),
+        [settings, setSettings] = useState({showLogo: '1', start_page: {name: ""}, exam_title: "", 'background-color':'', 'background-image':'', 'background-color-tickets': '', 'background-image-tickets':''}),
         [displayWidth, setDisplayWidth] = useState(window.innerWidth);
+        
 
   useEffect(()=>{
+
     request({method: "post", data: {action: "getSettings"}}).then(response=>{
       const {data} = response;
       setSettings(data);
@@ -67,9 +74,21 @@ export default function App(){
         setRole(data.role);
         setLogin(data.logged);
         setUser(data);
+        
+        if(data.role==1){
+          $("#footer").load("./pages/footer.html", function(){
+            $("#footer").wrap("<div id='footer-wrapper'></div>");
+            $("#footer").append("<span class='footer-edit-btn'>редактировать</span>");
+          });
+        }
+        else
+            $("#footer").load("./pages/footer.html");
       });
       window.addEventListener('resize', handleWindowSizeChange);
+      
     }, []);
+
+   
 
     const handleWindowSizeChange = () => {
       setDisplayWidth(window.innerWidth);
@@ -81,7 +100,7 @@ export default function App(){
     return (  
       
       // the rest is the same...
-      <AppContext.Provider value={{user: user, logged: isLogin, userRole: role, isMobile: isMobile}}>
+      <AppContext.Provider value={{user: user, logged: isLogin, userRole: role, isMobile: isMobile, settings: settings}}>
           <HashRouter>
             { (isMobile) ?  
                 <MobileHeader />
@@ -95,6 +114,7 @@ export default function App(){
                   }
               </Routes>
             </div>
+            <Footer />
           </HashRouter>
         </AppContext.Provider>
     )

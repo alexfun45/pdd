@@ -13,7 +13,14 @@ body {
     width: 100%;
     max-width: 100%;
     overflow: hidden;
+    background-repeat: no-repeat;
+    background-size: cover;
 }
+
+table{
+    max-width: 100%;
+}
+
 
 p{
     width: 100% !important;
@@ -26,6 +33,34 @@ p{
 .content{
     width: 100%;
     max-width: 100%;
+    height: 100% !important;
+}
+
+.footer{
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 10vh;
+    text-align: center;
+}
+
+.footer-edit-btn{
+    position: absolute;
+    top: 0;
+    right: 50px;
+    font-size: 16px;
+    color:rgba(82, 159, 241, 0.7);
+    cursor: pointer;
+}
+
+.footer-edit-btn:hover{
+    color:rgba(3, 115, 235, 0.7);
+}
+
+.inner-block{
+    display: inline-block;
+    margin: 0 auto;
 }
 
 .pageWrapper{
@@ -70,7 +105,7 @@ p{
 }
 
 .containerWrapper{
-    height: 100%;
+    height: 90%;
     width: 100%;
     overflow: hidden;
     word-wrap: break-word;
@@ -169,6 +204,10 @@ p{
 }
 .bs-example > p > .close {
     float: none;
+}
+
+.table-responsive{
+    text-align: center !important;
 }
 
 /* Typography */
@@ -365,6 +404,8 @@ p{
 .list-group{
     max-height: 500px;
     overflow-y: auto;
+    background-color: #FFF;
+    padding-bottom: 35px;
 }
 
 .bs-example > .list-group {
@@ -401,9 +442,10 @@ p{
     display: inline-block;
 }
 
-button.list-group-item {
+.list-group-item {
     width: 100%;
     text-align: left;
+    padding: .75rem 0.4rem !important;
   }
 
 .mobileWrapper{
@@ -448,7 +490,38 @@ button.list-group-item {
 }
 .mobileWrapper p{
     line-height: 1.1;
-    font-size: 3vh;
+    font-size: 2vh;
+}
+
+.mobileWrapper table{
+    font-size: 2vh;
+    max-width: 100%;
+    overflow: hidden; 
+    text-overflow: ellipsis; 
+    word-wrap: break-word;
+    table-layout:fixed;
+}
+
+.mobileWrapper table td{
+    font-size: 2.5vh;
+    padding: 1px 2px;
+    min-width: auto;
+    width: auto;
+    overflow: hidden; 
+    text-overflow: ellipsis; 
+    word-wrap: break-word;
+}
+
+.mobileWrapper table td p{
+    font-size: 2.5vh;
+    word-wrap: break-word;
+}
+
+.mobileWrapper table th{
+    font-size: 2.5vh;
+    padding: 1px 2px !important;
+    min-width: auto;
+    width: auto;
 }
 
 .mobileWrapper .myheader p.lead{
@@ -469,6 +542,17 @@ button.list-group-item {
 
 .mobileWrapper small{
     display: none;
+}
+
+@media only screen and (max-width: 480px) {
+    .mobileWrapper table td{
+        font-size: 1.1vh;
+    }
+
+    .mobileWrapper table td p{
+        font-size: 1.1vh;  
+    }
+
 }
 
 @media screen and (max-width: 767px) {
@@ -770,10 +854,52 @@ div.suggestPopupContent div table tbody tr td.item-selected{
 
 .text{
     width: 95%;
+    /*height: 30px;*/
+    height: auto;
+    padding: 12px 5px;
 }
+
+.nav-tabs{
+    margin-top: 20px !important;
+    display:block;
+    margin:auto;
+    background-color: #f6f6f6;
+}
+
+.nav-tabs li{
+    display: inline-block;
+    text-align:center;
+    padding: 0;
+}
+
+.nav-tabs li a{
+    display:table-cell;
+  }
+
+.qForm{
+    background-color: #FFF;
+    padding: 20px;
+}
+
+.qForm > div{
+    margin-bottom: 15px;
+}
+
+.qForm .variant-section > div{
+    margin-bottom: 15px;
+}
+
+/*.qForm fieldset > label:not(:first-child){
+    margin-top: 15px;
+}*/
 
 #examSizePanel label{
     display: inline-block !important;
+    margin-right: 5px;
+}
+
+#examErrorSize{
+    padding-left: 4px;
 }
 
 .ticket-wrapper .title{
@@ -805,18 +931,25 @@ div.suggestPopupContent div table tbody tr td.item-selected{
 .block-wrapper{
     position: relative;
     padding: 15px 20px;
-    text-align: left;
+    text-align: center;
     height: 100%;
 }
 
 .block-wrapper > .col-30{
-    min-width: 300px;
-    max-width: 30%;
+    min-width: 23%;
+    max-width: 25%;
     margin-right: 20px;
     display: inline-block;
 }
 
-.block-wrapper > .col-30, .middle-column{
+.col-50{
+    min-width: 41%;
+    max-width: 45%;
+    margin-right: 20px;
+    display: inline-block; 
+}
+
+.block-wrapper > .col-30, .col-50, .middle-column{
     min-height: 300px;
     vertical-align: top;
 }
@@ -833,11 +966,11 @@ div.suggestPopupContent div table tbody tr td.item-selected{
 .middle-column > i{
     cursor: pointer;
     font-size: 20px;
-    color: #8bcc8b;
+    color: #4eca4e;
 }
 
 .middle-column > i:hover{
-    color:#4cae4c;
+    color:#209620;
 }
 
 .col-title{
@@ -974,7 +1107,7 @@ div.suggestPopupContent div table tbody tr td.item-selected{
 }
 
 .btn-primary{
-     background-color: transparent;
+     /*background-color: transparent;*/
 }
 
 .blue-btn{
@@ -988,6 +1121,7 @@ div.suggestPopupContent div table tbody tr td.item-selected{
 
 .admin-container{
     width: 100% !important;
+    max-width: 85%;
     text-align: center !important;
 }
 .admin-container .row{
@@ -1025,19 +1159,26 @@ div.suggestPopupContent div table tbody tr td.item-selected{
     margin-left: 40px;
     border-spacing: 10px;
     text-align: left;
+    display: inline-table;
     color: #333;
+    background-color: #FFF;
+}
+
+.MuiAutocomplete-popper{
+    text-align: left;
 }
 
 .users-table tr{
     border: none;
 }
 
+.QuestionForm{
+    text-align: left;
+}
+
 .users-table th{
     background-color: #3c96e6;
     color: #FFF;
-}
-
-.users-table th, td{
     padding: 12px 17px !important;
     border: none;
 }
@@ -1045,6 +1186,8 @@ div.suggestPopupContent div table tbody tr td.item-selected{
 .users-table td{
     font-size: 16px;
     font-weight: 400;
+    padding: 12px 17px !important;
+    border: none;
 }
 
 .users-table td:hover{
@@ -1138,6 +1281,7 @@ div.suggestPopupContent div table tbody tr td.item-selected{
 
     .configTable{
         margin-bottom: 15px;
+        display: inline-table;
     }
 
     .config-section> div{
@@ -1162,6 +1306,11 @@ div.suggestPopupContent div table tbody tr td.item-selected{
         text-align: right;
     }
 
+    .configTable td:nth-child(2){
+        text-align: left;
+        padding-left: 20px;
+    }
+
     .btn-big{
         margin-top: 35px;  
         margin-left: 30px; 
@@ -1184,6 +1333,7 @@ div.suggestPopupContent div table tbody tr td.item-selected{
         color:#454545 !important;
         font-size: 2.5vh !important;
         font-weight: 400 !important;
+        padding: 0.9rem 2rem !important;
     }
 
     .auth_container{
@@ -1230,6 +1380,7 @@ div.suggestPopupContent div table tbody tr td.item-selected{
 
     .btn{
         margin-right: 5px;
+        margin-left: 5px;
     }
     
     #buttonPanel.btn-group-sm > button , #buttonPanel1 > button, #buttonPanel2 > button, #buttonPanel3 > button , #buttonPanel4 > button {
@@ -1254,6 +1405,52 @@ div.suggestPopupContent div table tbody tr td.item-selected{
         user-select: none;
         background-image: none;
         border: 1px solid transparent;
+        width: 50px;
+        height: auto;
+        margin-right: 0px !important;
+        margin-left: 0px !important;
+    }
+
+    .slide-wrapper{
+        display: inline-block;
+        text-align: center;
+        overflow-wrap: break-word;
+        position:relative;
+    }
+
+    .button-slider{
+        width: 100%;
+        display: inline-block;
+        position: relative;
+        overflow: hidden;
+        height: 40px;
+    }
+
+    .button-slider #buttonPanel{
+        text-align: center;
+        word-wrap: normal;
+        position: absolute;
+        white-space: nowrap;
+        top: 0;
+    }
+
+    .arrow-btn{
+        font-size: 30px;
+        position:absolute;
+        top: 2px;
+    }
+
+    .arrow-left-btn{
+        left: -30px;
+    }
+
+    .arrow-rigth-btn{
+        right: -30px;
+    }
+
+    .arrow-btn:hover{
+        cursor: pointer;
+        color: #000;
     }
 
     .panel-primary {
@@ -1312,6 +1509,28 @@ div.suggestPopupContent div table tbody tr td.item-selected{
     .right-panel{
         display: inline-block;
         float: right;
+    }
+
+    .pos-element{
+        visibility: hidden;
+    }
+
+    .pos-element i{
+        color: rgb(104, 226, 104);
+    }
+
+    .pos-element i{
+        margin: 0;
+        font-weight: 600;
+    }
+
+    .pos-element i:hover{
+        color:#33bb33;
+        cursor: pointer;
+    }
+
+    .list-group-item:hover .pos-element{
+        visibility: visible;
     }
 
     .right-panel i{
@@ -1475,10 +1694,12 @@ div.suggestPopupContent div table tbody tr td.item-selected{
  }
 
  .radio-inline input[type="radio"]{
-    position: absolute;
+    /*position: absolute;*/
     margin: 4px 0 0;
     margin-left: -20px;
+    margin-right: 4px;
     line-height: normal;
+    margin-bottom: 4px;
  }
 
  .checkbox-inline, .radio-inline {
@@ -1505,6 +1726,15 @@ div.suggestPopupContent div table tbody tr td.item-selected{
 
   .btn{
     vertical-align: middle;
+  }
+
+  .input-right-btn:hover{
+    background-color: #FFF;
+  }
+
+  .form-inline{
+    display: inline-flex;
+    text-align: center;
   }
 
   .form-inline .form-control{
@@ -1549,16 +1779,33 @@ div.suggestPopupContent div table tbody tr td.item-selected{
     display: none !important;
   }
 
+  .MuiList-root{
+    width: 100%;
+  }
+
+  .questvariant{
+    line-height: 1;
+  }
+
+  #questComment{
+    line-height: 1.1;
+  }
+
   .row.testrow{
     display: block !important;
     text-align: center !important;
     width: 100% !important;
     margin-right: 0;
     margin-left: 0;
+    line-height: 40px;
   }
 
   .col-lg-8.col-md-8.col-sm-8{
     display: inline-block !important;
+  }
+
+  .col-md-12{
+    text-align: center;
   }
 
   .col-md-12.col-sm-12.myheader{
@@ -1634,3 +1881,11 @@ div.suggestPopupContent div table tbody tr td.item-selected{
   .note-video-clip{
     max-width: 100%;
   }
+
+  .title-num{
+    font-size: 16px;
+    color:#1f82d8;
+    text-align: right;
+  }
+
+  

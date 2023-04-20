@@ -1,7 +1,17 @@
-import { Link } from "react-router-dom" 
+import {useEffect, useState} from 'react'
 import { Button } from "react-bootstrap"
+import $ from 'jquery'
 
 export default ({Logout, isLogin, role, isMobile}: {Logout: React.MouseEventHandler, isLogin: boolean, role: number, isMobile: boolean}) => {
+
+    /*useEffect(()=>{
+        $('.footer-edit-btn').click(function(){
+            $("#footer-wrapper").hide();
+            $(this).parent().append('<textarea id="summernote" name="editordata"></textarea>');
+            $('#summernote').summernote();
+        });
+    }, []);*/
+
     return (
         <div className="admin-panel-wrapper">
             {(!isLogin) ? (

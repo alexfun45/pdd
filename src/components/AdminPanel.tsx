@@ -1,11 +1,12 @@
 import React, {useState, useEffect} from "react";
 import Tab from 'react-bootstrap/Tab';
 import Tabs from 'react-bootstrap/Tabs';
-import Tickets from './Tickets'
+import TicketManager from './TicketManager'
 import PageManager from './PageManager'
 import PageEditor from './PageEditor'
 import UsersManager from './Users'
 import Settings from './Settings'
+import request from '../utils/request'
 import {AppContext} from '../app'
 
 function TabTitle({tab_type, setpageTabtype, setKey, editPageName, setEditPageName}:{tab_type: number, setpageTabtype: React.Dispatch<React.SetStateAction<number>>, setKey: React.Dispatch<React.SetStateAction<string>>, editPageName: string, setEditPageName:React.Dispatch<React.SetStateAction<string>>}){
@@ -23,9 +24,19 @@ function TabTitle({tab_type, setpageTabtype, setKey, editPageName, setEditPageNa
 export default () => {
     const context = React.useContext(AppContext);
     const [key, setKey] = useState('tickets'),
+          [menuItems, setMenuItems] = useState<any>([]),
+          [allPages, setAllPages] = useState<any>([]),
           [pageTabtype, setpageTabtype] = useState(0),
           [editPageName, setEditPageName] = useState("");
 
+     // getting all menu items and all pages
+     useEffect(()=>{
+        request({method: "post", data: {action: "getMenuItems"}}).then((response)=>{
+            const {data} = response;
+            setMenuItems(data.menus);
+            setAllPages(data.pages);
+        });
+    }, []);
     useEffect(()=>{
         if(pageTabtype==0)
             setKey("pagemanager");
@@ -43,11 +54,11 @@ export default () => {
                     activeKey={key}
                     >
                     <Tab eventKey="tickets" title="Билеты">
-                        <Tickets />
+                        <TicketManager />
                     </Tab>
                     {(context.userRole==1) && (
                         <Tab eventKey="settings" title="Настройки">
-                            <Settings />
+                            <Settings allPages={allPages} />
                         </Tab>
                     )}
                     {(context.userRole==1) && (
@@ -56,7 +67,7 @@ export default () => {
                         </Tab>
                     )}
                     <Tab eventKey="pagemanager" title="Менеджер страниц">
-                        <PageManager setpageTabtype={setpageTabtype} setKey={setKey} setEditPageName={setEditPageName} />
+                        <PageManager setpageTabtype={setpageTabtype} setKey={setKey} setEditPageName={setEditPageName} __menuItems={menuItems} __allPages={allPages} />
                     </Tab>
                     { (pageTabtype!=0) && (
                         <Tab eventKey="newpage" tabClassName={(pageTabtype!=0)?'':'hide'} title={<TabTitle tab_type={pageTabtype} editPageName={editPageName} setpageTabtype={setpageTabtype} setKey={setKey} setEditPageName={setEditPageName}/>}>

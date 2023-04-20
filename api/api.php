@@ -30,6 +30,10 @@
             return file_get_contents($page_filename);
         }
 
+        protected function getFooter(){
+            return file_get_contents(PAGES . "footer.html");
+        }
+
         protected function editPage(){
             $page_name = $_POST['page'];
             $page_filename = PAGES . $page_name . ".html";
@@ -56,26 +60,96 @@
             $db->exec("DELETE FROM menus WHERE id=$menu_id");
         }
         
-        protected function getTickets($data){
-            $db = new SQLite3(DB."db.sqlite");
-            $current_page = $this->data->page;
-            $offset = ($current_page-1) * PAGE_NUM;
-            $res = $db->query("SELECT COUNT(*) as num FROM tickets");
-            $page_num = $res->fetchArray(SQLITE3_ASSOC);
-            $page_num = ceil($page_num["num"]/PAGE_NUM);
-            $page_num = ($page_num==0) ? 1:$page_num;
-            $sql = "SELECT * FROM tickets LIMIT ".PAGE_NUM." OFFSET $offset";
-            $res = $db->query($sql);
-            $data = array();
-            while ($v = $res->fetchArray(SQLITE3_ASSOC)){
-                array_push($data, $v);
-            }
-            $db->close();
-            return array("data"=>$data, "page_num"=>$page_num);
+    protected function getTickets(){
+        $db = new SQLite3(DB."db.sqlite");
+        $sql = "SELECT * FROM tickets";
+        $res = $db->query($sql);
+        $tickets = array();
+        while ($v = $res->fetchArray(SQLITE3_ASSOC)){
+            array_push($tickets, $v);
+        }
+        $db->close();
+        return $tickets;
     }
 
+    protected function getQuestions2($data){
+        $db = new SQLite3(DB."db.sqlite");
+        $current_page = $this->data->page;
+        $offset = ($current_page-1) * PAGE_NUM;
+        $res = $db->query("SELECT COUNT(*) as num FROM tickets");
+        $page_num = $res->fetchArray(SQLITE3_ASSOC);
+        $page_num = ceil($page_num["num"]/PAGE_NUM);
+        $page_num = ($page_num==0) ? 1:$page_num;
+        $sql = "SELECT * FROM tickets LIMIT ".PAGE_NUM." OFFSET $offset";
+        $res = $db->query($sql);
+        $data = array();
+        while ($v = $res->fetchArray(SQLITE3_ASSOC)){
+            array_push($data, $v);
+        }
+        $db->close();
+        return array("data"=>$data, "page_num"=>$page_num);
+}
 
-    function getAllTickets(){
+    function getQuestions(){
+        $ticket = ($this->data->settings)?null:$this->data->selectedTicket;
+        $num = $this->data->num;
+        //return $this->getTicketQuestions($ticket);
+        $questions = array_splice($this->getTicketQuestions($ticket), 0, $num);
+        if($this->data->random=="on" || $this->data->random)
+                shuffle($questions);
+        return $questions;
+    }
+
+    function getTickets_2_Questions(){
+        $db = new SQLite3(DB."db.sqlite");
+        $res = $db->query("SELECT * FROM tickets");
+        $tickets = array();
+        $i = 0;
+        while ($_t = $res->fetchArray(SQLITE3_ASSOC)){
+            $tickets[$i] = array("name"=>$_t['name']);
+            $res2 = $db->query("SELECT t2.* FROM ticket_2_question as t1 INNER JOIN questions as t2 ON t1.q_id=t2.id WHERE t1.tickets_id={$_t['id']}");
+            while ($q = $res2->fetchArray(SQLITE3_ASSOC)){
+                $tickets[$i]['questions'][] = $q;
+            }
+        }
+        $db->close();
+        return $tickets;
+    }
+
+    function getTicketQuestions($ticketId=null){
+        $db = new SQLite3(DB."db.sqlite");
+        $ticketId = ($ticketId===null)?$this->data->ticketId:$ticketId;
+        if($ticketId!=0)
+            $sql = "SELECT t1.indx, t1.tickets_id, t2.* FROM ticket_2_question as t1 INNER JOIN questions as t2 ON t1.q_id=t2.id WHERE t1.tickets_id=$ticketId ORDER BY t1.indx";
+        else
+            $sql = "SELECT * FROM questions";
+        $res = $db->query($sql);
+        $questions = array();
+        $i = 0;
+        while ($_q = $res->fetchArray(SQLITE3_ASSOC)){
+            $_v = array();
+            $questions[$i] = $_q;
+            $sql = "SELECT * FROM variants WHERE q_id='{$_q['id']}'";
+            $res2 = $db->query($sql);
+            while ($v = $res2->fetchArray(SQLITE3_ASSOC)){
+                $_v[] = $v;
+            }
+            $questions[$i]["variants"] = $_v;
+            $i++;
+        }
+        $db->close();
+        return $questions;
+    }
+
+    protected function removeQuestion(){
+        $db = new SQLite3(DB."db.sqlite");
+        $qId = $this->data->qId;
+        $db->exec("DELETE FROM questions WHERE id=$qId");
+        $db->exec("DELETE FROM ticket_2_question WHERE q_id=$qId");
+        $db->close();
+    }
+
+    function getAllTicketQuestions(){
         $db = new SQLite3(DB."db.sqlite");
         $num = $this->data->num;
         $max = $this->data->max;
@@ -100,6 +174,24 @@
         return $tickets;
     }
 
+    protected function changeTicketPos(){
+        $db = new SQLite3(DB."db.sqlite");
+        $tableName = $this->data->table;
+        $firstItemQId = $this->data->firstItem->id;
+        $secondItemQId = $this->data->secondItem->id;
+        $firstTicketId = $this->data->secondItem->tickets_id;
+        $secondTicketId = $this->data->secondItem->tickets_id;
+        $firstItemIndx = $this->data->firstItem->indx;
+        $secondItemIndx = $this->data->secondItem->indx;
+        $menu_id = $this->data->menu_id;
+        $sql1 = "UPDATE ticket_2_question SET indx=$firstItemIndx WHERE q_id=$firstItemQId AND tickets_id=$firstTicketId";
+        $sql2 = "UPDATE ticket_2_question SET indx=$secondItemIndx WHERE q_id=$secondItemQId AND tickets_id=$secondTicketId";
+        $db->query($sql1);
+        $db->query($sql2);
+        $db->close();
+        return $sql1;
+    }
+
     protected function getTicket(){
         $db = new SQLite3(DB."db.sqlite");
         $ticket_id = $this->data->ticket_id;
@@ -118,12 +210,12 @@
         return array("ticket"=>$ticket, "variants"=>$variants);
     }
 
-    protected function uploadFile($fileUpload){
+    protected function uploadFile($fileUpload, $input_name = 'file'){
         $IMAGE_PATH = __DIR__ . '/img/';
-        if (!isset($fileUpload['file'])) {
+        if (!isset($fileUpload[$input_name])) {
             $error = 'Не удалось загрузить файл.';
         } else {
-            $file = $fileUpload['file'];
+            $file = $fileUpload[$input_name];
         }
         $allow = array('jpg', 'jpeg', 'png', 'svg', 'gif');
 
@@ -148,7 +240,7 @@
                 if (move_uploaded_file($file['tmp_name'], IMG . $name)) {
                     return array("success"=>true, "filename"=>$name);
                 } else {
-                    $error = $_FILES["file"]["error"];
+                    $error = $_FILES[$input_name]["error"];
                 }
             }
         }
@@ -156,22 +248,78 @@
     }
 
     protected function addTicket(){
+        $db = new SQLite3(DB."db.sqlite");
+        $ticket_name = $this->data->ticket_name;
+        $db->exec("INSERT INTO tickets(name) VALUES('$ticket_name')");
+        $db->close();
+        return $db->lastInsertRowID();
+    }
+
+    protected function addQuestion(){
         $uploadResult = $this->uploadFile($_FILES);
         $image_name = ($uploadResult['success']) ? $uploadResult['filename'] : "";
         $text = $_POST['text'];
+        $code_id = $_POST['codeId'];
+        $ticket_id = $_POST['ticket_id'];
         $correct = $_POST['correct'];
         $variants = json_decode($_POST['variants']);
         sleep(1);
         $db = new SQLite3(DB."db.sqlite");
-        $db->exec("INSERT INTO tickets(text, image, correct_id) VALUES('$text', '$image_name', '$correct')");
-        $ticketId = $db->lastInsertRowID();
+        $db->exec("INSERT INTO questions(code_id, title, image, correct) VALUES('$code_id', '$text', '$image_name', '$correct')");
+        $QId = $db->lastInsertRowID();
+        //$db->exec("INSERT INTO ticket_2_question(ticket_id, q_id) VALUES($ticket_id, $QId)");
         for($i=0;$i<count($variants);$i++){
             $label = $variants[$i]->answer;
             $comment = $variants[$i]->comment;
-            $db->exec("INSERT INTO variants(ticket_id, answer, comment) VALUES('$ticketId', '$label', '$comment')");  
+            $db->exec("INSERT INTO variants(q_id, answer, comment) VALUES('$QId', '$label', '$comment')");  
         }
         $db->close();
-        return $text;
+        return $QId;
+    }
+
+    protected function editQuestion(){
+        $db = new SQLite3(DB."db.sqlite");
+        $uploadResult = $this->uploadFile($_FILES);
+        $image_name = ($uploadResult['success']) ? $uploadResult['filename'] : "";
+        $text = $_POST['text'];
+        $codeId = $_POST['codeId'];
+        $q_id = $_POST['qId'];
+        $correct = $_POST['correct'];
+        $variants = json_decode($_POST['variants']);
+        sleep(1);
+        $variants = json_decode($_POST['variants']);
+        if($uploadResult['success']!==false)
+            $db->exec("UPDATE questions SET code_id='$codeId', title='$text', image='$image_name', correct='$correct' WHERE id=$q_id");
+        else
+            $db->exec("UPDATE questions SET code_id='$codeId',title='$text', correct='$correct' WHERE id=$q_id"); 
+        
+        for($i=0;$i<count($variants);$i++){
+            $label = $variants[$i]->answer; 
+            $comment = $variants[$i]->comment;
+            $var_id = $variants[$i]->id;
+            if(array_key_exists("id", $variants[$i]))
+                $db->exec("UPDATE variants SET answer='$label', comment='$comment' WHERE q_id='$q_id' AND id='$var_id'");  
+            else
+                $db->exec("INSERT INTO variants(ticket_id, answer, comment) VALUES('$q_id', '$label', '$comment')");
+            }
+        $db->close();
+    }
+
+    protected function addQueToTicket(){
+        $db = new SQLite3(DB."db.sqlite");
+        $ticketId = $this->data->ticketId;
+        $questionId = $this->data->qId;
+        $next_indx = $this->data->next_indx;
+        $db->exec("INSERT INTO ticket_2_question(tickets_id, q_id, indx) VALUES($ticketId, $questionId, $next_indx)");
+        $db->close();
+    }
+
+    protected function removeQuestionicket(){
+        $db = new SQLite3(DB."db.sqlite");
+        $ticketId = $this->data->ticketId;
+        $questionId = $this->data->qId;
+        $db->exec("DELETE FROM ticket_2_question WHERE tickets_id=$ticketId AND q_id=$questionId");
+        $db->close();
     }
 
     protected function editTicket(){
@@ -191,7 +339,10 @@
             $label = $variants[$i]->answer;
             $comment = $variants[$i]->comment;
             $var_id = $variants[$i]->id;
-            $db->exec("UPDATE variants SET answer='$label', comment='$comment' WHERE ticket_id='$ticketId' AND id='$var_id'");  
+            if(array_key_exists("id", $variants[$i]))
+                $db->exec("UPDATE variants SET answer='$label', comment='$comment' WHERE ticket_id='$ticketId' AND id='$var_id'");  
+            else
+                $db->exec("INSERT INTO variants(ticket_id, answer, comment) VALUES('$ticketId', '$label', '$comment')");
             }
         $db->close();
         return true;
@@ -466,7 +617,7 @@
             '4'=>'4','5'=>'5','6'=>'6','7'=>'7','8'=>'8','9'=>'9', '('=>'(', ')'=>')', '-'=>'-', ' '=>' '
              );
      
-        $value = strtr($value, $converter);
+        $value = strtr(str_replace(" ", "", $value), $converter);
         return $value;
     }
 
@@ -486,14 +637,33 @@
         $db->close();
     }
 
+    protected function update(){
+        $db = new SQLite3(DB."db.sqlite");
+        $db->exec("INSERT INTO settings(config_name, value) values('exam_title', 'Выбор билета')");
+        $db->exec("ALTER TABLE ticket_2_question ADD COLUMN indx");
+        $res = $db->query("SELECT * FROM ticket_2_question");
+        $i = 0;
+        $tickets = array();
+        while($row = $res->fetchArray(SQLITE3_ASSOC)){
+            $i++;
+            if(!isset($tickets[$row['tickets_id']]))
+                $tickets[$row['tickets_id']] = 1;
+            else
+                $tickets[$row['tickets_id']]++;
+            $db->exec("UPDATE ticket_2_question SET indx={$tickets[$row['tickets_id']]} WHERE tickets_id={$row['tickets_id']} AND q_id={$row['q_id']}");
+        }
+        $db->close();
+    }
+
     // getting top menu
     protected function getMenu(){
         $db = new SQLite3(DB."db.sqlite");
-        $res = $db->query("SELECT t1.name, t1.title as menu_title, t3.name as page_name, t3.title FROM menus as t1 LEFT JOIN menu_2_page as t2 ON t1.id=t2.menu_id LEFT JOIN pages as t3 ON t2.page_id=t3.id");
+        $res = $db->query("SELECT t1.name, t1.title as menu_title, t3.name as page_name, t3.title FROM menus as t1 LEFT JOIN menu_2_page as t2 ON t1.id=t2.menu_id LEFT JOIN pages as t3 ON t2.page_id=t3.id ORDER BY t1.indx, t2.indx");
         $menu = array();
         while($row = $res->fetchArray(SQLITE3_ASSOC)){
             if($row['page_name']!=null){
                 $menu[$row['name']]['title'] = $row['menu_title'];
+                $menu[$row['name']]['name'] = $row['name'];
                 $menu[$row['name']]['submenu'][] = $row;
                 
             }
@@ -519,7 +689,7 @@
     protected function getMenuItems(){
         $db = new SQLite3(DB."db.sqlite");
         // query for getting all menu items
-        $res = $db->query("SELECT * FROM menus");
+        $res = $db->query("SELECT * FROM menus ORDER BY indx");
         $menus = array();
         $pages = array();
         while($row = $res->fetchArray(SQLITE3_ASSOC))
@@ -535,18 +705,42 @@
     protected function getMenuPages(){
         $db = new SQLite3(DB."db.sqlite");
         $menu_id = $this->data->menu_id;
-        $res = $db->query("SELECT t2.* FROM menu_2_page as t1 INNER JOIN pages as t2 ON t1.page_id=t2.id WHERE t1.menu_id=$menu_id");
+        $res = $db->query("SELECT t1.indx, t1.menu_id, t2.* FROM menu_2_page as t1 INNER JOIN pages as t2 ON t1.page_id=t2.id WHERE t1.menu_id=$menu_id ORDER BY t1.indx");
         $pages = array();
         while($row = $res->fetchArray(SQLITE3_ASSOC))
             $pages[] = $row;
+        $db->close();
         return $pages;
+    }
+
+    protected function changePos(){
+        $db = new SQLite3(DB."db.sqlite");
+        $tableName = $this->data->table;
+        $firstItemId = $this->data->firstItem->id;
+        $secondItemId = $this->data->secondItem->id;
+        $firstItemIndx = $this->data->firstItem->indx;
+        $secondItemIndx = $this->data->secondItem->indx;
+        $menu_id = $this->data->menu_id;
+        if($tableName=="menu_2_page"){
+            $sql1 = "UPDATE {$tableName} SET indx=$firstItemIndx WHERE page_id=$firstItemId AND menu_id=$menu_id";
+            $sql2 = "UPDATE {$tableName} SET indx=$secondItemIndx WHERE page_id=$secondItemId AND menu_id=$menu_id";
+        }
+        else{
+            $sql1 = "UPDATE {$tableName} SET indx=$firstItemIndx WHERE id=$firstItemId";
+            $sql2 = "UPDATE {$tableName} SET indx=$secondItemIndx WHERE id=$secondItemId"; 
+        }
+        $db->query($sql1);
+        $db->query($sql2);
+        $db->close();
+        return $sql1;
     }
 
     protected function addPageMenu(){
         $db = new SQLite3(DB."db.sqlite");
         $menu_id = $this->data->menu_id;
         $page_id = $this->data->page_id;
-        $db->exec("INSERT INTO menu_2_page(menu_id, page_id) VALUES($menu_id, $page_id)");
+        $indx = $this->data->indx;
+        $db->exec("INSERT INTO menu_2_page(menu_id, page_id, indx) VALUES($menu_id, $page_id, $indx)");
         $db->close();
         return true;
     }
@@ -563,8 +757,15 @@
     protected function getSettings(){
         $db = new SQLite3(DB."db.sqlite");
         $res = $db->query("SELECT * FROM settings");
-        while($row = $res->fetchArray(SQLITE3_ASSOC))
-            $settings[$row['config_name']] = $row['value'];
+        while($row = $res->fetchArray(SQLITE3_ASSOC)){
+            if($row['config_name']=='start_page'){
+                $res2 =  $db->query("SELECT * FROM pages WHERE id='{$row['value']}'");
+                $row2 = $res2->fetchArray(SQLITE3_ASSOC);
+                $settings[$row['config_name']] = $row2;
+            }
+            else
+                $settings[$row['config_name']] = $row['value'];
+        }
         $db->close();
         return $settings;
     }
@@ -585,19 +786,35 @@
         return './img/'.$result['value'];
     }
 
+
     protected function save_settings(){
         $db = new SQLite3(DB."db.sqlite");
-        $uploadResult = $this->uploadFile($_FILES);
+        $uploadResult = $this->uploadFile($_FILES, 'file');
         $image_name = ($uploadResult['success']) ? $uploadResult['filename'] : "";
+        $uploadResult2 = $this->uploadFile($_FILES, 'file_tickets');
+        $image_name_tickets = ($uploadResult2['success']) ? $uploadResult2['filename'] : "";
         $showLogo = $_POST['showLogo'];
         $bgcolor = $_POST['bgcolor'];
+        $bgcolor_tickets = $_POST['bgcolor_tickets'];
+        $examTitle = $_POST['exam_title'];
+        $start_page = $_POST['start_page'];
+        sleep(1);
         if($bgcolor)
             $db->exec("UPDATE settings SET value='$bgcolor' WHERE config_name='background-color'");
         if($image_name)
             $db->exec("UPDATE settings SET value='$image_name' WHERE config_name='background-image'");
+        if($image_name_tickets)
+            $db->exec("UPDATE settings SET value='$image_name_tickets' WHERE config_name='background-image-tickets'");
+        if($bgcolor_tickets)
+            $db->exec("UPDATE settings SET value='$bgcolor_tickets' WHERE config_name='background-color-tickets'"); 
         if($showLogo=="0" || $showLogo=="1"){
-            echo "show";
             $db->exec("UPDATE settings SET value='$showLogo' WHERE config_name='showLogo'");
+        }
+        if($start_page){
+            $db->exec("UPDATE settings SET value='$start_page' WHERE config_name='start_page'");
+        }
+        if($examTitle){
+            $db->exec("UPDATE settings SET value='$examTitle' WHERE config_name='exam_title'");
         }
         $db->close();
         }
@@ -607,6 +824,12 @@
         $db->exec("UPDATE settings SET value='' WHERE config_name='background-image'");
         $db->close();
         }
+
+    protected function removeBgTicketsImage(){
+        $db = new SQLite3(DB."db.sqlite");
+        $db->exec("UPDATE settings SET value='' WHERE config_name='background-image-tickets'");
+        $db->close();
+    }
     }
     $app = new Application();
     $app->run();

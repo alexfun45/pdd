@@ -74,10 +74,10 @@ export default () => {
     }
 
     return (
-        <div style={{textAlign: 'left'}}>
+        <div style={{textAlign: 'right'}}>
             <DialogUser showUserDialog={showUserDialog} setUserDialog={setUserDialog} selectedUser={selUser} users={users} setUsers={setUsers} />
             <PasswordDialog userId={userId} showPasswordDialog={showPasswordDialog} setShow={setPasswordDialog}  />
-            <Button onClick={handleDialog} style={{marginLeft: '20px'}} variant="primary">Добавить пользователя</Button>
+            <Button onClick={handleDialog} style={{marginRight: '220px'}} variant="primary">Добавить пользователя</Button>
             <Table className="users-table" responsive>
                 <thead>
                     <tr>

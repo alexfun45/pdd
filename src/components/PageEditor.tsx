@@ -5,29 +5,7 @@ import Modal from 'react-bootstrap/Modal';
 import Spinner from 'react-bootstrap/Spinner';
 import {useState, useEffect} from "react";
 import request from '../utils/request'
-// Require Editor JS files.
-/*import 'froala-editor/js/froala_editor.pkgd.min.js';
-import 'froala-editor/js/plugins/align.min.js';
-import 'froala-editor/js/plugins/fullscreen.min.js';       
-import 'froala-editor/js/plugins/code_beautifier.min.js';
-import 'froala-editor/js/plugins/font_family.min.js';     
-import 'froala-editor/js/plugins/link.min.js';  
-import 'froala-editor/js/plugins/image.min.js';
-import 'froala-editor/js/plugins/font_size.min.js';
-import 'froala-editor/js/plugins/colors.min.js';
-import 'froala-editor/js/plugins/paragraph_format.min.js';
-import 'froala-editor/js/plugins/paragraph_style.min.js';
-import 'froala-editor/js/plugins/lists.min.js';
-
-// Require Editor CSS files.
-import 'froala-editor/css/froala_style.min.css';
-import 'froala-editor/css/froala_editor.pkgd.min.css';
-  
-// Require Font Awesome.
-import 'font-awesome/css/font-awesome.css';
-import FroalaEditor from 'react-froala-wysiwyg';*/
 import $ from 'jquery'
-
 import SummerEditor from './SummerEditor'
 
 
@@ -45,7 +23,7 @@ export default function PageEditor({editPageName, setEditPageName, mode}: {editP
     const [show, setShow] = useState(false),
           [pageName, setPageName] = useState(""),
           [saving, setSaving] = useState(false);
-    const [model, setModel] = useState("");             // content of Froala editor
+    const [model, setModel] = useState("");            
     const [validated, setValidated] = useState(false);
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);

@@ -62,6 +62,25 @@ export default () => {
 
     }, []);
 
+    useEffect(()=>{
+        if(location.pathname=="/pdd-online" || location.pathname=="/pdd_for_school"){
+          if(context.settings['background-color-tickets'])
+            document.body.style.backgroundColor = context.settings['background-color-tickets'];
+          if(context.settings['background-image-tickets']){
+            let src = "./img/" + context.settings['background-image-tickets'];
+            document.body.style.backgroundImage = `url(${src})`;
+          }
+        }
+        else{
+          if(context.settings['background-color'])
+            document.body.style.backgroundColor = context.settings['background-color'];
+          if(context.settings['background-image-tickets']){
+            let src = "./img/" + context.settings['background-image'];
+            document.body.style.backgroundImage = `url(${src})`;
+          }
+        }
+      }, [window.location.href])
+
     const handleClick = (event: React.MouseEvent<HTMLElement>) => {
         setAnchorLeft(true);
     };

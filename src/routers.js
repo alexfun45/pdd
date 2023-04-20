@@ -35,7 +35,7 @@ const routes = [
     },
     {
         route: "pdd-online",
-        component: <TestPdd start={true} options={{num: 10, max_error:2, random: true, max: 1000, dblclick: false, settings: false}} />,
+        component: <TestPdd start={true} options={{num: 20, max_error:2, random: false, max: 1000, dblclick: false, settings: false}} />,
         key: "textpdd"
     },
     {

@@ -1,7 +1,7 @@
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 
-export default ({show, setShow, removeMethod}: {show: boolean, setShow: React.Dispatch<React.SetStateAction<boolean>>, removeMethod: Function}) => {
+export default ({show, setShow, title, removeMethod}: {show: boolean, setShow: React.Dispatch<React.SetStateAction<boolean>>, title: string, removeMethod: Function}) => {
 
     return (
         <Modal
@@ -15,10 +15,10 @@ export default ({show, setShow, removeMethod}: {show: boolean, setShow: React.Di
                 </Modal.Title>
                 </Modal.Header>  
                 <Modal.Body>
-                    <div>Вы действительно хотите удалить билет?</div>
+                    <div>{title}</div>
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button onClick={()=>removeMethod()} variant="primary" className="btn-danger">Да</Button>
+                    <Button onClick={()=> {removeMethod(); setShow(false);}} variant="primary" className="btn-danger">Да</Button>
                     <Button onClick={()=>setShow(false)} variant="secondary">Отмена</Button>
                 </Modal.Footer>
         </Modal>

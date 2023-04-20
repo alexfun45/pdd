@@ -1,7 +1,11 @@
 
-import {useState, useEffect} from "react";
+import React, {useState, useEffect, useRef} from "react";
 import {useForm} from 'react-hook-form'
 import $ from 'jquery'
+import FormControl from '@mui/material/FormControl';
+import Select, { SelectChangeEvent } from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
+import {AppContext} from '../app'
 import request from "../utils/request";
 
 type answersType = {
@@ -16,7 +20,7 @@ type InputSettings = {
 }
 
 type TicketPdd = {
-    text: string;
+    title: string;
     image: string;
     success: string;
     variants: answersType[];
@@ -30,6 +34,7 @@ type testOptionsType = {
     max: number;
     settings: boolean;
     dblclick: boolean;
+    selectedTicket: string;
 }
 
 var  pdd_questions: TicketPdd[] = [],
@@ -37,23 +42,23 @@ var  pdd_questions: TicketPdd[] = [],
      nextTicket = 1,
      selectedAnswer: number,
      selected: any = [],
-     results:any = [],
+     //results:any = [],
      errors = 0,
      question_answered = 0,
-     timer = 0;
-     
+     timer = 0,
+     page = 0;
 
-function getTickets(options: any, callback: Function){
-    request({method: 'post', data: {action: "getAllTickets", data: {...options}}}).then(response => {
+function getQuestions(options: any, callback: Function){
+    request({method: 'post', data: {action: "getQuestions", data: {...options}}}).then(response => {
         const {data} = response;
         if(data!=null){
-            var tickets = data;
-            for(var i=0, variants;i<tickets.length;i++){
-                variants =  tickets[i].variants;
+            var questions = data;
+            for(var i=0, variants;i<questions.length;i++){
+                variants =  questions[i].variants;
                 pdd_questions[i] = {
-                    text: tickets[i].text,
-                    image: "./img/"+tickets[i].image,
-                    success: tickets[i].correct_id,
+                    title: questions[i].title,
+                    image: "./img/"+questions[i].image,
+                    success: questions[i].correct,
                     variants: variants,
                     isSuccess: -1
                 };
@@ -64,24 +69,124 @@ function getTickets(options: any, callback: Function){
     });
 }
 
+const BtnQuestion = (props: any)  => {
+
+    function getBtnpageClass(i: number){
+        let classname = "btn btn-page btn-default";
+        if(props.currentTicket==i && props.results[i]!=1 && props.results[i]!=0)
+            classname += " current-button";
+        else if(props.currentTicket==i)
+            classname += " current-finished-button";
+        if(props.results[i]==1)
+            classname += " btn-danger";
+        else if(props.results[i]==0)   
+             classname+= " btn-success";
+        return classname;        
+    }
+    return props.qpages.map((v:any, i: number)=>{
+        //return <BtnQuestion key={selectedTicket+"_"+qpages.length} i={i} qpages={qpages} goToPage={goToPage} getBtnpageClass={getBtnpageClass(i, res)}/>
+        return <button key={"btn_"+props.qpages.length+"_"+i} onClick={()=>props.goToPage(i)} id={"btn_"+i} className={getBtnpageClass(i)} type="button">{i+1}</button>
+    })
+    //return <button key={"btn_"+props.qpages.length+"_"+props.i} onClick={()=>props.goToPage(props.i)} id={"btn_"+props.i} className={props.getBtnpageClass(props.i)} type="button">{props.i+1}</button>
+}
+
+const Watch = ({start, endTest, pause, _continue}: {start: boolean, endTest: boolean, pause: Function, _continue: Function}) => {
+
+    const [time, setTime] = useState("0:00");
+
+    function startTimer(){
+        timer++;
+        let minutes = Math.floor(timer/60),
+            seconds = timer%60,
+            __time = (seconds<10)?("0"+seconds):seconds.toString();
+        setTime(minutes+":"+__time);
+    }
+
+    function Pause(){
+        clearInterval(Timer);
+        Timer = 0;
+        pause();
+    }
+
+    function Continue(){
+        //Timer = setInterval(startTimer, 1000);
+        _continue();
+    }
+    
+    useEffect(()=>{
+        if(start===true && endTest===false){
+            setTime("0:00");
+            Timer = setInterval(startTimer, 1000);
+        }
+        if(endTest===true){
+            clearInterval(Timer);
+            Timer = 0;
+        }
+    }, [start, endTest]);    
+
+    return (
+        <span id="labelTimer" className="label-info lead label" title="таймер" style={{cursor: "pointer"}}><span id="time">{time}</span>
+                { (start==true) ? 
+                    <i onClick={()=>Pause()} className="bi bi-pause-fill pause-btn"></i>
+                :
+                    <i onClick={()=>Continue()} className="bi bi-play-fill pause-btn"></i>               
+                }
+        </span>
+    )
+}
+
+let numPageItems = 10,
+    availableWidth = 0,
+    itemWidth = 50,
+    requiredWidth = 0;
 
 const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
 
     const [time, setTime] = useState("0:00"),
           [selectedVariant, setSelectedVar] = useState(0),
           [options, setOptions] = useState({...props.options}),
+          [selectedTicket, setTicket] = useState('0'),
           [currentTicket, setCurrentTicket] = useState<number>(0),
+          results = useRef([]),
+          //[results, setResults] = useState([]),
           [currentQuestion, setCurrentQuestion] = useState<TicketPdd>(),
-          [start, setStart] = useState(props.start),
+          [start, setStart] = useState(false),
           [opened, setOpened] = useState<Number[]>([]),
           [qNum, setqNum] = useState<number>(0),
+          [tickets, setTickets] = useState([]),
+          [qpages, setqPages] = useState([]),
           //[opened, setOpened] = useState<Array<number[]>>([]),
+          [leftShift, setLeftShift] = useState(0),
           [endTest, setEndTest] = useState(false);
+    
+    const context = React.useContext(AppContext);
 
     useEffect(()=>{
         setOptions({...props.options});
+        availableWidth = $(".testrow").width()*0.7;
+        requiredWidth = numPageItems * itemWidth;
+        if(availableWidth < requiredWidth){
+            numPageItems = +((availableWidth / itemWidth).toFixed(0));
+            requiredWidth = availableWidth;
+        }
         setEndTest(false);
+        if(!props.options.settings)
+            getTickets();
     }, [props.options]);
+
+    useEffect(()=>{
+        setqPages([...new Array(qNum).slice(0)]);
+    }, [qNum]);
+
+    /*useEffect(()=>{
+        if(context.settings['background-color-tickets']!=""){
+            document.body.style.backgroundColor = context.settings['background-color-tickets'];
+        }
+        if(context.settings['background-image-tickets']){
+            let src = "./img/" + context.settings['background-image-tickets'];
+            document.body.style.backgroundImage = `url(${src})`;
+            }
+    }, [context.settings]);*/
 
     useEffect(()=>{
         if(currentQuestion){
@@ -116,6 +221,14 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
         handleStartTest();
     };
 
+    // getting tickets with questions
+    function getTickets(){
+        request({method: 'post', data: {action: "getTickets"}}).then(response => {
+            const {data} = response;
+            setTickets(data);
+        });
+    }
+
     function setQuestion(){
         if(pdd_questions.length>0 && pdd_questions.length-1>=currentTicket){
             setqNum(Math.min(options.num, pdd_questions.length));
@@ -123,18 +236,11 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
         }
     }
 
-    function startTimer(){
-        timer++;
-        let minutes = Math.floor(timer/60),
-            seconds = timer%60,
-            __time = (seconds<10)?("0"+seconds):seconds.toString();
-        setTime(minutes+":"+__time);
-    }
-
     function startTest(){
+        resetTest();
         setStart(true);
-		getTickets(options, setQuestion);
-        Timer = setInterval(startTimer, 1000);
+        setEndTest(false);
+		getQuestions(options, setQuestion);
     }
 
     function handleStartTest(){
@@ -143,14 +249,12 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
     }
 
     function testPause(){
-        clearInterval(Timer);
-        Timer = 0;
         setStart(false);
+
     }
 
     function continueTest(){
         if(endTest==true) return;
-        Timer = setInterval(startTimer, 1000);
         setStart(true);
     }
 
@@ -164,13 +268,15 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
         selected[currentTicket] = [..._opened];
         // current opened answers
         setOpened(_opened);
-       if(results[currentTicket]==1 || results[currentTicket]==0) return;
+       if(results.current[currentTicket]==1 || results.current[currentTicket]==0) return;
        if(selectedVar != parseInt(pdd_questions[currentTicket].success)){
             errors++;
-            results[currentTicket] = 1;
+            results.current[currentTicket] = 1;
        }
-       else
-            results[currentTicket] = 0;
+       else{
+            results.current[currentTicket] = 0;
+        }
+            
 
         question_answered++;
         if(options.settings && currentTicket==question_answered-1)
@@ -191,15 +297,20 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
         }   
     }
 
-    function getBtnpageClass(i: number){
+    function handleChangeTicket(event: SelectChangeEvent){
+        setTicket(event.target.value);
+        options.selectedTicket = event.target.value;
+    }
+
+    function getBtnpageClass2(i: number, res: any){
         let classname = "btn btn-page btn-default";
-        if(currentTicket==i && results[i]!=1 && results[i]!=0)
+        if(currentTicket==i && results.current[i]!=1 && results.current[i]!=0)
             classname += " current-button";
         else if(currentTicket==i)
             classname += " current-finished-button";
-        if(results[i]==1)
+        if(results.current[i]==1)
             classname += " btn-danger";
-        else if(results[i]==0)   
+        else if(results.current[i]==0)   
              classname+= " btn-success";
         return classname;        
     }
@@ -224,17 +335,19 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
     }
 
     const resetTest = () => {
-        setStart(false);
         setOpened([]);
         setCurrentTicket(0);
         selected = [];
-        clearInterval(Timer);
+        //clearInterval(Timer);
         setTime("0:00");
         Timer = 0;
-        results = [];
+        //setResults([]);
+        setqNum(0);
+        results.current = [];
         errors = 0;
         question_answered = 0
         timer = 0;
+        setStart(false);
     }
 
     useEffect(()=>{
@@ -243,13 +356,44 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
     
     useEffect(()=>{
         resetTest();
-        if(!props.options.settings)
-            startTest();
+        //if(!props.options.settings)
+          //  startTest();
     }, [props.options.settings]);
 
+    const toNextPage = () => {
+        if((qNum-(numPageItems*(page+1)))>0){
+            page+=1;
+            setLeftShift(-page*requiredWidth);
+        }
+    }
+
+    const toPrevPage = () => {
+        if(page>0){
+            page-=1;
+            setLeftShift(-page*requiredWidth);
+        }
+    }
 
     return (
         <div className="container">
+            <div className={(options.settings===false)?"row testrow":"hide"}>
+                <div><label>{context.settings.exam_title}</label></div>
+                <FormControl sx={{ m: 1, minWidth: 120 }}>
+                    
+                    <Select
+                        labelId="demo-simple-select-helper-label"
+                        id="demo-simple-select-helper"
+                        value={selectedTicket}
+                        onChange={handleChangeTicket}>
+                            {
+                                tickets.map((v, i)=>(
+                                    <MenuItem value={v.id}>{v.name}</MenuItem>
+                                ))
+                            }
+                    </Select>
+                    <input onClick={startTest} style={{marginTop: "15px"}} id="buttonSchoolSetName" type="submit" className={(start)?"hide":"btn btn-success"} value="Начать" />
+                </FormControl>
+            </div>
             <div className={(options.settings===true)?"row testrow":"hide"}>
                 <div className="col-md-12">
             <form onSubmit={handleSubmit(onSubmit)} className="form-inline">
@@ -310,19 +454,28 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
             </div>
             <div className="checkbox">
                 <label>
-                    <input disabled={start} id="btnConfRandomVariants" onChange={(e)=>handleChangeOption(e, 'random')} defaultChecked={options.random} type="checkbox"/> Перемешивать ответы
+                    <input disabled={start} id="btnConfRandomVariants" onChange={(e)=>handleChangeOption(e, 'random')} defaultChecked={options.random} type="checkbox"/> Перемешивать вопросы
                 </label>
+                </div>
+            </form>
             </div>
-        </form>
-    </div>
-            </div>
+        </div>
             <div className="row testrow">
-                <div id="buttonPanel" className={(start)?"btn-group btn-group-xs":"hide"}>
-                    {
-                        [...new Array(qNum)].map((v, i)=>(
-                           <button onClick={()=>goToPage(i)} id={"btn_"+i} className={getBtnpageClass(i)} type="button">{i+1}</button>
-                        ))
-                    }
+                <div className="slide-wrapper" style={{width: (requiredWidth+"px")}}>
+                    <i onClick={toPrevPage} className={start?"bi bi-caret-left arrow-btn arrow-left-btn":"hide"}></i>
+                    <div className="button-slider">
+                        <div key={selectedTicket} id="buttonPanel" style={{left: leftShift+"px"}} className={(start)?"btn-group btn-group-xs":"hide"}>
+                            {
+                                //getBtns(results)
+                                <BtnQuestion key={selectedTicket} results={results.current} qpages={qpages} goToPage={goToPage} currentTicket={currentTicket}/>
+                                //qpages.map((v, i)=>{
+                                    //return <BtnQuestion key={selectedTicket+"_"+qpages.length} i={i} qpages={qpages} goToPage={goToPage} getBtnpageClass={getBtnpageClass}/>
+                                    //return <button key={"btn_"+qpages.length+"_"+i} onClick={()=>goToPage(i)} id={"btn_"+i} className={getBtnpageClass(i, results)} type="button">{i+1}</button>
+                                //})
+                            }
+                        </div>
+                    </div>
+                    <i onClick={toNextPage} className={start?"bi bi-caret-right arrow-btn arrow-right-btn":"hide"}></i>
                 </div>
             </div>
             <div className="row testrow centered-row">
@@ -331,21 +484,21 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
                     <div className="row testrow">
                         <div className="col-md-12 col-sm-12 myheader">
                             
-                                <img className="img-responsive pull-left hidden-xs" style={{width: "75px"}} alt="логотип" src="./img/gibddlogo_pdd24.png" />
+                                {/*<img className="img-responsive pull-left hidden-xs" style={{width: "75px"}} alt="логотип" src="./img/gibddlogo_pdd24.png" />
                                 <h1 id="h1">Билеты ПДД 2023 экзамен ПДД</h1>
                                 <p>Экзаменационные билеты пдд соответствуют экзамену ГИБДД
-                                </p>
-
+                                </p>*/}
                                 <span id="labelQuestNumber" className="label label-primary">Новые правила экзамена пдд 2023</span>
                                 <span id="labelCategory" className="hide"> ABM </span>
-                                <span id="labelTimer" className="label-info lead label" title="таймер" style={{cursor: "pointer"}}><span id="time">{time}</span>
+                                <Watch start={start} endTest={endTest} pause={testPause} _continue={continueTest} />
+                                {/*<span id="labelTimer" className="label-info lead label" title="таймер" style={{cursor: "pointer"}}><span id="time">{time}</span>
                                     { (start==true) ? 
                                          <i onClick={testPause} className="bi bi-pause-fill pause-btn"></i>
                                         :
                                          <i onClick={continueTest} className="bi bi-play-fill pause-btn"></i>
                                     
                                     }
-                                    </span>
+                                </span>*/}
                                 <span id="labelBookmark" data-toggle="tooltip" data-placement="left" title="В закладки" style={{fontSize: "20px", color: "#5bc0de", cursor: "pointer"}} className="pull-right glyphicon glyphicon-star-empty"></span>
                         </div>
                     </div>
@@ -358,8 +511,9 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
                             <div id="questPanel" className={(start)?"":"hide"}>
                                 <img id="questImage" className="img-responsive" width="100%" style={{maxWidth: "100%"}}
                                         src={(currentQuestion!==undefined)?currentQuestion.image:""}
-                                        alt="картинка вопроса" />
-                                <div id="questText" className="questtext">{(currentQuestion!==undefined)?currentQuestion.text:""}</div>
+                                        onError={(e)=>{if (e.currentTarget.src != './img/no_picture.png') e.currentTarget.src = './img/no_picture.png';}}
+                                        />
+                                <div id="questText" className="questtext">{(currentQuestion!==undefined)?currentQuestion.title:""}</div>
                                 <div className="list-group">
                                     <div id="qlist">
                                         { (currentQuestion!=undefined) && (
@@ -371,11 +525,11 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
                                     </div>
                                     <div id="commentPanel" className={(opened.length>0)?"":"hide"}>
                                         <button onClick={next} id="questNext" type="button" className="list-group-item active">Далее <small className="text-warning small hidden-xs"> - Enter &nbsp;&nbsp;&nbsp; 1,2,3 - выбор &nbsp;&nbsp;&nbsp; &larr; назад &nbsp; вперед &rarr;</small></button>
-                                        <div id="questComment" className="list-group-item">{(currentQuestion)?currentQuestion.variants[selectedVariant].comment:""}</div>
+                                        <div id="questComment" className="list-group-item">{(currentQuestion!==undefined && currentQuestion.variants.length>selectedVariant)?currentQuestion.variants[selectedVariant].comment:""}</div>
                                     </div>
                                 </div>
                             </div>
-                            <div className={(endTest==true)?"row":"hide row"}>
+                            <div className={(endTest===true)?"row":"hide row"}>
                                 <div className="col-md-12">
                                     <div className="panel panel-primary">
                                         <div className="panel-heading lead">
