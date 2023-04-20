@@ -75,17 +75,16 @@ export default function App(){
         setLogin(data.logged);
         setUser(data);
         
-        if(data.role==1){
+        /*if(data.role==1){
           $("#footer").load("./pages/footer.html", function(){
             $("#footer").wrap("<div id='footer-wrapper'></div>");
             $("#footer").append("<span class='footer-edit-btn'>редактировать</span>");
           });
         }
         else
-            $("#footer").load("./pages/footer.html");
+            $("#footer").load("./pages/footer.html");*/
       });
       window.addEventListener('resize', handleWindowSizeChange);
-      
     }, []);
 
    

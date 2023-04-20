@@ -111,6 +111,10 @@ p{
     word-wrap: break-word;
 }
 
+.extended_footer{
+    height: 15%;
+}
+
 .containerWrapper img{
     max-width: 100%;
 }

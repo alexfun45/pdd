@@ -34,6 +34,16 @@
             return file_get_contents(PAGES . "footer.html");
         }
 
+        protected function saveFooter(){
+            $files = $_FILES;
+            foreach($files as $file){
+                $uploadFile = array("file"=>$file);
+                $this->uploadFile($uploadFile);
+            }
+            $pageContent = $_POST['content'];
+            file_put_contents(PAGES."footer.html", $pageContent);
+        }   
+
         protected function editPage(){
             $page_name = $_POST['page'];
             $page_filename = PAGES . $page_name . ".html";
