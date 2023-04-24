@@ -104,6 +104,11 @@ export default () => {
         setAnchorLeft(open);
         };
 
+    const handleItemClick = () => {
+      toggleDrawer(false);
+      setAnchorLeft(false);
+    }
+
     const list = () => (
         <Box
           role="presentation"
@@ -117,7 +122,7 @@ export default () => {
                         openSubmenu[item[1].name] = false;
                     return ( item[1].submenu ? (
                         <>
-                            <ListItemButton  onClick={()=>handleSubmenuClick(item[1].name)} divider={true}>
+                            <ListItemButton onClick={()=>handleSubmenuClick(item[1].name)} divider={true}>
                                 <ListItemText primary={item[1].title} />
                                 {openSubmenu[item[1].name] ? <ExpandLess onClick={()=>handleSubmenuClick(item[1].name)} sx={{fontSize: "5vh"}} /> : <ExpandMore  onClick={()=>handleSubmenuClick(item[1].name)} sx={{fontSize: "5vh"}} />}
                             </ListItemButton>  
@@ -126,7 +131,7 @@ export default () => {
                                     {
                                         
                                         item[1].submenu.map((submenuItem: any, j: number)=>(
-                                            <ListItemButton component="a" href={"#/"+submenuItem.page_name} divider={true} sx={{ pl: 4}}>
+                                            <ListItemButton onClick={handleItemClick} component="a" href={"#/"+submenuItem.page_name} divider={true} sx={{ pl: 4}}>
                                                 <ListItemText primary={submenuItem.title} />
                                             </ListItemButton> 
                                         ))                                
@@ -137,8 +142,8 @@ export default () => {
                     )
                     :
                     (
-                      <ListItemButton component="a" href={"#/"+item[1].name} divider={true}>
-                            <ListItemText primary={item[1].title} />
+                      <ListItemButton onClick={handleItemClick} component="a" href={"#/"+item[1].name} divider={true}>
+                            <ListItemText onClick={handleItemClick} primary={item[1].title} />
                       </ListItemButton>   
                     )
                     )
