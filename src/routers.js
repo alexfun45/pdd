@@ -21,7 +21,8 @@ const routes = [
     {
         route: "admin",
         component: <AdminPanel />,
-        key: "admin"
+        key: "admin",
+        auth: true
     },
     {
         route: "auth",

@@ -2,7 +2,7 @@ import React, {useState, useEffect} from "react";
 import { HashRouter, useLocation } from "react-router-dom" 
 import { createContext} from "react";
 import "@/css/docs18.css"
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate, useNavigation } from "react-router-dom";
 import routes from './routers'
 import Header from "./components/Header"
 import MobileHeader from './components/MobileHeader'
@@ -10,14 +10,7 @@ import Footer from './components/Footer'
 import $ from 'jquery'
 import request from './utils/request'
 
-const getRoutes = (allRoutes: Array<{route:string, key: string, component: object}>) =>
-    allRoutes.map((route) => {
-      if (route.route) {
-          return <Route path={route.route} element={route.component} key={route.key} />;
-      }
 
-      return null;
-    });
 
 let defaultUser = {
       login: "",
@@ -46,7 +39,6 @@ type userType = {
 };
 
 
-
 export default function App(){
   
   const [isLogin, setLogin] = useState(false),
@@ -54,7 +46,15 @@ export default function App(){
         [role, setRole] = useState(3),
         [settings, setSettings] = useState({showLogo: '1', start_page: {name: ""}, exam_title: "", 'background-color':'', 'background-image':'', 'background-color-tickets': '', 'background-image-tickets':''}),
         [displayWidth, setDisplayWidth] = useState(window.innerWidth);
-        
+  
+  const getRoutes = (allRoutes: Array<{route:string, key: string, component: object, auth?: boolean}>) =>
+        allRoutes.map((route) => {
+          if (route.route) {
+              return (route.auth && role!=1)?<Route path={route.route} element={<Navigate to="/auth" replace />} />:<Route path={route.route} element={route.component} key={route.key} />;
+          }
+    
+          return null;
+        });
 
   useEffect(()=>{
 

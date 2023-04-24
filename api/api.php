@@ -25,9 +25,14 @@
         }
 
         protected function getPage(){
+            $db = new SQLite3(DB."db.sqlite");
             $id = $this->data->page_id;
+            $sql = "SELECT private from pages WHERE name=$id";
+            $res = $db->query("SELECT private from pages WHERE name='$id'");
+            $page = $res->fetchArray(SQLITE3_ASSOC);
             $page_filename = PAGES . $id . ".html";
-            return file_get_contents($page_filename);
+            $db->close();
+            return array("private"=>$page["private"], "content"=>file_get_contents($page_filename));
         }
 
         protected function getFooter(){
@@ -53,6 +58,14 @@
                 $this->uploadFile($uploadFile);
             }
             file_put_contents($page_filename, $_POST['content']);
+        }
+
+        protected function privatePage(){
+            $db = new SQLite3(DB."db.sqlite");
+            $page_id = $this->data->page_id;
+            $private_status = $this->data->private_status;
+            $db->exec("UPDATE pages SET private=$private_status WHERE id=$page_id");
+            $db->close();
         }
 
         protected function removePage(){

@@ -18,6 +18,7 @@ type PageType = {
     name: string;
     title: string;
     indx: number;
+    private: number;
 };
 
 var currentRemoveItem:any,
@@ -241,6 +242,15 @@ export default function PageManager({setpageTabtype, setKey, setEditPageName, __
         setRemovePageDialog(true);
     }
 
+    const lockPage = (v: PageType) => {
+        let private_status = (v.private==0)?1:0;
+        request({method: "post", data: {action: "privatePage", data: {page_id: v.id, private_status:private_status}}});
+        let pages = [...allPages];
+        let indx = pages.findIndex(x => x.id === v.id);
+        pages[indx].private = private_status;
+        setAllPages(pages);
+    }
+
     return (
         <div className="block-wrapper">
             <DeleteDialog show={showRemovePageDialog} setShow={setRemovePageDialog} title="Вы действительно хотите произвести удаление?" removeMethod={removeMethod}/>
@@ -292,12 +302,12 @@ export default function PageManager({setpageTabtype, setKey, setEditPageName, __
                         {
                             (filtered.length==0 ? 
                                 allPages.map((v:PageType)=>(
-                                    <ListGroup.Item action onClick={(e)=>selectPage(v)} eventKey={v.name}>{v.title}<div className="right-panel"><span><i onClick={()=>handleEditPage(v)} className="bi bi-pencil-fill"></i><i onClick={()=>handleRemovePage(v)} className="bi bi-trash3-fill"></i></span></div></ListGroup.Item> 
+                                    <ListGroup.Item action onClick={(e)=>selectPage(v)} eventKey={v.name}>{v.title}<div className="right-panel"><span><i onClick={()=>lockPage(v)} className={(v.private==0)?"bi bi-unlock-fill":"bi bi-lock-fill"}></i><i onClick={()=>handleEditPage(v)} className="bi bi-pencil-fill"></i><i onClick={()=>handleRemovePage(v)} className="bi bi-trash3-fill"></i></span></div></ListGroup.Item> 
                                 )) 
                             :
                                 (
                                 filtered.map((v:PageType)=>(
-                                    <ListGroup.Item action onClick={(e)=>selectPage(v)} eventKey={v.name}>{v.title}<div className="right-panel"><span><i onClick={()=>handleEditPage(v)} className="bi bi-pencil-fill"></i><i onClick={()=>handleRemovePage(v)} className="bi bi-trash3-fill"></i></span></div></ListGroup.Item> 
+                                    <ListGroup.Item action onClick={(e)=>selectPage(v)} eventKey={v.name}>{v.title}<div className="right-panel"><span><i onClick={()=>lockPage(v)} className={(v.private==0)?"bi bi-unlock-fill":"bi bi-lock-fill"}></i><i onClick={()=>handleEditPage(v)} className="bi bi-pencil-fill"></i><i onClick={()=>handleRemovePage(v)} className="bi bi-trash3-fill"></i></span></div></ListGroup.Item> 
                                 ))   
                             )
                             )

@@ -22,10 +22,12 @@ function Content(){
     useEffect(()=>{
         request({method: "post", data:{action: "getPage", data: {page_id: id}}}).then( response =>{
             const {data} = response;
-            let regexp = /(font\-)?size[=\:][\'\"]?\s?([^\'\";]*)[\'\"]?/sg;
-            let result = "";
-            if(data){
-                result = data.replace(regexp, (match: string, fullform: string, fontsize: string)=>{ 
+            if(data.private==1 && !context.logged)  navigate("/auth");
+            let regexp = /(font\-)?size[=\:][\'\"]?\s?([^\'\";]*)[\'\"]?/sg,
+                content = data.content,
+                result = "";
+            if(content){
+                result = content.replace(regexp, (match: string, fullform: string, fontsize: string)=>{ 
                 let fontStyleName = (fullform!==undefined) ? "font-size:":"size=";
                 if(parseInt(fontsize)<14)
                     return fontStyleName+"2vh";
@@ -37,7 +39,7 @@ function Content(){
             }
             setContent(result);
         });
-    }, [id]);
+    }, [context.logged, id]);
 
     return (
         <div className="container">
