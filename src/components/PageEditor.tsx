@@ -37,7 +37,7 @@ export default function PageEditor({editPageName, setEditPageName, mode}: {editP
         if(mode==2){
           request({method: "post", data:{action: "getPage", data: {page_id: editPageName}}}).then(response => {
             const {data} = response;
-            setModel(data);
+            setModel(data.content);
           });
         }
         else
