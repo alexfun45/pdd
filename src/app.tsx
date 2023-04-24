@@ -10,8 +10,6 @@ import Footer from './components/Footer'
 import $ from 'jquery'
 import request from './utils/request'
 
-
-
 let defaultUser = {
       login: "",
       name: "",
@@ -26,7 +24,9 @@ const AppContext = createContext({
   userRole: 3,
   logged: false,
   isMobile: false,
-  settings: {start_page:{name:""}, exam_title: "",'background-color':'', 'background-image':'', 'background-color-tickets': '', 'background-image-tickets': ''}
+  settings: {start_page:{name:""}, exam_title: "",'background-color':'', 'background-image':'', 'background-color-tickets': '', 'background-image-tickets': ''},
+  pageTitle: "",
+  setPageTitle: null
 });
 
 type userType = {
@@ -42,6 +42,7 @@ type userType = {
 export default function App(){
   
   const [isLogin, setLogin] = useState(false),
+        [pageTitle, setPageTitle] = useState(""),
         [user, setUser] = useState<userType>(defaultUser),
         [role, setRole] = useState(3),
         [settings, setSettings] = useState({showLogo: '1', start_page: {name: ""}, exam_title: "", 'background-color':'', 'background-image':'', 'background-color-tickets': '', 'background-image-tickets':''}),
@@ -99,7 +100,7 @@ export default function App(){
     return (  
       
       // the rest is the same...
-      <AppContext.Provider value={{user: user, logged: isLogin, userRole: role, isMobile: isMobile, settings: settings}}>
+      <AppContext.Provider value={{user: user, logged: isLogin, userRole: role, isMobile: isMobile, settings: settings, pageTitle, setPageTitle}}>
           <HashRouter>
             { (isMobile) ?  
                 <MobileHeader />

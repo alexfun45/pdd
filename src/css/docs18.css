@@ -298,7 +298,7 @@ p{
     font-size: 1em;
     top: 0;
     left: 0;
-    height: 8vh;
+    height: auto;
     background-color: #FFF;
     width: 100vw;
     z-index: 10000;
@@ -771,9 +771,25 @@ div.suggestPopupContent div table tbody tr td.item-selected{
     top: 0px;
     display: flex;
     z-index: 100000;
-    height: 8vh;
-    line-height: 8vh;
     justify-content: center;
+}
+
+.MuiDrawer-root .admin-panel-wrapper{
+    position: relative !important;
+    right: 0;
+    text-align: center;
+}
+
+.page-title{
+    font-size: 2.5vh;
+    display: inline-block;
+    word-wrap: break-word;
+    white-space: normal;
+    width: 85%;
+    max-width: 85%;
+    vertical-align: middle;
+    overflow: hidden;
+    line-height: 1 !important;
 }
 
 .admin-panel-wrapper span > input{
@@ -1335,9 +1351,9 @@ div.suggestPopupContent div table tbody tr td.item-selected{
     .nav-link{
         background-color: #f6f6f6 !important;
         color:#454545 !important;
-        font-size: 2.5vh !important;
+        font-size: 2vh !important;
         font-weight: 400 !important;
-        padding: 0.9rem 2rem !important;
+        padding: 0.9rem 2rem;
     }
 
     .auth_container{
@@ -1871,6 +1887,8 @@ div.suggestPopupContent div table tbody tr td.item-selected{
     background-color: transparent !important;
     border: none !important;
     color:rgba(0, 0, 0, 0.35) !important;
+    line-height: 20px;
+    padding: 15px 15px !important;
   }
 
   .adminpanel-btn > i:hover{

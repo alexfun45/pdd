@@ -27,7 +27,7 @@ export default ({Logout, isLogin, role, isMobile}: {Logout: React.MouseEventHand
             ) :
             (
             <div id="admin_panel">
-                {(role==1 || role==2) && (
+                {((role==1 || role==2) && !isMobile) && (
                     <a className="adminpanel-btn btn btn-primary btn-auth" id="admin-btn" href="#/admin">
                         <i className="bi bi-gear"></i>
                     </a>

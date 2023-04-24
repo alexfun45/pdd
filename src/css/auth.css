@@ -14,7 +14,7 @@
 }
 
 .wrapper{
-  max-width: 450px !important;
+  max-width: 510px !important;
   width: 100%;
   padding: 20px 20px;
   height: auto;
@@ -27,10 +27,10 @@
               2px 2px 5px rgba(68, 75, 87, 0.356);
 }
 .mobileWrapper .wrapper{
-  min-width: 80%;
+  min-width: 90%;
   height: auto;
   width: 100%;
-  max-width: 80%;
+  max-width: 100%;
   top: 50%;
   left: 50%;
   transform: translate(-50%,-50%);
@@ -49,6 +49,14 @@
 
 .mainContainer{
   padding: 35px 40px;
+}
+
+.mobileWrapper .mainContainer{
+  padding: 5px 10px;
+}
+
+.mobileWrapper .nav-link{
+  padding: 0.4rem 1rem !important;
 }
 
 .wrapper .nav-tabs ul{
@@ -101,14 +109,21 @@
   margin-top: 10px;
 }
 
+.homeLink{
+  font-size: 3vh;
+  cursor: pointer;
+  color:#3498db;
+}
+
 .wrapper .input_field .input{
   width: 100%;
+  height: 100%;
   border: none;
   background: #dde9ecb7;
   color: black;
   font-family: sans-serif;
   border: 2px solid rgba(13, 162, 231, 0.596);
-  font-size: 14px;
+  font-size: 2vh;
   padding: 17px;
   border-radius: 10px;
 } 
@@ -135,7 +150,7 @@
   border: none;
   width: 100%;
   display: inline-block;
-  font-size: 16px;
+  font-size: 2.2vh;
   font-family: sans-serif;
 }
 .icon-button{

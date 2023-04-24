@@ -93,11 +93,15 @@ export default () => {
         });
     }, []);
 
+    const toHomePage = () => {
+        navigate("/");
+    }
+
     return (
         <>
         <div className="wrapper">
             <div className="mainContainer">
-               
+                <div style={{width: '100%', textAlign: 'center'}}><a onClick={toHomePage} className="homeLink"><i className="bi bi-house"></i>На главную</a></div>
                 <div className={(!isForgot)?"hide":""}>
                     <div className="top-btn-panel"><input onClick={handlePrev} className="btn-control" value="< Назад" type="button" /></div>
                     <div className="tab-content">
@@ -133,7 +137,7 @@ export default () => {
                                 <div className="input_field">
                                     <input type="login" 
                                         {...register("login", {
-                                            required: "Field is required",
+                                            required: "Поле обязательно",
                                             maxLength: 50,
                                             pattern: {
                                                 value: /^[A-Za-z0-9]+$/i,
@@ -149,8 +153,10 @@ export default () => {
                                         type="password" placeholder="пароль" className="input" />
                                     {<p className="error-msg">{errors.password && errors.password.message}</p>}
                                 </div>
-                                <div className="btn"><input id="signin" value="Войти" type="submit" /></div>
-                                <div className="btn"><input onClick={handleForgotBtn} id="passforgot" value="Забыли пароль?" type="submit" /></div>
+                                <div style={{width: '100%', textAlign: 'center'}}>
+                                    <div className="btn"><input id="signin" value="Войти" type="submit" /></div>
+                                    <div className="btn"><input onClick={handleForgotBtn} id="passforgot" value="Забыли пароль?" type="submit" /></div>
+                                </div>
                                 <input name="call" value="signin" type="hidden" />
                         </form>
                         </Tab>
@@ -234,8 +240,11 @@ export default () => {
                                     placeholder="повторите пароль" className="input" />
                                     {<p className="error-msg">{errors2.cppassword && errors2.cppassword.message}</p>}
                                 </div>
-                                
-                                <div className="btn"><input type="submit" value="Зарегистрироваться" /></div>
+                                <div style={{width: '100%', textAlign: 'center'}}>
+                                    <div className="btn">
+                                        <input type="submit" value="Зарегистрироваться" />
+                                    </div>
+                                </div>
                                 <input name="call" value="signup" type="hidden" />
                             </form>
                         </Tab>

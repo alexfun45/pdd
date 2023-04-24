@@ -22,10 +22,11 @@ function Content(){
     useEffect(()=>{
         request({method: "post", data:{action: "getPage", data: {page_id: id}}}).then( response =>{
             const {data} = response;
-            if(data.private==1 && !context.logged)  navigate("/auth");
+            if(data.private==1 && !context.logged) navigate("/auth");
             let regexp = /(font\-)?size[=\:][\'\"]?\s?([^\'\";]*)[\'\"]?/sg,
                 content = data.content,
                 result = "";
+            context.setPageTitle(data.title);
             if(content){
                 result = content.replace(regexp, (match: string, fullform: string, fontsize: string)=>{ 
                 let fontStyleName = (fullform!==undefined) ? "font-size:":"size=";

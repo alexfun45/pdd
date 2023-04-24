@@ -179,7 +179,7 @@ export default () => {
 
     return (
         <div className="mobileHeader">
-            <Admin Logout={Logout} isLogin={context.logged} role={context.userRole} isMobile={true}/>
+            <div style={{position: 'relative', width: '100%',  whiteSpace: 'nowrap', lineHeight: '100%'}}>
              <IconButton
                 aria-label="more"
                 id="long-button"
@@ -200,9 +200,12 @@ export default () => {
                 onClose={toggleDrawer(false)}
             >
                 {list()}
+              <div style={{width:'100%', textAlign: 'center'}}><Admin Logout={Logout} isLogin={context.logged} role={context.userRole} isMobile={true}/></div>
             </Drawer>
+            <span className="page-title">{context.pageTitle}</span>
             {/*<div className="homeIcon" onClick={handleHomeLink}><a href="./"></a><input onClick={triggerUpload} id="homeIcon" onChange={changeHomeIcon} type="file" /><img src={homeIcon}></img></div>
             */}
+            </div>
         </div>
     )
 }
