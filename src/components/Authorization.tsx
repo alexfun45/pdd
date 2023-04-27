@@ -50,7 +50,7 @@ export default () => {
             const {data} = response;
             if(data==true){
                 navigate("/");
-                document.location.href = "./";
+                //document.location.href = "./";
             }
             else{
                 setError('password', {

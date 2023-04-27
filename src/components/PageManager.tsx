@@ -25,13 +25,17 @@ var currentRemoveItem:any,
     removeMethod: Function,
     changePostionLock = false;
 
-var options:any[] = [];
+var options:any[] = [],
+    menuNewName = "",
+    pageNewName = "";
 
 export default function PageManager({setpageTabtype, setKey, setEditPageName, __menuItems = [], __allPages = []}: any){
 
     const [menuItems, setMenuItems] = useState<any>(__menuItems),
+          [menuItemRename, setMenuItemRename] = useState(0),
           [menuPages, setMenuPages] = useState<any>([]),
           [allPages, setAllPages] = useState<any>(__allPages),
+          [pageItemRename, setPageItemRename] = useState(0),
           [showRemovePageDialog, setRemovePageDialog] = useState(false),
           [selectedMenuId, setSelectedMenuId] = useState<any>(),
           [selectedPage, setSelectedPage]= useState<PageType>(),
@@ -242,6 +246,50 @@ export default function PageManager({setpageTabtype, setKey, setEditPageName, __
         setRemovePageDialog(true);
     }
 
+    const handleRenameEvent = (ItemId:number) => {
+        menuNewName = "";
+        setMenuItemRename(ItemId);
+    }
+
+    const handleRenameEventPage = (ItemId: number) => {
+        pageNewName = "";
+        setPageItemRename(ItemId);
+    }
+
+    const handleChangeMenuName = (e: React.ChangeEvent<HTMLInputElement>) => {
+        menuNewName = e.target.value;
+    }
+
+    const handleChangePageName = (e: React.ChangeEvent<HTMLInputElement>) => {
+        pageNewName = e.target.value;
+    }
+
+    const handleKeyDown = (i: number, e: React.KeyboardEvent<HTMLDivElement>) => {
+        console.log("pageItemRename", pageItemRename);
+        console.log("pageNewName", pageNewName);
+        if(e.keyCode==13){
+          if(menuItemRename!=0 && menuNewName!=""){
+            request({method: "post", data: {action: "renameMenu", data: {id: menuItemRename, newName: menuNewName}}}).then(response=>{
+                setMenuItemRename(0);
+                let copy = [...menuItems];
+                copy[i].title = menuNewName;
+                menuNewName = "";
+                setMenuItems(copy);
+            });
+          }
+          else if(pageItemRename!=0 && pageNewName!=""){
+            request({method: "post", data: {action: "renamePage", data: {id: pageItemRename, newName: pageNewName}}}).then(response=>{
+                setPageItemRename(0);
+                let copy = [...allPages];
+                console.log(pageNewName);
+                copy[i].title = pageNewName;
+                pageNewName = "";
+                setAllPages(copy);
+            });
+          }
+        }
+    }
+
     const lockPage = (v: PageType) => {
         let private_status = (v.private==0)?1:0;
         request({method: "post", data: {action: "privatePage", data: {page_id: v.id, private_status:private_status}}});
@@ -260,7 +308,7 @@ export default function PageManager({setpageTabtype, setKey, setEditPageName, __
                     <ListGroup>
                         {
                             menuItems.map((value:any, i: number) => {
-                                    return <ListGroup.Item action id={value.id} onClick={(e)=>selectItem(value.id)} eventKey={value.id}><span className="pos-element"><i onClick={(e)=>{e.stopPropagation(); toUpPos("menus", i)}} className="bi bi-arrow-up"></i><i onClick={(e)=>{e.stopPropagation(); toDownPos("menus", i)}} className="bi bi-arrow-down"></i></span>{value.title}<div className="right-panel"><span><i onClick={()=>handleRemoveTopMenu(value.id, i)} className="bi bi-trash3-fill"></i></span></div></ListGroup.Item> 
+                                    return <ListGroup.Item action id={value.id} onClick={(e)=>selectItem(value.id)} onDoubleClick={()=>handleRenameEvent(value.id)} eventKey={value.id}><span className="pos-element"><i onClick={(e)=>{e.stopPropagation(); toUpPos("menus", i)}} className="bi bi-arrow-up"></i><i onClick={(e)=>{e.stopPropagation(); toDownPos("menus", i)}} className="bi bi-arrow-down"></i></span><span className={menuItemRename==value.id?"":"hide"}><TextField defaultValue={value.title} onKeyDown={(e)=>handleKeyDown(i, e)} onChange={handleChangeMenuName} style={{width: '80%'}} label="" /></span><span className={menuItemRename==value.id?"hide":""}>{value.title}</span><div className="right-panel"><span><i onClick={()=>handleRemoveTopMenu(value.id, i)} className="bi bi-trash3-fill"></i></span></div></ListGroup.Item> 
                             })
                     
                             
@@ -301,13 +349,13 @@ export default function PageManager({setpageTabtype, setKey, setEditPageName, __
                     <ListGroup>
                         {
                             (filtered.length==0 ? 
-                                allPages.map((v:PageType)=>(
-                                    <ListGroup.Item action onClick={(e)=>selectPage(v)} eventKey={v.name}>{v.title}<div className="right-panel"><span><i onClick={()=>lockPage(v)} className={(v.private==0)?"bi bi-unlock-fill":"bi bi-lock-fill"}></i><i onClick={()=>handleEditPage(v)} className="bi bi-pencil-fill"></i><i onClick={()=>handleRemovePage(v)} className="bi bi-trash3-fill"></i></span></div></ListGroup.Item> 
+                                allPages.map((v:PageType, i: number)=>(
+                                    <ListGroup.Item onDoubleClick={()=>handleRenameEventPage(v.id)} action onClick={(e)=>selectPage(v)} eventKey={v.name}><span className={pageItemRename==v.id?"":"hide"}><TextField defaultValue={v.title} onKeyDown={(e)=>handleKeyDown(i, e)} onChange={handleChangePageName} style={{width: '80%'}} label="" /></span><span className={pageItemRename==v.id?"hide":""}>{v.title}</span><div className="right-panel"><span><i onClick={()=>lockPage(v)} className={(v.private==0)?"bi bi-unlock-fill":"bi bi-lock-fill"}></i><i onClick={()=>handleEditPage(v)} className="bi bi-pencil-fill"></i><i onClick={()=>handleRemovePage(v)} className="bi bi-trash3-fill"></i></span></div></ListGroup.Item> 
                                 )) 
                             :
                                 (
-                                filtered.map((v:PageType)=>(
-                                    <ListGroup.Item action onClick={(e)=>selectPage(v)} eventKey={v.name}>{v.title}<div className="right-panel"><span><i onClick={()=>lockPage(v)} className={(v.private==0)?"bi bi-unlock-fill":"bi bi-lock-fill"}></i><i onClick={()=>handleEditPage(v)} className="bi bi-pencil-fill"></i><i onClick={()=>handleRemovePage(v)} className="bi bi-trash3-fill"></i></span></div></ListGroup.Item> 
+                                filtered.map((v:PageType, i: number)=>(
+                                    <ListGroup.Item onDoubleClick={()=>handleRenameEventPage(v.id)} action onClick={(e)=>selectPage(v)} eventKey={v.name}><span className={pageItemRename==v.id?"":"hide"}><TextField defaultValue={v.title} onKeyDown={(e)=>handleKeyDown(i, e)} onChange={handleChangePageName} style={{width: '80%'}} label="" /></span><span className={pageItemRename==v.id?"hide":""}>{v.title}</span><div className="right-panel"><span><i onClick={()=>lockPage(v)} className={(v.private==0)?"bi bi-unlock-fill":"bi bi-lock-fill"}></i><i onClick={()=>handleEditPage(v)} className="bi bi-pencil-fill"></i><i onClick={()=>handleRemovePage(v)} className="bi bi-trash3-fill"></i></span></div></ListGroup.Item> 
                                 ))   
                             )
                             )
@@ -323,11 +371,11 @@ export default function PageManager({setpageTabtype, setKey, setEditPageName, __
                         <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
                             <Form.Label>Введите имя нового меню</Form.Label>
                             <Form.Control
-                            required
-                            type="text"
-                            onChange={handleChangeName}
-                            placeholder=""
-                            autoFocus
+                                required
+                                type="text"
+                                onChange={handleChangeName}
+                                placeholder=""
+                                autoFocus
                             />
                         </Form.Group>
                         <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">

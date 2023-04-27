@@ -28,11 +28,11 @@
             $db = new SQLite3(DB."db.sqlite");
             $id = $this->data->page_id;
             $sql = "SELECT private from pages WHERE name=$id";
-            $res = $db->query("SELECT private from pages WHERE name='$id'");
+            $res = $db->query("SELECT title, private from pages WHERE name='$id'");
             $page = $res->fetchArray(SQLITE3_ASSOC);
             $page_filename = PAGES . $id . ".html";
             $db->close();
-            return array("private"=>$page["private"], "content"=>file_get_contents($page_filename));
+            return array("private"=>$page["private"], "title"=>$page["title"], "content"=>file_get_contents($page_filename));
         }
 
         protected function getFooter(){
@@ -662,18 +662,19 @@
 
     protected function update(){
         $db = new SQLite3(DB."db.sqlite");
-        $db->exec("INSERT INTO settings(config_name, value) values('exam_title', 'Выбор билета')");
-        $db->exec("ALTER TABLE ticket_2_question ADD COLUMN indx");
-        $res = $db->query("SELECT * FROM ticket_2_question");
+        //$db->exec("INSERT INTO settings(config_name, value) values('exam_title', 'Выбор билета')");
+        //$db->exec("ALTER TABLE ticket_2_question ADD COLUMN indx");
+        //$res = $db->query("SELECT * FROM ticket_2_question");
+        $res = $db->query("SELECT * FROM menu_2_page");
         $i = 0;
         $tickets = array();
         while($row = $res->fetchArray(SQLITE3_ASSOC)){
             $i++;
-            if(!isset($tickets[$row['tickets_id']]))
-                $tickets[$row['tickets_id']] = 1;
-            else
-                $tickets[$row['tickets_id']]++;
-            $db->exec("UPDATE ticket_2_question SET indx={$tickets[$row['tickets_id']]} WHERE tickets_id={$row['tickets_id']} AND q_id={$row['q_id']}");
+            //if(!isset($tickets[$row['tickets_id']]))
+                //$page[$row['tickets_id']] = 1;
+            //else
+                //$page[$row['tickets_id']]++;
+            $db->exec("UPDATE menu_2_page SET indx={$i} WHERE page_id={$row['page_id']} AND menu_id={$row['menu_id']}");
         }
         $db->close();
     }
@@ -707,6 +708,22 @@
         $menuId = $db->lastInsertRowID();
         $db->close();
         return array("title"=>$menu_title, "id"=>$menuId);
+    }
+
+    protected function renameMenu(){
+        $db = new SQLite3(DB."db.sqlite");
+        $new_name = $this->data->newName;
+        $menuId = $this->data->id;
+        $db->exec("UPDATE menus SET title='$new_name' WHERE id=$menuId");
+        $db->close();
+    }
+
+    protected function renamePage(){
+        $db = new SQLite3(DB."db.sqlite");
+        $new_name = $this->data->newName;
+        $id = $this->data->id;
+        $db->exec("UPDATE pages SET title='$new_name' WHERE id=$id");
+        $db->close();
     }
 
     protected function getMenuItems(){
