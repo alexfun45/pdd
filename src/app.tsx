@@ -7,7 +7,6 @@ import routes from './routers'
 import Header from "./components/Header"
 import MobileHeader from './components/MobileHeader'
 import Footer from './components/Footer'
-import $ from 'jquery'
 import request from './utils/request'
 
 let defaultUser = {
@@ -51,7 +50,8 @@ export default function App(){
   const getRoutes = (allRoutes: Array<{route:string, key: string, component: object, auth?: boolean}>) =>
         allRoutes.map((route) => {
           if (route.route) {
-              return (route.auth && role!=1)?<Route path={route.route} element={<Navigate to="/auth" replace />} />:<Route path={route.route} element={route.component} key={route.key} />;
+              let userRole = (window.localStorage.getItem('user')!=null) ? JSON.parse(window.localStorage.getItem('user')).role:0;
+              return (route.auth && userRole!=1)?<Route path={route.route} element={<Navigate to="/auth" replace />} />:<Route path={route.route} element={route.component} key={route.key} />;
           }
     
           return null;
@@ -69,22 +69,22 @@ export default function App(){
         document.body.style.backgroundImage = `url(${src})`;
         }
       });
-
-      request({method: 'post', data:{action: 'getUserRole'}}).then( response => {
-        const {data} = response;
-        setRole(data.role);
-        setLogin(data.logged);
-        setUser(data);
-        
-        /*if(data.role==1){
-          $("#footer").load("./pages/footer.html", function(){
-            $("#footer").wrap("<div id='footer-wrapper'></div>");
-            $("#footer").append("<span class='footer-edit-btn'>редактировать</span>");
-          });
-        }
-        else
-            $("#footer").load("./pages/footer.html");*/
-      });
+      if(window.localStorage.getItem('user')!=null && window.localStorage.getItem('user')!="false"){
+        let userData = JSON.parse(window.localStorage.getItem('user'));
+        console.log("userData", userData);
+        setRole(userData.role);
+        setLogin(userData.logged);
+        setUser(userData);
+      } 
+      else{
+        request({method: 'post', data:{action: 'getUserRole'}}).then( response => {
+          const {data} = response;
+          setRole(data.role);
+          setLogin(data.logged);
+          setUser(data);
+          window.localStorage.setItem("user", JSON.stringify(data));
+          })
+      }
       window.addEventListener('resize', handleWindowSizeChange);
     }, []);
 

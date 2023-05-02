@@ -67,6 +67,7 @@ function TopMenu({showLogo}:{showLogo: string}) {
     request({method: 'post', data:{ action: 'Logout'}});
     //setLogin(false);
     //navigate("/");
+    window.localStorage.clear();
     document.location.href = "./";
   }
 
