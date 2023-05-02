@@ -182,9 +182,9 @@ export default () => {
     const addQueToTicket = () => {
         if(selectedQuestion!=null && (ticketQuestions.findIndex(item=>item.id==selectedQuestion.id))===-1){
             // determine next indx of ticket question array
-            let max_indx = ticketQuestions[ticketQuestions.length-1].indx + 1;
+            let max_indx = (ticketQuestions.length>0) ? (ticketQuestions[ticketQuestions.length-1].indx + 1) : 1;
             request({method: "post", data: {action: "addQueToTicket", data: {ticketId: selectedTicket, qId: selectedQuestion.id, next_indx: max_indx}}}).then(response=>{
-                setTicketQue(prev=>[...prev, selectedQuestion]);
+                setTicketQue(prev=>[...prev, {...selectedQuestion, indx: max_indx}]);
             });
         }
     }

@@ -265,8 +265,8 @@ export default function PageManager({setpageTabtype, setKey, setEditPageName, __
     }
 
     const handleKeyDown = (i: number, e: React.KeyboardEvent<HTMLDivElement>) => {
-        console.log("pageItemRename", pageItemRename);
-        console.log("pageNewName", pageNewName);
+        if(e.keyCode==27)
+            cancelEdit();
         if(e.keyCode==13){
           if(menuItemRename!=0 && menuNewName!=""){
             request({method: "post", data: {action: "renameMenu", data: {id: menuItemRename, newName: menuNewName}}}).then(response=>{
@@ -281,7 +281,6 @@ export default function PageManager({setpageTabtype, setKey, setEditPageName, __
             request({method: "post", data: {action: "renamePage", data: {id: pageItemRename, newName: pageNewName}}}).then(response=>{
                 setPageItemRename(0);
                 let copy = [...allPages];
-                console.log(pageNewName);
                 copy[i].title = pageNewName;
                 pageNewName = "";
                 setAllPages(copy);
@@ -299,6 +298,14 @@ export default function PageManager({setpageTabtype, setKey, setEditPageName, __
         setAllPages(pages);
     }
 
+    const cancelEdit = () => {
+        pageNewName = "";
+        menuNewName = "";
+        setMenuItemRename(0);
+        setPageItemRename(0);
+        setAllPages(allPages);
+    }
+
     return (
         <div className="block-wrapper">
             <DeleteDialog show={showRemovePageDialog} setShow={setRemovePageDialog} title="Вы действительно хотите произвести удаление?" removeMethod={removeMethod}/>
@@ -308,7 +315,7 @@ export default function PageManager({setpageTabtype, setKey, setEditPageName, __
                     <ListGroup>
                         {
                             menuItems.map((value:any, i: number) => {
-                                    return <ListGroup.Item action id={value.id} onClick={(e)=>selectItem(value.id)} onDoubleClick={()=>handleRenameEvent(value.id)} eventKey={value.id}><span className="pos-element"><i onClick={(e)=>{e.stopPropagation(); toUpPos("menus", i)}} className="bi bi-arrow-up"></i><i onClick={(e)=>{e.stopPropagation(); toDownPos("menus", i)}} className="bi bi-arrow-down"></i></span><span className={menuItemRename==value.id?"":"hide"}><TextField defaultValue={value.title} onKeyDown={(e)=>handleKeyDown(i, e)} onChange={handleChangeMenuName} style={{width: '80%'}} label="" /></span><span className={menuItemRename==value.id?"hide":""}>{value.title}</span><div className="right-panel"><span><i onClick={()=>handleRemoveTopMenu(value.id, i)} className="bi bi-trash3-fill"></i></span></div></ListGroup.Item> 
+                                    return <ListGroup.Item action id={value.id} onClick={(e)=>selectItem(value.id)} onDoubleClick={()=>handleRenameEvent(value.id)} eventKey={value.id}><span className="pos-element"><i onClick={(e)=>{e.stopPropagation(); toUpPos("menus", i)}} className="bi bi-arrow-up"></i><i onClick={(e)=>{e.stopPropagation(); toDownPos("menus", i)}} className="bi bi-arrow-down"></i></span><span className={menuItemRename==value.id?"":"hide"}><TextField defaultValue={value.title} onKeyDown={(e)=>handleKeyDown(i, e)} onChange={handleChangeMenuName} style={{width: '70%'}} label="" /></span><span className={menuItemRename==value.id?"hide":""}>{value.title}</span><div className="right-panel"><span><i className={menuItemRename==value.id?"hide":"bi bi-trash3-fill"} onClick={()=>handleRemoveTopMenu(value.id, i)}></i><Button onClick={()=>cancelEdit()} className={menuItemRename==value.id?"":"hide"} style={{fontSize:"11px", marginTop: '7px'}} variant="danger">отмена</Button></span></div></ListGroup.Item> 
                             })
                     
                             
@@ -350,12 +357,12 @@ export default function PageManager({setpageTabtype, setKey, setEditPageName, __
                         {
                             (filtered.length==0 ? 
                                 allPages.map((v:PageType, i: number)=>(
-                                    <ListGroup.Item onDoubleClick={()=>handleRenameEventPage(v.id)} action onClick={(e)=>selectPage(v)} eventKey={v.name}><span className={pageItemRename==v.id?"":"hide"}><TextField defaultValue={v.title} onKeyDown={(e)=>handleKeyDown(i, e)} onChange={handleChangePageName} style={{width: '80%'}} label="" /></span><span className={pageItemRename==v.id?"hide":""}>{v.title}</span><div className="right-panel"><span><i onClick={()=>lockPage(v)} className={(v.private==0)?"bi bi-unlock-fill":"bi bi-lock-fill"}></i><i onClick={()=>handleEditPage(v)} className="bi bi-pencil-fill"></i><i onClick={()=>handleRemovePage(v)} className="bi bi-trash3-fill"></i></span></div></ListGroup.Item> 
+                                    <ListGroup.Item onDoubleClick={()=>handleRenameEventPage(v.id)} action onClick={(e)=>selectPage(v)} eventKey={v.name}><span className={pageItemRename==v.id?"":"hide"}><TextField defaultValue={v.title} onKeyDown={(e)=>handleKeyDown(i, e)} onChange={handleChangePageName} style={{width: '80%'}} label="" /></span><span className={pageItemRename==v.id?"hide":""}>{v.title}</span><div className="right-panel"><span className={pageItemRename==v.id?"hide":""}><i onClick={()=>lockPage(v)} className={(v.private==0)?"bi bi-unlock-fill":"bi bi-lock-fill"}></i><i onClick={()=>handleEditPage(v)} className="bi bi-pencil-fill"></i><i onClick={()=>handleRemovePage(v)} className="bi bi-trash3-fill"></i></span><span><Button onClick={()=>cancelEdit()} className={pageItemRename==v.id?"":"hide"} style={{fontSize:"11px", marginTop: '7px'}} variant="danger">отмена</Button></span></div></ListGroup.Item> 
                                 )) 
                             :
                                 (
                                 filtered.map((v:PageType, i: number)=>(
-                                    <ListGroup.Item onDoubleClick={()=>handleRenameEventPage(v.id)} action onClick={(e)=>selectPage(v)} eventKey={v.name}><span className={pageItemRename==v.id?"":"hide"}><TextField defaultValue={v.title} onKeyDown={(e)=>handleKeyDown(i, e)} onChange={handleChangePageName} style={{width: '80%'}} label="" /></span><span className={pageItemRename==v.id?"hide":""}>{v.title}</span><div className="right-panel"><span><i onClick={()=>lockPage(v)} className={(v.private==0)?"bi bi-unlock-fill":"bi bi-lock-fill"}></i><i onClick={()=>handleEditPage(v)} className="bi bi-pencil-fill"></i><i onClick={()=>handleRemovePage(v)} className="bi bi-trash3-fill"></i></span></div></ListGroup.Item> 
+                                    <ListGroup.Item onDoubleClick={()=>handleRenameEventPage(v.id)} action onClick={(e)=>selectPage(v)} eventKey={v.name}><span className={pageItemRename==v.id?"":"hide"}><TextField defaultValue={v.title} onKeyDown={(e)=>handleKeyDown(i, e)} onChange={handleChangePageName} style={{width: '80%'}} label="" /></span><span className={pageItemRename==v.id?"hide":""}>{v.title}</span><div className="right-panel"><span className={pageItemRename==v.id?"hide":""}><i onClick={()=>lockPage(v)} className={(v.private==0)?"bi bi-unlock-fill":"bi bi-lock-fill"}></i><i onClick={()=>handleEditPage(v)} className="bi bi-pencil-fill"></i><i onClick={()=>handleRemovePage(v)} className="bi bi-trash3-fill"></i></span><span><Button onClick={()=>cancelEdit()} className={pageItemRename==v.id?"":"hide"} style={{fontSize:"11px", marginTop: '7px'}} variant="danger">отмена</Button></span></div></ListGroup.Item> 
                                 ))   
                             )
                             )
