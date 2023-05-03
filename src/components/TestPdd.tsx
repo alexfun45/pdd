@@ -377,25 +377,26 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
     return (
         <div className="container">
             <div style={{marginTop: 0}} className={(options.settings===false)?"row testrow":"hide"}>
-                <div className="exam-title"><label>{context.settings.exam_title}</label></div>
+                <div className="exam-title">
+                    <label>{context.settings.exam_title}</label>
+                    <FormControl sx={{ m: 1, minWidth: 120 }}>
+                        <Select
+                            labelId="demo-simple-select-helper-label"
+                            sx={{"& .MuiSelect-select": {padding: "5px 14px"}}}
+                            id="demo-simple-select-helper"
+                            value={selectedTicket}
+                            onChange={handleChangeTicket}>
+                                {
+                                    tickets.map((v, i)=>(
+                                        <MenuItem value={v.id}>{v.name}</MenuItem>
+                                    ))
+                                }
+                        </Select>
+                    </FormControl>
+                </div>
             </div>
             <div style={{marginTop: '0px'}} className={(options.settings===false)?"row testrow":"hide"}>
-                
-                <FormControl sx={{ m: 1, minWidth: 120 }}>
-                    <Select
-                        labelId="demo-simple-select-helper-label"
-                        sx={{"& .MuiSelect-select":{padding: "11px 14px"}}}
-                        id="demo-simple-select-helper"
-                        value={selectedTicket}
-                        onChange={handleChangeTicket}>
-                            {
-                                tickets.map((v, i)=>(
-                                    <MenuItem value={v.id}>{v.name}</MenuItem>
-                                ))
-                            }
-                    </Select>
-                    <input onClick={startTest} style={{marginTop: "15px"}} id="buttonSchoolSetName" type="submit" className={(start)?"hide":"btn btn-success"} value="Начать" />
-                </FormControl>
+                    
             </div>
             <div className={(options.settings===true)?"row testrow":"hide"}>
                 <div className="col-md-12">
@@ -486,23 +487,15 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
 
                     <div style={{marginTop: 0}} className="row testrow">
                         <div className="col-md-12 col-sm-12 myheader">
-                            
-                                {/*<img className="img-responsive pull-left hidden-xs" style={{width: "75px"}} alt="логотип" src="./img/gibddlogo_pdd24.png" />
-                                <h1 id="h1">Билеты ПДД 2023 экзамен ПДД</h1>
-                                <p>Экзаменационные билеты пдд соответствуют экзамену ГИБДД
-                                </p>*/}
-                                <span id="labelQuestNumber" className="label label-primary">Новые правила экзамена пдд 2023</span>
-                                <span id="labelCategory" className="hide"> ABM </span>
-                                <Watch start={start} endTest={endTest} pause={testPause} _continue={continueTest} />
-                                {/*<span id="labelTimer" className="label-info lead label" title="таймер" style={{cursor: "pointer"}}><span id="time">{time}</span>
-                                    { (start==true) ? 
-                                         <i onClick={testPause} className="bi bi-pause-fill pause-btn"></i>
-                                        :
-                                         <i onClick={continueTest} className="bi bi-play-fill pause-btn"></i>
-                                    
-                                    }
-                                </span>*/}
-                                <span id="labelBookmark" data-toggle="tooltip" data-placement="left" title="В закладки" style={{fontSize: "20px", color: "#5bc0de", cursor: "pointer"}} className="pull-right glyphicon glyphicon-star-empty"></span>
+                            <span id="labelQuestNumber" className="label label-primary">Новые правила экзамена пдд 2023</span>
+                            <span id="labelCategory" className="hide"> ABM </span>
+                            {(selectedTicket!='0' && (currentQuestion!==undefined)) && (
+                                    <Watch start={start} endTest={endTest} pause={testPause} _continue={continueTest} />  
+                            )}
+                            {(selectedTicket!='0') && (
+                                <input onClick={startTest} id="buttonSchoolSetName" type="submit" className={(start)?"hide":"btn btn-start"} value="Начать" />
+                            )}
+                            <span id="labelBookmark" data-toggle="tooltip" data-placement="left" title="В закладки" style={{fontSize: "20px", color: "#5bc0de", cursor: "pointer"}} className="pull-right glyphicon glyphicon-star-empty"></span>
                         </div>
                     </div>
                 </div>

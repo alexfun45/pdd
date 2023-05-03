@@ -105,7 +105,7 @@ p{
 }
 
 .containerWrapper{
-    height: 90%;
+    height: 95%;
     position: relative;
     top: -40px;
     width: 100%;
@@ -122,7 +122,7 @@ p{
 }
 
 .container {
-    max-height: 90%;
+    max-height: 92%;
     width: 90%;
     margin: 0 auto;
     overflow-y: scroll;
@@ -454,6 +454,8 @@ p{
     padding: .75rem 0.4rem !important;
     background-color: transparent;
     border:none;
+    border-radius: 7px !important;
+    font-weight: 450;
   }
 
 .mobileWrapper{
@@ -612,6 +614,9 @@ p{
     padding-bottom: 10px;
     font-size: 20px;
     line-height: 1.15;
+    margin-top: 10px;
+    margin-bottom: 7px;
+    font-weight: 600;
 }
 .myconf-button{
     padding-left: 0px;
@@ -623,7 +628,7 @@ p{
 }
 
 .questvariant{
-    font-size: 16px;
+    font-size: 18px;
     padding-top: 11px;
     padding-bottom: 13px;
     padding-left: 5px;
@@ -1457,6 +1462,7 @@ div.suggestPopupContent div table tbody tr td.item-selected{
         position: absolute;
         white-space: nowrap;
         top: 0;
+        height: 100%;
     }
 
     .arrow-btn{
@@ -1533,6 +1539,19 @@ div.suggestPopupContent div table tbody tr td.item-selected{
 
     .exam-title{
         font-weight: bold;
+        line-height: 50px;
+    }
+
+    .exam-title > label{
+        font-size: 16px;
+    }
+
+    .btn-start{
+        background-color: #5bc0de;
+        color: #FFF;
+        font-size: 0.9rem;
+        padding: .050rem .95rem;
+        margin-bottom: 1px;
     }
 
     .right-panel{
@@ -1861,6 +1880,7 @@ div.suggestPopupContent div table tbody tr td.item-selected{
 
   .list-group-item{
     height: auto !important;
+    margin-bottom: 3px;
   }
   
   .MuiDrawer-paperAnchorDockedLeft{
