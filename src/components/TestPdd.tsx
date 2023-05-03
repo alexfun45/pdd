@@ -379,7 +379,7 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
             <div style={{marginTop: 0}} className={(options.settings===false)?"row testrow":"hide"}>
                 <div className="exam-title"><label>{context.settings.exam_title}</label></div>
             </div>
-            <div style={{marginTop: '20px'}} className={(options.settings===false)?"row testrow":"hide"}>
+            <div style={{marginTop: '0px'}} className={(options.settings===false)?"row testrow":"hide"}>
                 
                 <FormControl sx={{ m: 1, minWidth: 120 }}>
                     <Select
@@ -463,7 +463,7 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
             </form>
             </div>
         </div>
-            <div className="row testrow">
+            <div style={{marginTop: 0}} className="row testrow">
                 <div className="slide-wrapper" style={{width: (requiredWidth+"px")}}>
                     <i onClick={toPrevPage} className={start?"bi bi-caret-left arrow-btn arrow-left-btn":"hide"}></i>
                     <div className="button-slider">
@@ -507,7 +507,7 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
                     </div>
                 </div>
             </div>
-            <div className="row testrow">
+            <div style={{marginTop: 0}} className="row testrow">
                 <div className="col-lg-8 col-md-9 col-sm-12 mini-wrapper">
                     <div className="block-ticket">
                         <div className="col-md-12">

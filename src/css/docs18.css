@@ -107,7 +107,7 @@ p{
 .containerWrapper{
     height: 90%;
     position: relative;
-    top: -15px;
+    top: -40px;
     width: 100%;
     overflow: hidden;
     word-wrap: break-word;
@@ -453,6 +453,7 @@ p{
     text-align: left;
     padding: .75rem 0.4rem !important;
     background-color: transparent;
+    border:none;
   }
 
 .mobileWrapper{
