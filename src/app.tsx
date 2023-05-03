@@ -71,7 +71,6 @@ export default function App(){
       });
       if(window.localStorage.getItem('user')!=null && window.localStorage.getItem('user')!="false"){
         let userData = JSON.parse(window.localStorage.getItem('user'));
-        console.log("userData", userData);
         setRole(userData.role);
         setLogin(userData.logged);
         setUser(userData);

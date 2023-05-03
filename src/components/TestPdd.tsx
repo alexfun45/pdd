@@ -376,12 +376,15 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
 
     return (
         <div className="container">
-            <div className={(options.settings===false)?"row testrow":"hide"}>
-                <div><label>{context.settings.exam_title}</label></div>
+            <div style={{marginTop: 0}} className={(options.settings===false)?"row testrow":"hide"}>
+                <div className="exam-title"><label>{context.settings.exam_title}</label></div>
+            </div>
+            <div style={{marginTop: '20px'}} className={(options.settings===false)?"row testrow":"hide"}>
+                
                 <FormControl sx={{ m: 1, minWidth: 120 }}>
-                    
                     <Select
                         labelId="demo-simple-select-helper-label"
+                        sx={{"& .MuiSelect-select":{padding: "11px 14px"}}}
                         id="demo-simple-select-helper"
                         value={selectedTicket}
                         onChange={handleChangeTicket}>
@@ -478,10 +481,10 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
                     <i onClick={toNextPage} className={start?"bi bi-caret-right arrow-btn arrow-right-btn":"hide"}></i>
                 </div>
             </div>
-            <div className="row testrow centered-row">
+            <div style={{marginTop: 0}} className="row testrow centered-row">
                 <div className="col-lg-8 col-md-8 col-sm-8">    
 
-                    <div className="row testrow">
+                    <div style={{marginTop: 0}} className="row testrow">
                         <div className="col-md-12 col-sm-12 myheader">
                             
                                 {/*<img className="img-responsive pull-left hidden-xs" style={{width: "75px"}} alt="логотип" src="./img/gibddlogo_pdd24.png" />

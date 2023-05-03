@@ -106,6 +106,8 @@ p{
 
 .containerWrapper{
     height: 90%;
+    position: relative;
+    top: -15px;
     width: 100%;
     overflow: hidden;
     word-wrap: break-word;
@@ -408,8 +410,8 @@ p{
 .list-group{
     max-height: 500px;
     overflow-y: auto;
-    background-color: #FFF;
     padding-bottom: 35px;
+    background-color: transparent;
 }
 
 .bs-example > .list-group {
@@ -450,6 +452,7 @@ p{
     width: 100%;
     text-align: left;
     padding: .75rem 0.4rem !important;
+    background-color: transparent;
   }
 
 .mobileWrapper{
@@ -606,7 +609,7 @@ p{
 .questtext {
     padding-top: 5px;
     padding-bottom: 10px;
-    font-size: 17px;
+    font-size: 20px;
     line-height: 1.15;
 }
 .myconf-button{
@@ -1401,6 +1404,7 @@ div.suggestPopupContent div table tbody tr td.item-selected{
     .btn{
         margin-right: 5px;
         margin-left: 5px;
+        border-radius: 5px !important;
     }
     
     #buttonPanel.btn-group-sm > button , #buttonPanel1 > button, #buttonPanel2 > button, #buttonPanel3 > button , #buttonPanel4 > button {
@@ -1425,7 +1429,7 @@ div.suggestPopupContent div table tbody tr td.item-selected{
         user-select: none;
         background-image: none;
         border: 1px solid transparent;
-        width: 50px;
+        width: 45px;
         height: auto;
         margin-right: 0px !important;
         margin-left: 0px !important;
@@ -1443,7 +1447,7 @@ div.suggestPopupContent div table tbody tr td.item-selected{
         display: inline-block;
         position: relative;
         overflow: hidden;
-        height: 40px;
+        height: 50px;
     }
 
     .button-slider #buttonPanel{
@@ -1525,6 +1529,10 @@ div.suggestPopupContent div table tbody tr td.item-selected{
     .label-default {
         background-color: #777;
       }
+
+    .exam-title{
+        font-weight: bold;
+    }
 
     .right-panel{
         display: inline-block;
