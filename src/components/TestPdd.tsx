@@ -481,7 +481,7 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
                     <i onClick={toNextPage} className={start?"bi bi-caret-right arrow-btn arrow-right-btn":"hide"}></i>
                 </div>
             </div>
-            <div style={{marginTop: 0}} className="row testrow centered-row">
+            <div style={{marginTop: 0, position: 'relative', top: '-15px'}} className="row testrow centered-row">
                 <div className="col-lg-8 col-md-8 col-sm-8">    
 
                     <div style={{marginTop: 0}} className="row testrow">
