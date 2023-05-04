@@ -521,7 +521,7 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
                                     </div>
                                     <div id="commentPanel" className={(opened.length>0)?"":"hide"}>
                                         <button onClick={next} id="questNext" type="button" className="list-group-item active">Далее <small className="text-warning small hidden-xs"> - Enter &nbsp;&nbsp;&nbsp; 1,2,3 - выбор &nbsp;&nbsp;&nbsp; &larr; назад &nbsp; вперед &rarr;</small></button>
-                                        <div id="questComment" className="list-group-item">{(currentQuestion!==undefined && currentQuestion.variants.length>selectedVariant)?currentQuestion.variants[selectedVariant].comment:""}</div>
+                                        <div id="questComment" className="">{(currentQuestion!==undefined && currentQuestion.variants.length>selectedVariant)?currentQuestion.variants[selectedVariant].comment:""}</div>
                                     </div>
                                 </div>
                             </div>

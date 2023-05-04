@@ -451,10 +451,6 @@ p{
 .list-group-item {
     width: 100%;
     text-align: left;
-    padding: .75rem 0.4rem !important;
-    background-color: transparent;
-    border:none;
-    border-radius: 7px !important;
     font-weight: 450;
   }
 
@@ -634,7 +630,13 @@ p{
     padding-left: 5px;
     padding-right: 5px;
     cursor: pointer;
+    background-color: transparent;
+    border-radius: 7px !important;
+    padding: .75rem 0.4rem !important;
+    margin-bottom: 3px;
+    border:none;
 }
+
 .themelist{
     font-size: 14px;
     padding-top: 5px;
@@ -1845,6 +1847,16 @@ div.suggestPopupContent div table tbody tr td.item-selected{
 
   #questComment{
     line-height: 1.1;
+    width: 100%;
+    text-align: left;
+    padding: .75rem 0.4rem !important;
+    background-color: transparent;
+    font-weight: 450;
+  }
+
+  #questNext{
+    border-radius: 6px;
+    padding: .35rem 1.25rem;
   }
 
   .row.testrow{
@@ -1880,7 +1892,6 @@ div.suggestPopupContent div table tbody tr td.item-selected{
 
   .list-group-item{
     height: auto !important;
-    margin-bottom: 3px;
   }
   
   .MuiDrawer-paperAnchorDockedLeft{
