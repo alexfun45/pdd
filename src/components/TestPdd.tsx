@@ -226,6 +226,7 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
         request({method: 'post', data: {action: "getTickets"}}).then(response => {
             const {data} = response;
             setTickets(data);
+            setTicket(data[0].id);
         });
     }
 

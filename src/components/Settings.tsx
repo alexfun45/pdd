@@ -197,8 +197,11 @@ export default ({allPages = []} : any) => {
         }
 
         const handleChangeStartPage = (e:any, value: any) => {
-           formData.delete('start_page');
-           formData.append('start_page', value.id);
+          if(value){
+            setStartPage(value);
+            formData.delete('start_page');
+            formData.append('start_page', value.id);
+          }
         }
 
       const Update = () =>{
@@ -261,7 +264,8 @@ export default ({allPages = []} : any) => {
                 options={allPages}
                 getOptionLabel={(option: any) => (option!=null) ? option.title: ""}
                 sx={{ width: 300 }}
-                defaultValue={start_page}
+                value={(start_page)?start_page:""}
+                
                 onChange={handleChangeStartPage}
                 renderInput={(params) => <TextField {...params} label="Имя страницы" />}
               />
