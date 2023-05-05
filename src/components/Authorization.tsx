@@ -168,8 +168,8 @@ export default () => {
                                             required: "Поле обязательно",
                                             maxLength: 50,
                                             pattern: {
-                                                value: /^[A-Za-z0-9]+$/i,
-                                                message: "Пробелы недопустимы",
+                                                value: /^[A-Za-z0-9_@$#\/&\'\(\)%]+$/i,
+                                                message: "недопустимые символы",
                                                 },
                                             validate:{
                                                  isLoginExist: v => (users.find(user => {return user.login==v})===undefined) || "этот логин уже занят"
@@ -195,11 +195,11 @@ export default () => {
                                             required: "Поле обязательно",
                                             maxLength: 50,
                                             pattern: {
-                                                value: /^[A-Za-zа-яА-Я0-9@\.]+$/i,
-                                                message: "Пробелы недопустимы",
+                                                value: /^[A-Za-zа-яА-Я0-9@\._$\'\-#%\&\/]+$/i,
+                                                message: "недопустимые символы",
                                             },
                                             validate: {
-                                                isEmail: v => /^[a-zA-Z0-9]+?@[a-zA-Z0-9]+/.test(v) || "некорретный формат email",
+                                                isEmail: v => /^[a-zA-Z0-9@\._$\'\-#%\&\/]+?@[a-zA-Z0-9@\._$\'\-#%\&\/]+/.test(v) || "некорретный формат email",
                                                 isEmailExist: v => (users.find(user => {return user.email==v})===undefined) || "этот email уже занят"
                                             }
                                         }

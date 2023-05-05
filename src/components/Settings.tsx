@@ -263,11 +263,10 @@ export default ({allPages = []} : any) => {
                 id="combo-box-demo"
                 options={allPages}
                 getOptionLabel={(option: any) => (option!=null) ? option.title: ""}
-                sx={{ width: 300 }}
+                sx={{ width: '100%' }}
                 value={(start_page)?start_page:""}
-                
                 onChange={handleChangeStartPage}
-                renderInput={(params) => <TextField {...params} label="Имя страницы" />}
+                renderInput={(params) => <TextField sx={{width: '100%', backgroundColor: '#FFF'}} {...params} label="Имя страницы" />}
               />
               </td>
             </tr>
