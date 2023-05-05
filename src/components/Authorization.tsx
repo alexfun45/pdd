@@ -113,11 +113,11 @@ export default () => {
                                             required: "Поле обязательно",
                                             maxLength: 50,
                                             pattern: {
-                                                value: /^[A-Za-zа-яА-Я0-9@\.]+$/i,
+                                                value: /^[a-zA-Z0-9@\._$\'\-#%\&\/]+$/i,
                                                 message: "Пробелы недопустимы",
                                             },
                                             validate: {
-                                                isEmail: v => /^[a-zA-Z0-9]+?@[a-zA-Z0-9]+/.test(v) || "некорретный формат email"
+                                                isEmail: v => /^[a-zA-Z0-9@\._$\'\-#%\&\/]+?@[a-zA-Z0-9@\._$\'\-#%\&\/]+/.test(v) || "некорретный формат email"
                                             }})
                                             } type="email" placeholder="name@example.com" />
                                 {<p className="error-msg">{errors3.email_recovery && errors3.email_recovery.message}</p>}
@@ -140,7 +140,7 @@ export default () => {
                                             required: "Поле обязательно",
                                             maxLength: 50,
                                             pattern: {
-                                                value: /^[A-Za-z0-9]+$/i,
+                                                value: /^[A-Za-z0-9\-@&%_]+$/i,
                                                 message: "Пробелы недопустимы",
                                                 },
                                             })} 
