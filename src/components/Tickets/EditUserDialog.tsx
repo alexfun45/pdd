@@ -99,8 +99,8 @@ export default ({showUserDialog, setUserDialog, selectedUser, users, setUsers}: 
                                             required: "Поле обязательно",
                                             maxLength: 50,
                                             pattern: {
-                                                value: /^[A-Za-z0-9]+$/i,
-                                                message: "Пробелы недопустимы",
+                                                value: /^[A-Za-z0-9\-@&%_\.]+$/i,
+                                                message: "Недопустимые символы",
                                                 },
                                             validate: {
                                                     isExists: v => isUserExists(v) || "логин занят"
@@ -125,11 +125,11 @@ export default ({showUserDialog, setUserDialog, selectedUser, users, setUsers}: 
                                             required: "Поле обязательно",
                                             maxLength: 50,
                                             pattern: {
-                                                value: /^[A-Za-zа-яА-Я@0-9\.]+$/i,
-                                                message: "Пробелы недопустимы",
+                                                value: /^[A-Za-zа-яА-Я0-9@\._$\'\-#%\&\/]+$/i,
+                                                message: "Недопустимый символ",
                                             },
                                             validate: {
-                                                isEmail: v => /^[a-zA-Z0-9]+?@[a-zA-Z0-9]+/.test(v) || "некорретный формат email"
+                                                isEmail: v => /^[a-zA-Z0-9@\._$\'\-#%\&\/]+?@[a-zA-Z0-9@\._$\'\-#%\&\/]+/.test(v) || "некорретный формат email"
                                                 }
                                             }
                                         )}

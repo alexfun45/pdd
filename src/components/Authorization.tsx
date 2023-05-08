@@ -140,8 +140,8 @@ export default () => {
                                             required: "Поле обязательно",
                                             maxLength: 50,
                                             pattern: {
-                                                value: /^[A-Za-z0-9\-@&%_]+$/i,
-                                                message: "Пробелы недопустимы",
+                                                value: /^[A-Za-z0-9\-@&%_\.]+$/i,
+                                                message: "Недопустимые символы",
                                                 },
                                             })} 
                                         name="login" placeholder="логин" className="input required" />
