@@ -11,6 +11,7 @@ type userType = {
     login: string;
     email: string;
     role: number;
+    state: number;
     password: string;
 };
 
@@ -20,6 +21,7 @@ const defaultEmptyUser = {
     name: "",
     login: "",
     email: "",
+    state: 0,
     role: 3,
     password: ""
 }
@@ -73,18 +75,41 @@ export default () => {
         setPasswordDialog(true);
     }
 
+    const getColor = (state: number) => {
+        switch(state){
+            case 1: return "#40bd40";
+            case 0: return "rgb(187, 40, 40)";
+            default: return "#f2f55b";
+        }
+    }
+
+    const getTitle = (state: number) => {
+        switch(state){
+            case 1: return "онлайн";
+            case 0: return "оффлайн";
+            default: return "еще не заходил";
+        }
+    }
+
+    const getOnlineUsersNum = () => {
+        let num = 0;
+        users.forEach(item=>(item.state==1?num++:0));
+        return num;
+    }
+
     return (
-        <div style={{textAlign: 'right'}}>
+        <div className="tableWrapper">
             <DialogUser showUserDialog={showUserDialog} setUserDialog={setUserDialog} selectedUser={selUser} users={users} setUsers={setUsers} />
             <PasswordDialog userId={userId} showPasswordDialog={showPasswordDialog} setShow={setPasswordDialog}  />
             <Button onClick={handleDialog} style={{marginRight: '220px'}} variant="primary">Добавить пользователя</Button>
+            <div className="table-topheader" style={{display:"inline", float: "left"}}>Всего зарегистрировано: <b>{users.length}</b>  <span style={{marginLeft: "4px", marginRight: "3px", color: "rgb(25, 157, 25)"}}>онлайн:</span><b>{getOnlineUsersNum()}</b></div>
             <Table className="users-table" responsive>
                 <thead>
                     <tr>
                         <th>Имя</th>
                         <th>Логин</th>
                         <th>email</th>
-                        <th>роль</th>
+                        <th>Роль</th>
                         <th></th>
                     </tr>
                 </thead>
@@ -93,7 +118,7 @@ export default () => {
                         users.map((v:userType, i: number)=>(
                             <>
                                 <tr>
-                                    <td>{(v.name||"")}</td>
+                                    <td><i title={getTitle(v.state)} style={{color: getColor(v.state)}} className="bi bi-circle-fill status-circle"></i>{(v.name||"")}</td>
                                     <td>{v.login}</td>
                                     <td>{v.email}</td>
                                     <td className="role-cell">{roleNames[v.role-1]}</td>

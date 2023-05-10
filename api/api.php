@@ -16,11 +16,17 @@
             $reqData = (!empty($reqBody)) ? json_decode($reqBody): (object) $_REQUEST;
             $this->action = $reqData->action;
             $this->data = $reqData->data;
-            
+            //$this->db = new SQLite3(DB."db.sqlite");
         }
 
         public function run(){
+            $db = new SQLite3(DB."db.sqlite");
             $result = call_user_method($this->action, $this);
+            if($_COOKIE['userid'] && ($this->action=="getSettings" || $this->action=="getPage")){
+                $current_time = time();
+                $db->exec("UPDATE users SET action_time='{$current_time}' WHERE id={$_COOKIE['userid']}");
+                $db->close();
+            }
             echo json_encode(array("data"=>$result));
         }
 
@@ -500,9 +506,12 @@
 
     function getUsers(){
         $db = new SQLite3(DB."db.sqlite");
-        $sql = "SELECT id, name, login, email, role FROM users";
+        $sql = "SELECT id, name, login, email, role, action_time FROM users";
         $res = $db->query($sql);
+        $currentTime = time();
         while($user = $res->fetchArray(SQLITE3_ASSOC)){
+            $online = ($user['action_time']==0) ? -1 : (($currentTime-$user['action_time']>60*5)?0:1);
+            $user['state'] = $online;
             $users[] = $user;
         }
         $db->close();
@@ -522,6 +531,7 @@
             if($result!=false && $result!=null){
                 $user = $result->fetchArray(SQLITE3_ASSOC);
                 setcookie("login", $_POST['login'], time() + 30*24*3600);
+                setcookie("userid", $user['id'], time() + 30*24*3600);
                 setcookie("password", $password, time() + 30*24*3600);
                 $_SESSION['logged'] = 1;
                 $_SESSION['role'] = $user['role'];
@@ -554,14 +564,14 @@
     protected function signup(){
         $token = $this->gen_token();
         $user_id = $this->addNewUser($token);
-        $link = "https://dev.traffic-rules.ru/#/confirmation/".$user_id ."/".$token;
+        $link = "https://pddlife.ru/#/confirmation/".$user_id ."/".$token;
         $to      = $this->data->email;
         $subject = 'Подтверждение регистрации';
         $message = 'Для подтверждения регистрации перейдите по ссылке:<br/>';
-        $headers  = "From: server\r\n";
+        $headers  = "From: robot@pddlife.ru\r\n";
         $headers .= "MIME-Version: 1.0\r\n";
         $headers .= "Content-Type: text/html; charset=UTF-8\r\n";
-        $message = '<p>Для подтверждения регистрации перейдите по ссылке: '.$link.' </p>';
+        $message = '<p>Спасибо за регистрацию на сайте www.pddlife.ru</p><p>Для подтверждения регистрации перейдите по ссылке: '.$link.' </p><p>Это письмо сформировано автоматически, отвечать на него не нужно.</p>';
         mail($to, $subject, $message, $headers);
     }
 
@@ -571,13 +581,13 @@
         $db = new SQLite3(DB."db.sqlite");
         $db->exec("UPDATE users SET token='$token' WHERE email='$email'");
         $db->close();
-        $link = "https://dev.traffic-rules.ru/#/passwordrecovery/".$email ."/".$token;
+        $link = "https://pddlife.ru/#/passwordrecovery/".$email ."/".$token;
         $to      = $email;
         $subject = 'Восстановление пароля';
-        $headers  = "From: server\r\n";
+        $headers  = "From: robot@pddlife.ru\r\n";
         $headers .= "MIME-Version: 1.0\r\n";
         $headers .= "Content-Type: text/html; charset=UTF-8\r\n";
-        $message = '<p>Для восстановления пароля перейдите по ссылке: '.$link.' </p>';
+        $message = '<p>Для восстановления пароля перейдите по ссылке: '.$link.' </p><p>Это письмо сформировано автоматически, отвечать на него не нужно.</p>';
         mail($to, $subject, $message, $headers);
     }
 

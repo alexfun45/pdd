@@ -12,6 +12,7 @@ type InputSignUpTypes = {
     email: string;
     password: string;
     role: number;
+    state: number;
     cppassword: string;
 }
 
@@ -21,6 +22,7 @@ type userType = {
     login: string;
     email: string;
     role: number;
+    state: number;
     password: string;
 };
 
@@ -48,7 +50,7 @@ export default ({showUserDialog, setUserDialog, selectedUser, users, setUsers}: 
         setValue("cppassword", selectedUser.password);
     }, [ selectedUser.login]);
 
-    const onSubmit = (data: {id: number; name: string, login:string, password:string, role: number, email: string}) => {
+    const onSubmit = (data: {id: number; name: string, login:string, password:string, role: number, email: string, state: number}) => {
         if(show=="create"){
             request({method: 'post', data: {action: 'addNewUser', data: data}});
             setUsers([...users, data]);

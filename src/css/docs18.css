@@ -1183,16 +1183,23 @@ div.suggestPopupContent div table tbody tr td.item-selected{
 }
 
 .users-table{
-    min-width: 70%;
-    max-width: 700px;
+    min-width: 100%;
     border: 0px;
     margin-top: 10px;
-    margin-left: 40px;
     border-spacing: 10px;
     text-align: left;
     display: inline-table;
     color: #333;
     background-color: #FFF;
+}
+
+.table-topheader{
+    display:inline;
+    float: left;
+    font-size: 16px;
+    color:#3f3f3f;
+    position: relative;
+    top: 8px;
 }
 
 .MuiAutocomplete-popper{
@@ -1955,6 +1962,19 @@ div.suggestPopupContent div table tbody tr td.item-selected{
   .title-num{
     font-size: 16px;
     color:#1f82d8;
+    text-align: right;
+  }
+
+  .status-circle{
+    position: relative;
+    bottom: 2px;
+    margin-right: 4px;
+    font-size: 10px;
+  }
+
+  .tableWrapper{
+    min-width: 60%;
+    display: inline-block;
     text-align: right;
   }
 
