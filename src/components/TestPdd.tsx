@@ -138,7 +138,8 @@ const Watch = ({start, endTest, pause, _continue}: {start: boolean, endTest: boo
 let numPageItems = 10,
     availableWidth = 0,
     itemWidth = 50,
-    requiredWidth = 0;
+    requiredWidth = 0,
+    variantBackgroundColor = "transparent";
 
 const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
 
@@ -153,6 +154,7 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
           [start, setStart] = useState(false),
           [opened, setOpened] = useState<Number[]>([]),
           [qNum, setqNum] = useState<number>(0),
+          [ticketBg, setTicketBg] = useState("transparent"),
           [tickets, setTickets] = useState([]),
           [qpages, setqPages] = useState([]),
           //[opened, setOpened] = useState<Array<number[]>>([]),
@@ -171,8 +173,17 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
         }
         setEndTest(false);
         if(!props.options.settings)
-            getTickets();
+            getTickets();        
     }, [props.options]);
+
+    useEffect(()=>{
+        variantBackgroundColor = context.settings['background-color'];
+        var rgb = variantBackgroundColor.replace(/^rgba?\(|\s+|\)$/g,'').split(',');
+        rgb[0] = (parseInt(rgb[0])+10).toString();
+        rgb[1] = (parseInt(rgb[1])+10).toString();
+        rgb[2] = (parseInt(rgb[2])+10).toString();
+        setTicketBg(`rgba(${rgb[0]},${rgb[1]},${rgb[2]},${rgb[3]})`);
+    }, [context])
 
     useEffect(()=>{
         setqPages([...new Array(qNum).slice(0)]);
@@ -515,7 +526,7 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
                                     <div id="qlist">
                                         { (currentQuestion!=undefined) && (
                                             currentQuestion.variants.map((v,i)=>{
-                                                return <a onDoubleClick={()=>{if(options.dblclick) selectAnswer(i)}} onClick={()=>{if(!options.dblclick) selectAnswer(i)}} id={i.toString()} className={"list-group-item questvariant "+showResult(i)}>{i+1}. {v.answer}</a>
+                                                return <a style={{backgroundColor: ((opened.indexOf(i) != -1))?"":ticketBg}} onDoubleClick={()=>{if(options.dblclick) selectAnswer(i)}} onClick={()=>{if(!options.dblclick) selectAnswer(i)}} id={i.toString()} className={"list-group-item questvariant "+showResult(i)}>{i+1}. {v.answer}</a>
                                             })
                                         )
                                         }
