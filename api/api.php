@@ -329,7 +329,7 @@
             if(array_key_exists("id", $variants[$i]))
                 $db->exec("UPDATE variants SET answer='$label', comment='$comment' WHERE q_id='$q_id' AND id='$var_id'");  
             else
-                $db->exec("INSERT INTO variants(ticket_id, answer, comment) VALUES('$q_id', '$label', '$comment')");
+                $db->exec("INSERT INTO variants(q_id, answer, comment) VALUES('$q_id', '$label', '$comment')");
             }
         $db->close();
     }

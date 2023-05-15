@@ -526,7 +526,8 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
                                     <div id="qlist">
                                         { (currentQuestion!=undefined) && (
                                             currentQuestion.variants.map((v,i)=>{
-                                                return <a style={{backgroundColor: ((opened.indexOf(i) != -1))?"":ticketBg}} onDoubleClick={()=>{if(options.dblclick) selectAnswer(i)}} onClick={()=>{if(!options.dblclick) selectAnswer(i)}} id={i.toString()} className={"list-group-item questvariant "+showResult(i)}>{i+1}. {v.answer}</a>
+                                                return <a onDoubleClick={()=>{if(options.dblclick) selectAnswer(i)}} onClick={()=>{if(!options.dblclick) selectAnswer(i)}} id={i.toString()} className={"list-group-item questvariant "+showResult(i)}>{i+1}. {v.answer}</a>
+                                                //return <a style={{backgroundColor: ((opened.indexOf(i) != -1))?"":ticketBg}} onDoubleClick={()=>{if(options.dblclick) selectAnswer(i)}} onClick={()=>{if(!options.dblclick) selectAnswer(i)}} id={i.toString()} className={"list-group-item questvariant "+showResult(i)}>{i+1}. {v.answer}</a>
                                             })
                                         )
                                         }

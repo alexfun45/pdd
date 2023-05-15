@@ -158,10 +158,12 @@ export default ({show, setShow, Question, setSelectedQue, setQuestions, update}:
                 else{
                     update();
                 }
-                setText("");
-                setCodeId("");
-                setImg("");
-                setAnswers([{answer: '', comment: ''}]);
+                if(Question==null){
+                    setText("");
+                    setCodeId("");
+                    setImg("");
+                    setAnswers([{answer: '', comment: ''}]);
+                }
             },
             error: function(e) {
               console.log("ERROR : ", e);
