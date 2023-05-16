@@ -107,7 +107,7 @@ p{
 .containerWrapper{
     height: 95%;
     position: relative;
-    top: -40px;
+    top: 0px;
     width: 100%;
     overflow: hidden;
     word-wrap: break-word;
@@ -459,7 +459,7 @@ p{
   }
 
 .mobileWrapper{
-    padding-top: 8vh;
+    padding-top: 10vh;
 }
 
 .mobileWrapper .col-md-9{
@@ -1564,7 +1564,7 @@ div.suggestPopupContent div table tbody tr td.item-selected{
         font-size: 1em;
         position: relative;
         display: block;
-        top: 0px;
+        top: -2px;
         left: 30px;
         z-index: 10000;
         width: 90%;
