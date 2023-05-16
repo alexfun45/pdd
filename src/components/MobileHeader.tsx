@@ -25,7 +25,7 @@ import {AppContext} from '../app'
 
 const useStyles = makeStyles({
     drawerPaper: {
-      marginTop: "8vh",
+      marginTop: "7vh",
       width: "80vw"
     }
   });
@@ -184,7 +184,7 @@ export default () => {
 
     return (
         <div className="mobileHeader">
-            <div style={{position: 'relative', width: '100%',  whiteSpace: 'nowrap', lineHeight: '100%'}}>
+            <div style={{position: 'relative', width: '100%'}}>
              <IconButton
                 aria-label="more"
                 id="long-button"

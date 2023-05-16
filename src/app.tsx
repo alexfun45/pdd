@@ -93,7 +93,7 @@ export default function App(){
       setDisplayWidth(window.innerWidth);
     }
 
-    const width = displayWidth;
+    const width = displayWidth; 
     const isMobile = width <= 1000;
 
     return (  

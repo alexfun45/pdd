@@ -1,6 +1,7 @@
 html{
     height: 100%;
     width: 100%;
+    overflow: hidden;
 }
 body {
     font-family: Lato,Helvetica,Arial,sans-serif;
@@ -31,9 +32,10 @@ p{
 }
 
 .content{
-    width: 100%;
-    max-width: 100%;
+    width: 98%;
+    max-width: 98%;
     height: 100% !important;
+    overflow: hidden;
 }
 
 .footer{
@@ -298,13 +300,17 @@ p{
 .mobileHeader{
     position: absolute;
     font-size: 1em;
-    top: 0;
+    top: 0px;
     left: 0;
     height: auto;
     background-color: #aec1bd;
-    width: 100vw;
+    width: 100%;
     z-index: 10000;
-  }
+}
+
+ .MuiButtonBase-root{
+    padding: 5px !important;
+    }
 
   .mobileHeader .homeIcon{
     width: 200px;
@@ -1561,11 +1567,11 @@ div.suggestPopupContent div table tbody tr td.item-selected{
     }
 
     .exam-title > label{
-        font-size: 0.8em;
+        font-size: 0.7em;
         position: absolute;
         display: block;
-        top: 6px;
-        left: 45px;
+        top: 4px;
+        left: 40px;
         z-index: 10001;
         width: 90%;
         padding: 0px 10px;
