@@ -391,7 +391,7 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
             <div style={{marginTop: 0}} className={(options.settings===false)?"row testrow":"hide"}>
                 <div className="exam-title">
                     <label>{context.settings.exam_title}</label>
-                    <FormControl sx={{ m: 1, minWidth: 120 }}>
+                    <FormControl className="form-ticket" sx={{ m: 1, minWidth: 120, marginTop: '40px'}}>
                         <Select
                             labelId="demo-simple-select-helper-label"
                             sx={{"& .MuiSelect-select": {padding: "5px 14px"}}}
