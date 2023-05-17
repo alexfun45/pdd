@@ -925,6 +925,7 @@ div.suggestPopupContent div table tbody tr td.item-selected{
 .qForm{
     background-color: #FFF;
     padding: 20px;
+    margin-bottom: 40px;
 }
 
 .qForm > div{
