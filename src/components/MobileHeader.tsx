@@ -207,7 +207,7 @@ export default () => {
                 {list()}
               <div style={{width:'100%', textAlign: 'center'}}><Admin Logout={Logout} isLogin={context.logged} role={context.userRole} isMobile={true}/></div>
             </Drawer>
-            <span className="page-title">{((location.pathname=="/pdd-online")) ? "":((location.pathname!="/pdd_for_school")?context.pageTitle:"Внутренний экзамен")}</span>
+            <span className="page-title">{((location.pathname=="/pdd-online")) ? context.settings.exam_title:((location.pathname!="/pdd_for_school")?context.pageTitle:"Внутренний экзамен")}</span>
             {/*<div className="homeIcon" onClick={handleHomeLink}><a href="./"></a><input onClick={triggerUpload} id="homeIcon" onChange={changeHomeIcon} type="file" /><img src={homeIcon}></img></div>
             */}
             </div>
