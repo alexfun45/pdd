@@ -145,7 +145,7 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
 
     const [time, setTime] = useState("0:00"),
           [selectedVariant, setSelectedVar] = useState(0),
-          [options, setOptions] = useState({...props.options}),
+          [Options, setOptions] = useState({...props.options}),
           [selectedTicket, setTicket] = useState('0'),
           [currentTicket, setCurrentTicket] = useState<number>(0),
           results = useRef([]),
@@ -204,7 +204,7 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
             $(document).on('keydown', function(event: any){
                 let e = event.originalEvent;
                
-                if(e.which==13 && !options.settings && (currentTicket==(question_answered-1))){
+                if(e.which==13 && !Options.settings && (currentTicket==(question_answered-1))){
                     next();
                 }
                 let selectedAnswer = parseInt(e.key); 
@@ -216,7 +216,7 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
                         goToPage(currentTicket-1);
                 }
                 if(e.keyCode==39){
-                    if((currentTicket+1)<qNum && ((currentTicket+1)<=question_answered || !options.settings))
+                    if((currentTicket+1)<qNum && ((currentTicket+1)<=question_answered || !Options.settings))
                         goToPage(currentTicket+1);
                 }
             });
@@ -237,15 +237,15 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
         request({method: 'post', data: {action: "getTickets"}}).then(response => {
             const {data} = response;
             setTickets(data);
-            options.selectedTicket = data[0].id;
-            setOptions({...options});
+            //options.selectedTicket = data[0].id;
+            setOptions({...Options, selectedTicket: data[0].id});
             setTicket(data[0].id);
         });
     }
 
     function setQuestion(){
         if(pdd_questions.length>0 && pdd_questions.length-1>=currentTicket){
-            setqNum(Math.min(options.num, pdd_questions.length));
+            setqNum(Math.min(Options.num, pdd_questions.length));
             setCurrentQuestion(pdd_questions[currentTicket]);
         }
     }
@@ -254,7 +254,7 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
         resetTest();
         setStart(true);
         setEndTest(false);
-		getQuestions(options, setQuestion);
+		getQuestions(Options, setQuestion);
     }
 
     function handleStartTest(){
@@ -273,7 +273,7 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
     }
 
     function selectAnswer(selectedVar: any){
-        if(options.settings && currentTicket<question_answered) return;
+        if(Options.settings && currentTicket<question_answered) return;
         let _opened = [...opened];
         _opened.push(selectedVar);
         setSelectedVar(selectedVar);
@@ -293,7 +293,7 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
             
 
         question_answered++;
-        if(options.settings && currentTicket==question_answered-1)
+        if(Options.settings && currentTicket==question_answered-1)
             next();
     }
 
@@ -302,7 +302,7 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
     }
 
     function next(){
-        if(question_answered<pdd_questions.length && question_answered<=options.num){
+        if(question_answered<pdd_questions.length && question_answered<=Options.num){
             goToPage(question_answered);
         }
         else if(question_answered>=props.options.num || question_answered>=pdd_questions.length){
@@ -313,7 +313,7 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
 
     function handleChangeTicket(event: SelectChangeEvent){
         setTicket(event.target.value);
-        options.selectedTicket = event.target.value;
+        Options.selectedTicket = event.target.value;
     }
 
     function getBtnpageClass2(i: number, res: any){
@@ -337,7 +337,7 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
                 setOpened([]);
             setCurrentTicket(ticketIndx);
         }
-        else if(ticketIndx==question_answered || !options.settings){
+        else if(ticketIndx==question_answered || !Options.settings){
             setOpened([]);
             setCurrentTicket(ticketIndx);
         }
@@ -345,7 +345,7 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
 
     // handle change test options
     const handleChangeOption = (event: React.ChangeEvent<HTMLInputElement>, optionName: any) => {
-        setOptions({...options, [optionName]: event.target.value});
+        setOptions({...Options, [optionName]: event.target.value});
     }
 
     const resetTest = () => {
@@ -370,8 +370,7 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
     
     useEffect(()=>{
         resetTest();
-        //if(!props.options.settings)
-          //  startTest();
+        setOptions({...props.options});
     }, [props.options.settings]);
 
     const toNextPage = () => {
@@ -390,10 +389,10 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
 
     return (
         <div className="container">
-            <div style={{marginTop: 0}} className={(options.settings===false)?"row testrow":"hide"}>
+            <div style={{marginTop: 0}} className={(Options.settings===false)?"row testrow":"hide"}>
                 <div className="exam-title">
                     <label>{context.settings.exam_title}</label>
-                    <FormControl className="form-ticket" sx={{ m: 1, minWidth: 120, marginTop: '40px'}}>
+                    <FormControl className="form-ticket" sx={{ m: 1, minWidth: 120, marginTop: '5px'}}>
                         <Select
                             labelId="demo-simple-select-helper-label"
                             sx={{"& .MuiSelect-select": {padding: "5px 14px"}}}
@@ -409,10 +408,7 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
                     </FormControl>
                 </div>
             </div>
-            <div style={{marginTop: '0px'}} className={(options.settings===false)?"row testrow":"hide"}>
-                    
-            </div>
-            <div className={(options.settings===true)?"row testrow":"hide"}>
+            <div className={(props.options.settings==true)?"row testrow":"hide"}>
                 <div className="col-md-12">
             <form onSubmit={handleSubmit(onSubmit)} className="form-inline">
                 <div className="form-group">
@@ -445,34 +441,34 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
             <div id="examSizePanel" className="form-group">
                 <label>Вопросов</label>
                 <label className="radio-inline">
-                    <input disabled={start} onChange={(e)=>handleChangeOption(e, 'num')} type="radio" checked={options.num==20} name="examSize" id="examSize20" value="20"/>20
+                    <input disabled={start} onChange={(e)=>handleChangeOption(e, 'num')} type="radio" checked={Options.num==20} name="examSize" id="examSize20" value="20"/>20
                 </label>
                 <label className="radio-inline">
-                    <input disabled={start} onChange={(e)=>handleChangeOption(e, 'num')} type="radio" checked={options.num==40} name="examSize" id="examSize40" value="40"/>40
+                    <input disabled={start} onChange={(e)=>handleChangeOption(e, 'num')} type="radio" checked={Options.num==40} name="examSize" id="examSize40" value="40"/>40
                 </label>
                 <label className="radio-inline">
-                    <input disabled={start} onChange={(e)=>handleChangeOption(e, 'num')} type="radio"  checked={options.num==60} name="examSize" id="examSize60" value="60"/>60
+                    <input disabled={start} onChange={(e)=>handleChangeOption(e, 'num')} type="radio"  checked={Options.num==60} name="examSize" id="examSize60" value="60"/>60
                 </label>
                 <label className="radio-inline">
-                    <input disabled={start} onChange={(e)=>handleChangeOption(e, 'num')} type="radio"  checked={options.num==80} name="examSize" id="examSize80" value="80"/>80
+                    <input disabled={start} onChange={(e)=>handleChangeOption(e, 'num')} type="radio"  checked={Options.num==80} name="examSize" id="examSize80" value="80"/>80
                 </label>
                 <label className="radio-inline">
-                    <input disabled={start} onChange={(e)=>handleChangeOption(e, 'num')} type="radio"  checked={options.num==100} name="examSize" id="examSize100" value="100"/>100
+                    <input disabled={start} onChange={(e)=>handleChangeOption(e, 'num')} type="radio"  checked={Options.num==100} name="examSize" id="examSize100" value="100"/>100
                 </label>
                 &nbsp;&nbsp;&nbsp;
             </div>
             <div className="form-group">
                 <label style={{display: "inline-block !important"}}>Ошибок &nbsp; </label>
-                <input disabled={start} id="examErrorSize" onChange={(e)=>handleChangeOption(e, 'max_error')} value={options.max_error} type="number" min={1} max={100} />&nbsp;&nbsp;&nbsp;
+                <input disabled={start} id="examErrorSize" onChange={(e)=>handleChangeOption(e, 'max_error')} value={Options.max_error} type="number" min={1} max={100} />&nbsp;&nbsp;&nbsp;
             </div>
             <div className="checkbox">
                 <label>
-                    <input disabled={start} id="btnConfDoubleClick" onChange={(e)=>handleChangeOption(e, 'dblclick')} defaultChecked={options.dblclick} type="checkbox"/> Двойной клик
+                    <input disabled={start} id="btnConfDoubleClick" onChange={(e)=>handleChangeOption(e, 'dblclick')} defaultChecked={Options.dblclick} type="checkbox"/> Двойной клик
                 </label>&nbsp;&nbsp;&nbsp;
             </div>
             <div className="checkbox">
                 <label>
-                    <input disabled={start} id="btnConfRandomVariants" onChange={(e)=>handleChangeOption(e, 'random')} defaultChecked={options.random} type="checkbox"/> Перемешивать вопросы
+                    <input disabled={start} id="btnConfRandomVariants" onChange={(e)=>handleChangeOption(e, 'random')} defaultChecked={Options.random} type="checkbox"/> Перемешивать вопросы
                 </label>
                 </div>
             </form>
@@ -528,7 +524,7 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
                                     <div id="qlist">
                                         { (currentQuestion!=undefined) && (
                                             currentQuestion.variants.map((v,i)=>{
-                                                return <a onDoubleClick={()=>{if(options.dblclick) selectAnswer(i)}} onClick={()=>{if(!options.dblclick) selectAnswer(i)}} id={i.toString()} className={"list-group-item questvariant "+showResult(i)}>{i+1}. {v.answer}</a>
+                                                return <a onDoubleClick={()=>{if(Options.dblclick) selectAnswer(i)}} onClick={()=>{if(!Options.dblclick) selectAnswer(i)}} id={i.toString()} className={"list-group-item questvariant "+showResult(i)}>{i+1}. {v.answer}</a>
                                                 //return <a style={{backgroundColor: ((opened.indexOf(i) != -1))?"":ticketBg}} onDoubleClick={()=>{if(options.dblclick) selectAnswer(i)}} onClick={()=>{if(!options.dblclick) selectAnswer(i)}} id={i.toString()} className={"list-group-item questvariant "+showResult(i)}>{i+1}. {v.answer}</a>
                                             })
                                         )
@@ -544,12 +540,12 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
                                 <div className="col-md-12">
                                     <div className="panel panel-primary">
                                         <div className="panel-heading lead">
-                                            ошибок <span id="resultErrors" className="label label-danger">{errors}</span> из <span id="resultCount" className="label label-default">{options.num}</span>
+                                            ошибок <span id="resultErrors" className="label label-danger">{errors}</span> из <span id="resultCount" className="label label-default">{Options.num}</span>
                                         </div>
                                         <div className="panel-body">
                                             <p id="resultText" className="lead">
-                                                {(options.max_error<errors) ?
-                                                    (<><i style={{color: "#222", fontSize: "18px"}} className="bi bi-x-lg"></i> Экзамен не сдан. У вас более {options.max_error} ошибок</>)
+                                                {(Options.max_error<errors) ?
+                                                    (<><i style={{color: "#222", fontSize: "18px"}} className="bi bi-x-lg"></i> Экзамен не сдан. У вас более {Options.max_error} ошибок</>)
                                                     :
                                                     (<><i style={{color: "green"}} className="bi bi-check-lg"></i> Экзамен сдан</>)
                                                 }
