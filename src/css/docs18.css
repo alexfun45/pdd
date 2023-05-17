@@ -806,16 +806,24 @@ div.suggestPopupContent div table tbody tr td.item-selected{
     text-align: center;
 }
 
+.titleHeader{
+    display: flex;
+    width: 100%;
+    position: relative;
+    flex-direction: row;
+    align-items: center;
+}
+
 .page-title{
     font-size: 2.5vh;
     display: inline-block;
     word-wrap: break-word;
     white-space: normal;
-    width: 85%;
-    max-width: 85%;
     vertical-align: middle;
     overflow: hidden;
+    text-align: center;
     line-height: 1 !important;
+    flex-grow: 1;
 }
 
 .admin-panel-wrapper span > input{

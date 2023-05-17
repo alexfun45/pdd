@@ -184,7 +184,7 @@ export default () => {
 
     return (
         <div className="mobileHeader">
-            <div style={{position: 'relative', width: '100%'}}>
+            <div className="titleHeader" style={{position: 'relative', width: '100%'}}>
              <IconButton
                 aria-label="more"
                 id="long-button"

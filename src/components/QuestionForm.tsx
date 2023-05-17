@@ -33,8 +33,8 @@ type ValidateQuestionType = {
     variants: Array<varType>
 }
 
-const Answer = ({reg, errors, answer, indx, handleChangeQuestions, setCorrect, correct}: {reg: any, errors: any, answer:InputSignInTypes, indx: number, handleChangeQuestions: Function, setCorrect: Function, correct: number}) => {
-  
+const Answer = ({reg, removeVariant, errors, answer, indx, handleChangeQuestions, setCorrect, correct}: {reg: any, removeVariant:Function, errors: any, answer:InputSignInTypes, indx: number, handleChangeQuestions: Function, setCorrect: Function, correct: number}) => {
+    
     return (
         <div key={indx} className="variant-section">
             <Form.Group controlId="validationCustom03">
@@ -52,6 +52,7 @@ const Answer = ({reg, errors, answer, indx, handleChangeQuestions, setCorrect, c
                 <div className="input-label">комментарий к варианту ответа</div>
                 {/*<input type="text" name="comment" onChange={(e)=>handleChangeQuestions(e.target.value, "comment", indx)} id="comment" value={answer.comment} className="text ui-widget-content ui-corner-all" /> */}
             </div>
+            <div style={{textAlign: "right", marginBottom: "3px"}}><Button onClick={()=>removeVariant(indx)} variant="primary" className="btn-danger">Удалить</Button></div>
         </div> 
     )
 }
@@ -89,6 +90,11 @@ export default ({show, setShow, Question, setSelectedQue, setQuestions, update}:
         setValidated(true);
       };
     
+    const removeVariant = (removeIndx: number) => {
+        let __answers = [...answers];
+        __answers.splice(removeIndx, 1);
+        setAnswers(__answers); 
+    }
 
     const handleCloseDeleteDialog = () => {
         setDeleteShow(false);
@@ -240,7 +246,7 @@ export default ({show, setShow, Question, setSelectedQue, setQuestions, update}:
                         <div className="answers_block">
                             {
                                     answers.map((v, i)=>(
-                                        <Answer reg={register} errors={errors} answer={v} handleChangeQuestions={handleChangeQuestions} indx={i} setCorrect={setCorrect} correct={correct}/>
+                                        <Answer reg={register} removeVariant={removeVariant} errors={errors} answer={v} handleChangeQuestions={handleChangeQuestions} indx={i} setCorrect={setCorrect} correct={correct}/>
                                     ))
                             }
                         <span id="add_var" onClick={addQuestion} className="add-btn">+</span>

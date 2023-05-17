@@ -321,14 +321,16 @@
             $db->exec("UPDATE questions SET code_id='$codeId', title='$text', image='$image_name', correct='$correct' WHERE id=$q_id");
         else
             $db->exec("UPDATE questions SET code_id='$codeId',title='$text', correct='$correct' WHERE id=$q_id"); 
-        
+        if(count($variants)>0)
+            $db->exec("DELETE FROM variants WHERE q_id='$q_id'");
         for($i=0;$i<count($variants);$i++){
             $label = $variants[$i]->answer; 
             $comment = $variants[$i]->comment;
             $var_id = $variants[$i]->id;
-            if(array_key_exists("id", $variants[$i]))
-                $db->exec("UPDATE variants SET answer='$label', comment='$comment' WHERE q_id='$q_id' AND id='$var_id'");  
-            else
+
+            //if(array_key_exists("id", $variants[$i]))
+                //$db->exec("UPDATE variants SET answer='$label', comment='$comment' WHERE q_id='$q_id' AND id='$var_id'");  
+            //else
                 $db->exec("INSERT INTO variants(q_id, answer, comment) VALUES('$q_id', '$label', '$comment')");
             }
         $db->close();
