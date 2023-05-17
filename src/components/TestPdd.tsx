@@ -122,6 +122,8 @@ const Watch = ({start, endTest, pause, _continue}: {start: boolean, endTest: boo
             clearInterval(Timer);
             Timer = 0;
         }
+        if(start===false && endTest===false)
+            setTime("0:00");
     }, [start, endTest]);    
 
     return (
@@ -171,7 +173,7 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
             numPageItems = +((availableWidth / itemWidth).toFixed(0));
             requiredWidth = availableWidth;
         }
-        setEndTest(false);
+        
         if(!props.options.settings)
             getTickets();        
     }, [props.options]);
@@ -352,7 +354,7 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
         setOpened([]);
         setCurrentTicket(0);
         selected = [];
-        //clearInterval(Timer);
+        clearInterval(Timer);
         setTime("0:00");
         Timer = 0;
         //setResults([]);
