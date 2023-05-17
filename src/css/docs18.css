@@ -1586,7 +1586,7 @@ div.suggestPopupContent div table tbody tr td.item-selected{
         vertical-align: middle;
     }
 
-    .mobileWrapper .exam-title{
+    .mobileWrapper .exam-title > label{
         display: none;
     }
 
