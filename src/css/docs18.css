@@ -1576,14 +1576,14 @@ div.suggestPopupContent div table tbody tr td.item-selected{
     }
 
     .exam-title > label{
-        font-size: 0.7em;
+        font-size: 1em;
+        display: inline-block;  
         position: relative;
-        display: block;
         z-index: 10001;
-        width: 100%;
         padding: 0px 10px;
         word-break: break-all;
         line-height: 1em;
+        vertical-align: middle;
     }
 
     .mobileWrapper .exam-title{
@@ -1595,7 +1595,7 @@ div.suggestPopupContent div table tbody tr td.item-selected{
     }
 
     .form-ticket{
-        margin-top: 30px;
+        vertical-align: middle;
     }
 
     .btn-start{
