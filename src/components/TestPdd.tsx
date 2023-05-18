@@ -396,6 +396,7 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
                     <label>{context.settings.exam_title}</label>
                     <FormControl className="form-ticket" sx={{ m: 1, minWidth: 120, marginTop: '5px'}}>
                         <Select
+                            disabled={start?true:false}
                             labelId="demo-simple-select-helper-label"
                             sx={{"& .MuiSelect-select": {padding: "5px 14px"}}}
                             id="demo-simple-select-helper"

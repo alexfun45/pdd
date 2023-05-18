@@ -461,7 +461,7 @@ p{
 .list-group-item {
     width: 100%;
     text-align: left;
-    font-weight: 450;
+    font-weight: bold;
   }
 
 .mobileWrapper{
