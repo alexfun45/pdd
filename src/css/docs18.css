@@ -391,7 +391,8 @@ p{
 }
 
 .label-info{
-    background-color: #5bc0de;
+    background-color: #168e8e;
+    margin-top: 15px;
 }
 
 .btngroup{
@@ -1602,9 +1603,9 @@ div.suggestPopupContent div table tbody tr td.item-selected{
     }
 
     .btn-start{
-        background-color: #5bc0de;
+        background-color: #168e8e;
         color: #FFF;
-        font-size: 0.9rem;
+        font-size: 1.2rem;
         padding: .050rem .95rem;
         margin-bottom: 1px;
     }

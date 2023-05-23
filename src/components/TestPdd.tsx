@@ -94,7 +94,8 @@ const BtnQuestion = (props: any)  => {
 
 const Watch = ({start, endTest, pause, _continue}: {start: boolean, endTest: boolean, pause: Function, _continue: Function}) => {
 
-    const [time, setTime] = useState("0:00");
+    const [time, setTime] = useState("0:00"),
+          [isPause, setPause] = useState(false);
 
     function startTimer(){
         timer++;
@@ -108,10 +109,12 @@ const Watch = ({start, endTest, pause, _continue}: {start: boolean, endTest: boo
         clearInterval(Timer);
         Timer = 0;
         pause();
+        setPause(true);
     }
 
     function Continue(){
         //Timer = setInterval(startTimer, 1000);
+        setPause(false);
         _continue();
     }
     
@@ -124,7 +127,7 @@ const Watch = ({start, endTest, pause, _continue}: {start: boolean, endTest: boo
             clearInterval(Timer);
             Timer = 0;
         }
-        if(start===false && endTest===false)
+        if(start===false && endTest===false && isPause!==true)
             setTime("0:00");
     }, [start, endTest]);    
 
@@ -257,7 +260,6 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
 
     function setQuestion(){
         if(pdd_questions.length>0 && pdd_questions.length-1>=currentTicket){
-            console.log("pdd_length", pdd_questions.length);
             setqNum(Math.min(Options.num, pdd_questions.length));
             setCurrentQuestion(pdd_questions[currentTicket]);
         }
@@ -277,7 +279,6 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
 
     function testPause(){
         setStart(false);
-
     }
 
     function continueTest(){
@@ -364,12 +365,13 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
     const resetTest = () => {
         setOpened([]);
         setCurrentTicket(0);
+        setCurrentQuestion(undefined);
+        setTicket('0');
         setqPages([]);
         selected = [];
         clearInterval(Timer);
         setTime("0:00");
         Timer = 0;
-        //setResults([]);
         setqNum(0);
         results.current = [];
         errors = 0;
@@ -516,7 +518,7 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
                             <span id="labelCategory" className="hide"> ABM </span>
                            
                             {(selectedTicket!='0') && (
-                                <input onClick={startTest} id="buttonSchoolSetName" type="submit" className={(start)?"hide":"btn btn-start"} value="Начать" />
+                                <input onClick={startTest} id="buttonSchoolSetName" type="submit" className={(start || props.options.settings===true)?"hide":"btn btn-start"} value="Начать" />
                             )}
                             <span id="labelBookmark" data-toggle="tooltip" data-placement="left" title="В закладки" style={{fontSize: "20px", color: "#5bc0de", cursor: "pointer"}} className="pull-right glyphicon glyphicon-star-empty"></span>
                         </div>
@@ -532,7 +534,7 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
                                         src={(currentQuestion!==undefined)?currentQuestion.image:""}
                                         onError={(e)=>{if (e.currentTarget.src != './img/no_picture.png') e.currentTarget.src = './img/no_picture.png';}}
                                         />
-                                 { ((selectedTicket!='0' && (currentQuestion!==undefined) ) || (props.options.settings==true && start===true) ) && (
+                                 { ((selectedTicket!='0' || (currentQuestion!==undefined) ) ) && (
                                     <Watch start={start} endTest={endTest} pause={testPause} _continue={continueTest} />  
                                  )}
                                 <div id="questText" className={(start)?"questtext":"hide"}>{(currentQuestion!==undefined)?currentQuestion.title:""}</div>
