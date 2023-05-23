@@ -49,6 +49,7 @@ var  pdd_questions: TicketPdd[] = [],
      page = 0;
 
 function getQuestions(options: any, callback: Function){
+    pdd_questions = [];
     request({method: 'post', data: {action: "getQuestions", data: {...options}}}).then(response => {
         const {data} = response;
         if(data!=null){
@@ -63,9 +64,10 @@ function getQuestions(options: any, callback: Function){
                     isSuccess: -1
                 };
             }
+            if(callback)
+                callback();
         }
-        if(callback)
-            callback();
+        
     });
 }
 
@@ -138,6 +140,7 @@ const Watch = ({start, endTest, pause, _continue}: {start: boolean, endTest: boo
 }
 
 let numPageItems = 10,
+    firstRunning = 0,
     availableWidth = 0,
     itemWidth = 50,
     requiredWidth = 0,
@@ -190,6 +193,13 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
     useEffect(()=>{
         setqPages([...new Array(qNum).slice(0)]);
     }, [qNum]);
+
+    useEffect(()=>{
+        if(selectedTicket!='0' && firstRunning==1){
+            startTest();
+        }
+        firstRunning++;
+    }, [selectedTicket])
 
     /*useEffect(()=>{
         if(context.settings['background-color-tickets']!=""){
@@ -247,6 +257,7 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
 
     function setQuestion(){
         if(pdd_questions.length>0 && pdd_questions.length-1>=currentTicket){
+            console.log("pdd_length", pdd_questions.length);
             setqNum(Math.min(Options.num, pdd_questions.length));
             setCurrentQuestion(pdd_questions[currentTicket]);
         }
@@ -353,6 +364,7 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
     const resetTest = () => {
         setOpened([]);
         setCurrentTicket(0);
+        setqPages([]);
         selected = [];
         clearInterval(Timer);
         setTime("0:00");
@@ -500,7 +512,7 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
 
                     <div style={{marginTop: 0}} className="row testrow">
                         <div className="col-md-12 col-sm-12 myheader">
-                            <span id="labelQuestNumber" className="label label-primary">Новые правила экзамена пдд 2023</span>
+                            {/*<span id="labelQuestNumber" className="label label-primary">Новые правила экзамена пдд 2023</span>*/}
                             <span id="labelCategory" className="hide"> ABM </span>
                             {(selectedTicket!='0' && (currentQuestion!==undefined)) && (
                                     <Watch start={start} endTest={endTest} pause={testPause} _continue={continueTest} />  
