@@ -131,7 +131,7 @@ const Watch = ({start, endTest, pause, _continue}: {start: boolean, endTest: boo
     return (
         <span id="labelTimer" className="label-info lead label" title="таймер" style={{cursor: "pointer"}}><span id="time">{time}</span>
                 { (start==true) ? 
-                    <i onClick={()=>Pause()} className="bi bi-pause-fill pause-btn"></i>
+                    <i onClick={()=>Pause()} className="bi bi-pause pause-btn"></i>
                 :
                     <i onClick={()=>Continue()} className="bi bi-play-fill pause-btn"></i>               
                 }
@@ -195,7 +195,7 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
     }, [qNum]);
 
     useEffect(()=>{
-        if(selectedTicket!='0' && firstRunning==1){
+        if(selectedTicket!='0' && firstRunning==1 && (props.options.settings==false)){
             startTest();
         }
         firstRunning++;
@@ -514,9 +514,7 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
                         <div className="col-md-12 col-sm-12 myheader">
                             {/*<span id="labelQuestNumber" className="label label-primary">Новые правила экзамена пдд 2023</span>*/}
                             <span id="labelCategory" className="hide"> ABM </span>
-                            {(selectedTicket!='0' && (currentQuestion!==undefined)) && (
-                                    <Watch start={start} endTest={endTest} pause={testPause} _continue={continueTest} />  
-                            )}
+                           
                             {(selectedTicket!='0') && (
                                 <input onClick={startTest} id="buttonSchoolSetName" type="submit" className={(start)?"hide":"btn btn-start"} value="Начать" />
                             )}
@@ -529,13 +527,16 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
                 <div className="col-lg-8 col-md-9 col-sm-12 mini-wrapper">
                     <div className="block-ticket">
                         <div className="col-md-12">
-                            <div id="questPanel" className={(start)?"":"hide"}>
-                                <img id="questImage" className="img-responsive" width="100%" style={{maxWidth: "100%"}}
+                            <div id="questPanel" >
+                                <img id="questImage" className={(start)?"img-responsive":"hide"} width="100%" style={{maxWidth: "100%"}}
                                         src={(currentQuestion!==undefined)?currentQuestion.image:""}
                                         onError={(e)=>{if (e.currentTarget.src != './img/no_picture.png') e.currentTarget.src = './img/no_picture.png';}}
                                         />
-                                <div id="questText" className="questtext">{(currentQuestion!==undefined)?currentQuestion.title:""}</div>
-                                <div className="list-group">
+                                 { ((selectedTicket!='0' && (currentQuestion!==undefined) ) || (props.options.settings==true && start===true) ) && (
+                                    <Watch start={start} endTest={endTest} pause={testPause} _continue={continueTest} />  
+                                 )}
+                                <div id="questText" className={(start)?"questtext":"hide"}>{(currentQuestion!==undefined)?currentQuestion.title:""}</div>
+                                <div className={(start)?"list-group":"hide"}>
                                     <div id="qlist">
                                         { (currentQuestion!=undefined) && (
                                             currentQuestion.variants.map((v,i)=>{
@@ -545,7 +546,7 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
                                         )
                                         }
                                     </div>
-                                    <div id="commentPanel" className={(opened.length>0)?"":"hide"}>
+                                    <div id="commentPanel" className={(!start)?"hide":((opened.length>0)?"":"hide")}>
                                         <button onClick={next} id="questNext" type="button" className="list-group-item active">Далее <small className="text-warning small hidden-xs"> - Enter &nbsp;&nbsp;&nbsp; 1,2,3 - выбор &nbsp;&nbsp;&nbsp; &larr; назад &nbsp; вперед &rarr;</small></button>
                                         <div id="questComment" className="">{(currentQuestion!==undefined && currentQuestion.variants.length>selectedVariant)?currentQuestion.variants[selectedVariant].comment:""}</div>
                                     </div>
