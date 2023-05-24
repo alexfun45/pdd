@@ -365,7 +365,7 @@ p{
 }
 
 .pause-btn{
-    font-size: 31px;
+    font-size: 20px;
     color: #FFF !important;
 }
 
@@ -443,7 +443,7 @@ p{
         font-size: 14px;
     }
     .myheader span {
-        font-size: 18px;
+        font-size: 1.2rem;
     }
 }
 
@@ -1546,20 +1546,20 @@ div.suggestPopupContent div table tbody tr td.item-selected{
         border-top-right-radius: 3px;
       }
 
-    .label-info{
-        background-color: #168e8e;
+    .label-info{  
         margin-top: 15px;
-        border-radius: 100%;
+        background-color: #4298d1;
+        /*border-radius: 100%;
         display: inline-flex;
         flex-direction: column;
         justify-content: center;
         align-items: center;
         width: 90px;
-        height: 90px;
+        height: 90px;*/
     }
 
     .lead {
-        font-size: 21px;
+        font-size: 20px;
         margin-bottom: 20px;
         font-weight: 300;        
       }
@@ -1605,7 +1605,7 @@ div.suggestPopupContent div table tbody tr td.item-selected{
     }
 
     .btn-start{
-        background-color: #168e8e;
+        background-color: #4298d1;
         color: #FFF;
         font-size: 1.2rem;
         padding: .050rem .95rem;

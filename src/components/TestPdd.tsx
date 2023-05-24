@@ -544,10 +544,12 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
                         <div className="col-md-12 col-sm-12 myheader">
                             {/*<span id="labelQuestNumber" className="label label-primary">Новые правила экзамена пдд 2023</span>*/}
                             <span id="labelCategory" className="hide"> ABM </span>
-                           
-                            {(selectedTicket!='0') && (
+                            { (currentQuestion!=undefined) && (
+                                    <Watch start={start} setEndTest={setEndTest} endTest={endTest} pause={testPause} _continue={continueTest} iterator={iterator} startTime={startTime} />  
+                                 )}
+                            
                                 <input onClick={startTest} id="buttonSchoolSetName" type="submit" className={(start || props.options.settings===true)?"hide":"btn btn-start"} value="Начать" />
-                            )}
+                            
                             <span id="labelBookmark" data-toggle="tooltip" data-placement="left" title="В закладки" style={{fontSize: "20px", color: "#5bc0de", cursor: "pointer"}} className="pull-right glyphicon glyphicon-star-empty"></span>
                         </div>
                     </div>
@@ -563,9 +565,7 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
                                         onError={(e)=>{if (e.currentTarget.src != './img/no_picture.png') e.currentTarget.src = './img/no_picture.png';}}
                                         />
 
-                                 { (currentQuestion!=undefined) && (
-                                    <Watch start={start} setEndTest={setEndTest} endTest={endTest} pause={testPause} _continue={continueTest} iterator={iterator} startTime={startTime} />  
-                                 )}
+                                 
 
                                 <div id="questText" className={(start)?"questtext":"hide"}>{(currentQuestion!==undefined)?currentQuestion.title:""}</div>
                                 <div className={(start)?"list-group":"hide"}>
