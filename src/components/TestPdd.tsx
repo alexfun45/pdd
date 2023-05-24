@@ -92,13 +92,19 @@ const BtnQuestion = (props: any)  => {
     //return <button key={"btn_"+props.qpages.length+"_"+props.i} onClick={()=>props.goToPage(props.i)} id={"btn_"+props.i} className={props.getBtnpageClass(props.i)} type="button">{props.i+1}</button>
 }
 
-const Watch = ({start, endTest, pause, _continue}: {start: boolean, endTest: boolean, pause: Function, _continue: Function}) => {
+let iterator = 1;
+
+const Watch = ({start, setEndTest, endTest, pause, _continue, reverse=false, startTime=0}: {start: boolean, setEndTest: Function, endTest: boolean, pause: Function, _continue: Function, reverse: boolean, startTime: number}) => {
 
     const [time, setTime] = useState("0:00"),
           [isPause, setPause] = useState(false);
 
     function startTimer(){
-        timer++;
+        timer+=iterator;
+        if(timer==0){
+            Pause();
+            setEndTest(true);
+        }
         let minutes = Math.floor(timer/60),
             seconds = timer%60,
             __time = (seconds<10)?("0"+seconds):seconds.toString();
@@ -113,22 +119,36 @@ const Watch = ({start, endTest, pause, _continue}: {start: boolean, endTest: boo
     }
 
     function Continue(){
-        //Timer = setInterval(startTimer, 1000);
         setPause(false);
         _continue();
     }
+
+    function getTimeString(seconds: number){
+        let minutes = Math.ceil(seconds/60),
+            __seconds = seconds%60;
+        return ((minutes<10)?("0"+minutes):minutes)+((__seconds<10)?("0"+__seconds):__seconds.toString());
+    }
+
+    useEffect(()=>{
+        if(startTime!=0){
+            timer = startTime;
+            setTime(getTimeString(startTime));
+        }
+    }, [startTime])
     
     useEffect(()=>{
         if(start===true && endTest===false){
             setTime("0:00");
             Timer = setInterval(startTimer, 1000);
-        }
+            }
         if(endTest===true){
             clearInterval(Timer);
             Timer = 0;
-        }
+            }
         if(start===false && endTest===false && isPause!==true)
             setTime("0:00");
+        if(reverse)
+            iterator = -1;
     }, [start, endTest]);    
 
     return (
@@ -378,6 +398,7 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
         question_answered = 0
         timer = 0;
         setStart(false);
+        setEndTest(false);
     }
 
     useEffect(()=>{
@@ -534,9 +555,11 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
                                         src={(currentQuestion!==undefined)?currentQuestion.image:""}
                                         onError={(e)=>{if (e.currentTarget.src != './img/no_picture.png') e.currentTarget.src = './img/no_picture.png';}}
                                         />
-                                 { ((selectedTicket!='0' || (currentQuestion!==undefined) ) ) && (
-                                    <Watch start={start} endTest={endTest} pause={testPause} _continue={continueTest} />  
+
+                                 { ((currentQuestion!==undefined && props.options.settings!==true && start!==false && endTest!==true)) && (
+                                    <Watch start={start} setEndTest={setEndTest} endTest={endTest} pause={testPause} _continue={continueTest} reverse={(props.options.settings)?true:false} startTime={(props.options.settings)?(10):0} />  
                                  )}
+
                                 <div id="questText" className={(start)?"questtext":"hide"}>{(currentQuestion!==undefined)?currentQuestion.title:""}</div>
                                 <div className={(start)?"list-group":"hide"}>
                                     <div id="qlist">
