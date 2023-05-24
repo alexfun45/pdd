@@ -92,9 +92,8 @@ const BtnQuestion = (props: any)  => {
     //return <button key={"btn_"+props.qpages.length+"_"+props.i} onClick={()=>props.goToPage(props.i)} id={"btn_"+props.i} className={props.getBtnpageClass(props.i)} type="button">{props.i+1}</button>
 }
 
-let iterator = 1;
 
-const Watch = ({start, setEndTest, endTest, pause, _continue, reverse=false, startTime=0}: {start: boolean, setEndTest: Function, endTest: boolean, pause: Function, _continue: Function, reverse: boolean, startTime: number}) => {
+const Watch = ({start, setEndTest, endTest, pause, _continue, iterator=1, startTime=0}: {start: boolean, setEndTest: Function, endTest: boolean, pause: Function, _continue: Function, iterator: number, startTime: number}) => {
 
     const [time, setTime] = useState("0:00"),
           [isPause, setPause] = useState(false);
@@ -147,8 +146,6 @@ const Watch = ({start, setEndTest, endTest, pause, _continue, reverse=false, sta
             }
         if(start===false && endTest===false && isPause!==true)
             setTime("0:00");
-        if(reverse)
-            iterator = -1;
     }, [start, endTest]);    
 
     return (
@@ -173,6 +170,8 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
 
     const [time, setTime] = useState("0:00"),
           [selectedVariant, setSelectedVar] = useState(0),
+          [startTime, setStartTime] = useState(0),
+          [iterator, setIterator] = useState(1),
           [Options, setOptions] = useState({...props.options}),
           [selectedTicket, setTicket] = useState('0'),
           [currentTicket, setCurrentTicket] = useState<number>(0),
@@ -408,6 +407,14 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
     useEffect(()=>{
         resetTest();
         setOptions({...props.options});
+        if(props.options.settings===true){
+            setStartTime(20*60);
+            setIterator(-1);
+        }
+        else{
+            setStartTime(0);
+            setIterator(1);
+        }
     }, [props.options.settings]);
 
     const toNextPage = () => {
@@ -556,8 +563,8 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
                                         onError={(e)=>{if (e.currentTarget.src != './img/no_picture.png') e.currentTarget.src = './img/no_picture.png';}}
                                         />
 
-                                 { ((currentQuestion!==undefined && props.options.settings!==true && start!==false && endTest!==true)) && (
-                                    <Watch start={start} setEndTest={setEndTest} endTest={endTest} pause={testPause} _continue={continueTest} reverse={(props.options.settings)?true:false} startTime={(props.options.settings)?(10):0} />  
+                                 { (currentQuestion!=undefined) && (
+                                    <Watch start={start} setEndTest={setEndTest} endTest={endTest} pause={testPause} _continue={continueTest} iterator={iterator} startTime={startTime} />  
                                  )}
 
                                 <div id="questText" className={(start)?"questtext":"hide"}>{(currentQuestion!==undefined)?currentQuestion.title:""}</div>
