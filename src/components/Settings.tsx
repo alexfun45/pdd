@@ -158,27 +158,34 @@ export default ({allPages = []} : any) => {
         const uploadImage2 =(e: React.ChangeEvent<HTMLInputElement>) => {
           let file = (e.target.files) ? e.target.files[0]:'';
           var reader = new FileReader();
-          /*reader.onload = function(e){
-            if(e.target)
-              if(reader.result){
-                document.body.style.backgroundImage = `url(${reader.result})`;
-              }
-          }*/
           if(e.target.files!=null)
             reader.readAsDataURL(e.target.files[0]);
-          formData.delete('file');
+          formData.delete('file_tickets');
           formData.append('file_tickets', file);
       }
 
+      const uploadImageTitleExam =(e: React.ChangeEvent<HTMLInputElement>) => {
+        let file = (e.target.files) ? e.target.files[0]:'';
+        var reader = new FileReader();
+        if(e.target.files!=null)
+          reader.readAsDataURL(e.target.files[0]);
+        formData.delete('file_titleimg');
+        formData.append('file_titleimg', file);
+    } 
 
-        const removeBgImage = () => {
+
+      const removeBgImage = () => {
           request({method: "post", data: {action: "removeBgImage"}});
           document.body.style.backgroundImage = "";
         }
 
-        const removeBgImage2  = () => {
+      const removeBgImage2  = () => {
           request({method: "post", data: {action: "removeBgTicketsImage"}});
         }
+
+      const removeImageTitleExam = () => {
+        request({method: "post", data: {action: "removeImageTitleExam"}});
+      }
 
         const saveSettings = () => {
           setLoading(true);
@@ -247,6 +254,13 @@ export default ({allPages = []} : any) => {
               <td>
                 <input name="bgimg_tickets" onChange={uploadImage2} accept="image/png, image/gif, image/jpeg" type='file' />
                 <Button onClick={removeBgImage2} variant="warning">Удалить</Button>
+              </td>
+            </tr>
+            <tr>
+              <td>Начальное изображение раздела Внутреннего экзамена</td>
+              <td>
+                <input name="bgimg_tickets" onChange={uploadImageTitleExam} accept="image/png, image/gif, image/jpeg" type='file' />
+                <Button onClick={removeImageTitleExam} variant="warning">Удалить</Button>
               </td>
             </tr>
             <tr>

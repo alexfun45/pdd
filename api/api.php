@@ -844,7 +844,9 @@
         $uploadResult = $this->uploadFile($_FILES, 'file');
         $image_name = ($uploadResult['success']) ? $uploadResult['filename'] : "";
         $uploadResult2 = $this->uploadFile($_FILES, 'file_tickets');
+        $uploadResult3 = $this->uploadFile($_FILES, 'file_titleimg');
         $image_name_tickets = ($uploadResult2['success']) ? $uploadResult2['filename'] : "";
+        $image_title_exam = ($uploadResult3['success']) ? $uploadResult3['filename'] : "";
         $showLogo = $_POST['showLogo'];
         $bgcolor = $_POST['bgcolor'];
         $bgcolor_tickets = $_POST['bgcolor_tickets'];
@@ -858,7 +860,9 @@
         if($image_name_tickets)
             $db->exec("UPDATE settings SET value='$image_name_tickets' WHERE config_name='background-image-tickets'");
         if($bgcolor_tickets)
-            $db->exec("UPDATE settings SET value='$bgcolor_tickets' WHERE config_name='background-color-tickets'"); 
+            $db->exec("UPDATE settings SET value='$bgcolor_tickets' WHERE config_name='background-color-tickets'");
+        if($image_title_exam)
+            $db->exec("UPDATE settings SET value='$image_title_exam' WHERE config_name='image_title_exam'");
         if($showLogo=="0" || $showLogo=="1"){
             $db->exec("UPDATE settings SET value='$showLogo' WHERE config_name='showLogo'");
         }
@@ -869,6 +873,7 @@
             $db->exec("UPDATE settings SET value='$examTitle' WHERE config_name='exam_title'");
         }
         $db->close();
+        echo $image_title_exam;
         }
 
     protected function removeBgImage(){

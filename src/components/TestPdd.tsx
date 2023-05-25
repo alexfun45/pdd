@@ -92,7 +92,6 @@ const BtnQuestion = (props: any)  => {
     //return <button key={"btn_"+props.qpages.length+"_"+props.i} onClick={()=>props.goToPage(props.i)} id={"btn_"+props.i} className={props.getBtnpageClass(props.i)} type="button">{props.i+1}</button>
 }
 
-
 const Watch = ({start, setEndTest, endTest, pause, _continue, iterator=1, startTime=0}: {start: boolean, setEndTest: Function, endTest: boolean, pause: Function, _continue: Function, iterator: number, startTime: number}) => {
 
     const [time, setTime] = useState("0:00"),
@@ -217,7 +216,7 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
     }, [qNum]);
 
     useEffect(()=>{
-        if(selectedTicket!='0' && firstRunning==1 && (props.options.settings==false)){
+        if(selectedTicket!='0' && (props.options.settings==false)){
             startTest();
         }
         firstRunning++;
@@ -382,6 +381,8 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
     }
 
     const resetTest = () => {
+        if(props.options.settings===false)
+            setOptions({...props.options});
         setOpened([]);
         setCurrentTicket(0);
         setCurrentQuestion(undefined);
@@ -406,7 +407,6 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
     
     useEffect(()=>{
         resetTest();
-        setOptions({...props.options});
         if(props.options.settings===true){
             setStartTime(20*60);
             setIterator(-1);
@@ -414,6 +414,8 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
         else{
             setStartTime(0);
             setIterator(1);
+            setOptions({...props.options});
+            console.log("options", Options);
         }
     }, [props.options.settings]);
 
@@ -430,6 +432,19 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
             setLeftShift(-page*requiredWidth);
         }
     }
+
+    const Variants = (props:{dblclick: boolean}) => {
+        return (
+            <div id="qlist">
+                { (currentQuestion!=undefined) && (
+                    currentQuestion.variants.map((v,i)=>(
+                        <a key={"var_"+i} onDoubleClick={()=>{if(props.dblclick) selectAnswer(i)}} onClick={()=>{if(!props.dblclick) selectAnswer(i)}} id={i.toString()} className={"list-group-item questvariant "+showResult(i)}>{i+1}. {v.answer}</a>
+                        )
+                    ))
+                }
+            </div>
+         );
+}
 
     return (
         <div className="container">
@@ -519,6 +534,12 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
             </form>
             </div>
         </div>
+            { (props.options.settings && !start && context.settings["image_title_exam"]!='') && (
+                <div className="titleImage">
+                    <img width='auto' height='auto' src={'./img/'+context.settings["image_title_exam"]}/>
+                </div>
+            )
+            }
             <div style={{marginTop: 0}} className="row testrow">
                 <div className="slide-wrapper" style={{width: (requiredWidth+"px")}}>
                     <i onClick={toPrevPage} className={start?"bi bi-caret-left arrow-btn arrow-left-btn":"hide"}></i>
@@ -564,20 +585,23 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
                                         src={(currentQuestion!==undefined)?currentQuestion.image:""}
                                         onError={(e)=>{if (e.currentTarget.src != './img/no_picture.png') e.currentTarget.src = './img/no_picture.png';}}
                                         />
-
-                                 
-
                                 <div id="questText" className={(start)?"questtext":"hide"}>{(currentQuestion!==undefined)?currentQuestion.title:""}</div>
                                 <div className={(start)?"list-group":"hide"}>
-                                    <div id="qlist">
+                                    <Variants dblclick={Options.dblclick} key={+props.options.settings} />
+                                    {/*<div key={+props.options.settings-1} id="qlist">
                                         { (currentQuestion!=undefined) && (
-                                            currentQuestion.variants.map((v,i)=>{
-                                                return <a onDoubleClick={()=>{if(Options.dblclick) selectAnswer(i)}} onClick={()=>{if(!Options.dblclick) selectAnswer(i)}} id={i.toString()} className={"list-group-item questvariant "+showResult(i)}>{i+1}. {v.answer}</a>
-                                                //return <a style={{backgroundColor: ((opened.indexOf(i) != -1))?"":ticketBg}} onDoubleClick={()=>{if(options.dblclick) selectAnswer(i)}} onClick={()=>{if(!options.dblclick) selectAnswer(i)}} id={i.toString()} className={"list-group-item questvariant "+showResult(i)}>{i+1}. {v.answer}</a>
-                                            })
-                                        )
+                                            currentQuestion.variants.map((v,i)=>(
+                                                //if(Options.dblclick)
+                                                  //  return (<a key={+props.options.settings+"var_"+i} onDoubleClick={()=>selectAnswer(i)} id={i.toString()} className={"list-group-item questvariant "+showResult(i)}>{i+1}. {v.answer}</a>)
+                                                //else
+                                                  //  return <a key={+props.options.settings+"var_"+i} onClick={()=>selectAnswer(i)} id={i.toString()} className={"list-group-item questvariant "+showResult(i)}>{i+1}. {v.answer}</a>
+                                                <a key={"var_"+i} onDoubleClick={()=>{if(Options.dblclick) selectAnswer(i)}} onClick={()=>{if(!Options.dblclick) selectAnswer(i)}} id={i.toString()} className={"list-group-item questvariant "+showResult(i)}>{i+1}. {v.answer}</a>
+                                                    //return <a style={{backgroundColor: ((opened.indexOf(i) != -1))?"":ticketBg}} onDoubleClick={()=>{if(options.dblclick) selectAnswer(i)}} onClick={()=>{if(!options.dblclick) selectAnswer(i)}} id={i.toString()} className={"list-group-item questvariant "+showResult(i)}>{i+1}. {v.answer}</a>
+                                            )
+                                        ))
                                         }
                                     </div>
+                                    */}
                                     <div id="commentPanel" className={(!start)?"hide":((opened.length>0)?"":"hide")}>
                                         <button onClick={next} id="questNext" type="button" className="list-group-item active">Далее <small className="text-warning small hidden-xs"> - Enter &nbsp;&nbsp;&nbsp; 1,2,3 - выбор &nbsp;&nbsp;&nbsp; &larr; назад &nbsp; вперед &rarr;</small></button>
                                         <div id="questComment" className="">{(currentQuestion!==undefined && currentQuestion.variants.length>selectedVariant)?currentQuestion.variants[selectedVariant].comment:""}</div>

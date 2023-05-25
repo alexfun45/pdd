@@ -23,7 +23,7 @@ const AppContext = createContext({
   userRole: 3,
   logged: false,
   isMobile: false,
-  settings: {start_page:{name:""}, exam_title: "",'background-color':'', 'background-image':'', 'background-color-tickets': '', 'background-image-tickets': ''},
+  settings: {start_page:{name:""}, exam_title: "",'background-color':'', 'background-image':'', 'background-color-tickets': '', 'background-image-tickets': '', 'image_title_exam': ''},
   pageTitle: "",
   setPageTitle: null
 });
@@ -44,7 +44,7 @@ export default function App(){
         [pageTitle, setPageTitle] = useState(""),
         [user, setUser] = useState<userType>(defaultUser),
         [role, setRole] = useState(3),
-        [settings, setSettings] = useState({showLogo: '1', start_page: {name: ""}, exam_title: "", 'background-color':'', 'background-image':'', 'background-color-tickets': '', 'background-image-tickets':''}),
+        [settings, setSettings] = useState({showLogo: '1', start_page: {name: ""}, exam_title: "", 'background-color':'', 'background-image':'', 'background-color-tickets': '', 'background-image-tickets':'', 'image_title_exam':''}),
         [displayWidth, setDisplayWidth] = useState(window.innerWidth);
   
   const getRoutes = (allRoutes: Array<{route:string, key: string, component: object, auth?: boolean}>) =>
@@ -62,6 +62,7 @@ export default function App(){
     request({method: "post", data: {action: "getSettings"}}).then(response=>{
       const {data} = response;
       setSettings(data);
+      console.log("data", data);
       if(data['background-color'])
         document.body.style.backgroundColor = data['background-color'];
       if(data['background-image']){
