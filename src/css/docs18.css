@@ -2036,6 +2036,7 @@ div.suggestPopupContent div table tbody tr td.item-selected{
 
   .titleImage{
     width: 100%;
+    text-align: center;
     min-height: 400px;
     height: auto;
   }
