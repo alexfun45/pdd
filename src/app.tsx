@@ -62,7 +62,6 @@ export default function App(){
     request({method: "post", data: {action: "getSettings"}}).then(response=>{
       const {data} = response;
       setSettings(data);
-      console.log("data", data);
       if(data['background-color'])
         document.body.style.backgroundColor = data['background-color'];
       if(data['background-image']){

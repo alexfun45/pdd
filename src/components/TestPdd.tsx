@@ -377,6 +377,8 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
 
     // handle change test options
     const handleChangeOption = (event: React.ChangeEvent<HTMLInputElement>, optionName: any) => {
+        
+        //let value = (optionName=="dblclick" || optionName=="random") ? (event.target.value=="on"):event.target.value;
         setOptions({...Options, [optionName]: event.target.value});
     }
 
@@ -410,12 +412,12 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
         if(props.options.settings===true){
             setStartTime(20*60);
             setIterator(-1);
+            setOptions({...props.options});
         }
         else{
             setStartTime(0);
             setIterator(1);
             setOptions({...props.options});
-            console.log("options", Options);
         }
     }, [props.options.settings]);
 
@@ -523,12 +525,12 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
             </div>
             <div className="checkbox">
                 <label>
-                    <input disabled={start} id="btnConfDoubleClick" onChange={(e)=>handleChangeOption(e, 'dblclick')} defaultChecked={Options.dblclick} type="checkbox"/> Двойной клик
+                    <input disabled={start} id="btnConfDoubleClick" onChange={(e)=>handleChangeOption(e, 'dblclick')} checked={Options.dblclick} type="checkbox"/> Двойной клик
                 </label>&nbsp;&nbsp;&nbsp;
             </div>
             <div className="checkbox">
                 <label>
-                    <input disabled={start} id="btnConfRandomVariants" onChange={(e)=>handleChangeOption(e, 'random')} defaultChecked={Options.random} type="checkbox"/> Перемешивать вопросы
+                    <input disabled={start} id="btnConfRandomVariants" onChange={(e)=>handleChangeOption(e, 'random')} checked={Options.random} type="checkbox"/> Перемешивать вопросы
                 </label>
                 </div>
             </form>
