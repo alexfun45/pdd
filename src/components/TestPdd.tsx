@@ -387,8 +387,8 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
     }
 
     const resetTest = () => {
-        //if(props.options.settings===false)
-            //setOptions({...props.options});
+        if(props.options.settings===false)
+            setOptions({...props.options});
         setOpened([]);
         setCurrentTicket(0);
         setCurrentQuestion(undefined);
