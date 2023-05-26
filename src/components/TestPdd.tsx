@@ -71,6 +71,7 @@ function getQuestions(options: any, callback: Function){
     });
 }
 
+let settings = {};
 const BtnQuestion = (props: any)  => {
 
     function getBtnpageClass(i: number){
@@ -287,7 +288,10 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
         resetTest();
         setStart(true);
         setEndTest(false);
-		getQuestions(Options, setQuestion);
+        if(props.options.settings===false)
+		    getQuestions({...Options, selectedTicket:selectedTicket, settings: false}, setQuestion);
+        else
+            getQuestions(Options, setQuestion);
     }
 
     function handleStartTest(){
@@ -383,8 +387,8 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
     }
 
     const resetTest = () => {
-        if(props.options.settings===false)
-            setOptions({...props.options});
+        //if(props.options.settings===false)
+            //setOptions({...props.options});
         setOpened([]);
         setCurrentTicket(0);
         setCurrentQuestion(undefined);
