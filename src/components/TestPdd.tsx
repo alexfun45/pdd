@@ -583,13 +583,13 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
                 </div>
             </div>
             <div style={{marginTop: 0}} className="row testrow">
-                <div className="col-lg-8 col-md-9 col-sm-12 mini-wrapper">
+                <div className="col-lg-8 col-md-9 col-sm-12 mini-wrapper"   >
                     <div className="block-ticket">
                         <div className="col-md-12">
                             <div id="questPanel" >
                                 <img id="questImage" className={(start)?"img-responsive":"hide"} width="100%" style={{maxWidth: "100%"}}
                                         src={(currentQuestion!==undefined)?currentQuestion.image:""}
-                                        onError={(e)=>{if (e.currentTarget.src != './img/no_picture.png') e.currentTarget.src = './img/no_picture.png';}}
+                                        onError={(e)=>{if (e.currentTarget.src != './img/no_picture.png') e.currentTarget.src = './img/default_bilet_images.png';}}
                                         />
                                 <div id="questText" className={(start)?"questtext":"hide"}>{(currentQuestion!==undefined)?currentQuestion.title:""}</div>
                                 <div className={(start)?"list-group":"hide"}>
