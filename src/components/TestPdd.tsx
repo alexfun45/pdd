@@ -93,7 +93,7 @@ const BtnQuestion = (props: any)  => {
     //return <button key={"btn_"+props.qpages.length+"_"+props.i} onClick={()=>props.goToPage(props.i)} id={"btn_"+props.i} className={props.getBtnpageClass(props.i)} type="button">{props.i+1}</button>
 }
 
-const Watch = ({start, setEndTest, endTest, pause, _continue, iterator=1, startTime=0}: {start: boolean, setEndTest: Function, endTest: boolean, pause: Function, _continue: Function, iterator: number, startTime: number}) => {
+const Watch = ({start, setEndTest, endTest, pause, _continue, iterator=1, startTime=0, btnView='icon'}: {start: boolean, setEndTest: Function, endTest: boolean, pause: Function, _continue: Function, iterator: number, startTime: number, btnView: string}) => {
 
     const [time, setTime] = useState("0:00"),
           [isPause, setPause] = useState(false);
@@ -149,13 +149,28 @@ const Watch = ({start, setEndTest, endTest, pause, _continue, iterator=1, startT
     }, [start, endTest]);    
 
     return (
-        <span id="labelTimer" className="label-info lead label" title="таймер" style={{cursor: "pointer"}}><span id="time">{time}</span>
-                { (start==true) ? 
-                    <i onClick={()=>Pause()} className="bi bi-pause pause-btn"></i>
-                :
-                    <i onClick={()=>Continue()} className="bi bi-play-fill pause-btn"></i>               
-                }
-        </span>
+        <>
+            {(btnView=="icon") ? (
+                <span id="labelTimer" className="label-info lead label" title="таймер" style={{cursor: "pointer"}}><span id="time">{time}</span>
+                    { (start) ? 
+                        <i onClick={()=>Pause()} className="bi bi-pause pause-btn"></i>
+                    :
+                        <i onClick={()=>Continue()} className="bi bi-play-fill pause-btn"></i>               
+                    }
+                </span>
+                ) : (
+                    <>
+                       <span id="labelTimer" className="label-info lead label" title="таймер" style={{cursor: "pointer"}}><span id="time">{time}</span></span>
+                        { (start) ?
+                            <input onClick={()=>Pause()} type="submit" className="label lead label-info" value="пауза" />
+                        :
+                            <input onClick={()=>Continue()} type="submit" className="label lead label-info" value="Начать" />
+
+                        }
+                    </>
+                )
+            }
+        </>
     )
 }
 
@@ -457,7 +472,7 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
             <div style={{marginTop: 0}} className={(props.options.settings===false)?"row testrow":"hide"}>
                 <div className="exam-title">
                     <label>{context.settings.exam_title}</label>
-                    <FormControl className="form-ticket" sx={{ m: 1, minWidth: 120, marginTop: '5px'}}>
+                    <FormControl className="form-ticket" sx={{m: 1, minWidth: 120, marginTop: '5px', verticalAlign: 'middle'}}>
                         <Select
                             disabled={start?true:false}
                             labelId="demo-simple-select-helper-label"
@@ -472,6 +487,9 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
                                 }
                         </Select>
                     </FormControl>
+                    { (currentQuestion!=undefined && context.isMobile) && (
+                        <Watch start={start} setEndTest={setEndTest} endTest={endTest} pause={testPause} _continue={continueTest} iterator={iterator} startTime={startTime} btnView="button" />  
+                    )}
                 </div>
             </div>
             <div className={(props.options.settings==true)?"row testrow":"hide"}>
@@ -500,7 +518,7 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
                             )} type="text" className="form-control" id="textSchoolName3" placeholder="Отчество" />
                 </div>
 
-                <input id="buttonSchoolSetName" type="submit" className={(start)?"hide":"btn btn-success"} value="Начать" />
+                <input id="buttonSchoolSetName" type="submit" className={(start || context.isMobile)?"hide":"btn btn-success"} value="Начать" />
                 
             </form>
         <form id="collapseConf">
@@ -564,24 +582,24 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
                     <i onClick={toNextPage} className={start?"bi bi-caret-right arrow-btn arrow-right-btn":"hide"}></i>
                 </div>
             </div>
+            { (!context.isMobile) && (
             <div style={{marginTop: 0, position: 'relative', top: '-15px'}} className="row testrow centered-row">
                 <div className="col-lg-8 col-md-8 col-sm-8">    
 
                     <div style={{marginTop: 0}} className="row testrow">
                         <div className="col-md-12 col-sm-12 myheader">
-                            {/*<span id="labelQuestNumber" className="label label-primary">Новые правила экзамена пдд 2023</span>*/}
                             <span id="labelCategory" className="hide"> ABM </span>
-                            { (currentQuestion!=undefined) && (
-                                    <Watch start={start} setEndTest={setEndTest} endTest={endTest} pause={testPause} _continue={continueTest} iterator={iterator} startTime={startTime} />  
+                            { (currentQuestion!=undefined && !context.isMobile) && (
+                                    <Watch start={start} setEndTest={setEndTest} endTest={endTest} pause={testPause} _continue={continueTest} iterator={iterator} startTime={startTime} btnView="icon"/>  
                                  )}
-                            
-                                <input onClick={startTest} id="buttonSchoolSetName" type="submit" className={(start || props.options.settings===true)?"hide":"btn btn-start"} value="Начать" />
+                                <input onClick={startTest} id="buttonSchoolSetName" type="submit" className={(start || props.options.settings===true || context.isMobile)?"hide":"btn btn-start"} value="Начать" />
                             
                             <span id="labelBookmark" data-toggle="tooltip" data-placement="left" title="В закладки" style={{fontSize: "20px", color: "#5bc0de", cursor: "pointer"}} className="pull-right glyphicon glyphicon-star-empty"></span>
                         </div>
                     </div>
                 </div>
             </div>
+            )}
             <div style={{marginTop: 0}} className="row testrow">
                 <div className="col-lg-8 col-md-9 col-sm-12 mini-wrapper"   >
                     <div className="block-ticket">
