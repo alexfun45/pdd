@@ -313,6 +313,10 @@ p{
     z-index: 10000;
 }
 
+.MuiPaper-root{
+    background-color: #aec1bd !important;
+}
+
  .MuiButtonBase-root{
     padding: 5px !important;
     }
@@ -375,7 +379,7 @@ p{
 }
 
 .row{
-    margin-top: 20px;
+    margin-top: 5px;
 }
 
 .label{
@@ -488,6 +492,7 @@ p{
 
 .mobileWrapper .form-inline .form-group{
     display: inline-table;
+    margin-bottom: 2px !important;
 }
 
 .mobileWrapper .form-inline label{
@@ -498,8 +503,13 @@ p{
     display: table-cell;
 }
 
+#buttonSchoolSetName{
+    height: 40px;
+}
+
 .mobileWrapper #buttonSchoolSetName{
     display: inline-block;
+    vertical-align: top;
 }
 
 @media screen and (max-width: 400px) {
@@ -958,6 +968,7 @@ div.suggestPopupContent div table tbody tr td.item-selected{
 
 #examErrorSize{
     padding-left: 4px;
+    width: 17vh;
 }
 
 .ticket-wrapper .title{
@@ -1528,10 +1539,10 @@ div.suggestPopupContent div table tbody tr td.item-selected{
         margin-bottom: 20px;
         background-color: #fff;
         border: 1px solid transparent;
-          border-top-color: transparent;
-          border-right-color: transparent;
-          border-bottom-color: transparent;
-          border-left-color: transparent;
+        border-top-color: transparent;
+        border-right-color: transparent;
+        border-bottom-color: transparent;
+        border-left-color: transparent;
         border-radius: 4px;
         -webkit-box-shadow: 0 1px 1px rgba(0,0,0,.05);
         box-shadow: 0 1px 1px rgba(0,0,0,.05);
@@ -1546,7 +1557,7 @@ div.suggestPopupContent div table tbody tr td.item-selected{
     .panel-heading {
         padding: 10px 15px;
         border-bottom: 1px solid transparent;
-          border-bottom-color: transparent;
+        border-bottom-color: transparent;
         border-top-left-radius: 3px;
         border-top-right-radius: 3px;
       }
@@ -1554,13 +1565,11 @@ div.suggestPopupContent div table tbody tr td.item-selected{
     .label-info{  
         margin-top: 15px;
         background-color: #4298d1;
-        /*border-radius: 100%;
-        display: inline-flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        width: 90px;
-        height: 90px;*/
+        height: 34px;
+        display: inline-block;
+        vertical-align: middle;
+        border: 1px solid #2a7db4;
+        margin-left: 2px;
     }
 
     .lead {
@@ -1792,11 +1801,13 @@ div.suggestPopupContent div table tbody tr td.item-selected{
     display: inline-block;
     vertical-align: middle;
     margin-right: 4px;
+    height: 40px;
  }
 
  .form-group > label{
     display: inline-block;
     max-width: 100%;
+    font-size: 2.5vh;
     margin-bottom: 5px;
     font-weight: 700;
     margin-right: 1px;
@@ -1841,6 +1852,7 @@ div.suggestPopupContent div table tbody tr td.item-selected{
     margin-top: 0;
     margin-bottom: 0;
     vertical-align: middle;
+    text-align: center;
   }
 
   .btn{
@@ -1856,6 +1868,12 @@ div.suggestPopupContent div table tbody tr td.item-selected{
     text-align: center;
   }
 
+  .form-flex{
+    display: flex;
+    justify-content: center;
+    margin-bottom: 5px;
+  }
+
   .form-inline .form-control{
     display: inline-block;
     width: auto;
@@ -1868,6 +1886,13 @@ div.suggestPopupContent div table tbody tr td.item-selected{
     background-color: #fff;
     background-image: none;
     border: 1px solid #ccc;
+  }
+
+  .select-mobile{
+    font-size: 3vh;
+    height: 40px;
+    padding: 3px 5px;
+    width: 17vh;
   }
 
   .current-finished-button.btn-success{

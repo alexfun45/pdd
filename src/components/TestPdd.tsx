@@ -204,7 +204,7 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
           [endTest, setEndTest] = useState(false);
     
     const context = React.useContext(AppContext);
-
+   
     useEffect(()=>{
         setOptions({...props.options});
         availableWidth = $(".testrow").width()*0.7;
@@ -395,7 +395,7 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
     }
 
     // handle change test options
-    const handleChangeOption = (event: React.ChangeEvent<HTMLInputElement>, optionName: any) => {
+    const handleChangeOption = (event: any, optionName: any) => {
         
         //let value = (optionName=="dblclick" || optionName=="random") ? (event.target.value=="on"):event.target.value;
         setOptions({...Options, [optionName]: event.target.value});
@@ -494,57 +494,74 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
             </div>
             <div className={(props.options.settings==true)?"row testrow":"hide"}>
                 <div className="col-md-12">
-            <form onSubmit={handleSubmit(onSubmit)} className="form-inline">
-                <div className="form-group">
-                    <label>Фамилия&nbsp;</label>
-                    <input disabled={start} {...register("surname", {
-                                            required: "Field is required",
-                                            maxLength: 50} 
-                            )}
-                        type="text" className="form-control" id="textSchoolName1" placeholder="Фамилия" />
-                </div>
-                <div className="form-group">
-                    <label>Имя&nbsp;</label>
-                    <input disabled={start} {...register("name", {
-                                            required: "Field is required",
-                                            maxLength: 50} 
-                            )} type="text" className="form-control" id="textSchoolName2" placeholder="Имя" />
-                </div>
-                <div className="form-group">
-                    <label>Отчество&nbsp;</label>
-                    <input disabled={start} {...register("name2", {
-                                            required: "Field is required",
-                                            maxLength: 50} 
-                            )} type="text" className="form-control" id="textSchoolName3" placeholder="Отчество" />
-                </div>
-
-                <input id="buttonSchoolSetName" type="submit" className={(start || context.isMobile)?"hide":"btn btn-success"} value="Начать" />
-                
-            </form>
+                    <form onSubmit={handleSubmit(onSubmit)} className={(!context.logged)?"form-flex":"hide"}>
+                        <div className="form-group">
+                            <input disabled={start} {...register("surname", {
+                                                    required: "Field is required",
+                                                    maxLength: 50} 
+                                    )}
+                                type="text" className="form-control" id="textSchoolName1" placeholder="Фамилия" />
+                        </div>
+                        <div className="form-group">
+                            <input disabled={start} {...register("name", {
+                                                    required: "Field is required",
+                                                    maxLength: 50} 
+                                    )} type="text" className="form-control" id="textSchoolName2" placeholder="Имя" />
+                        </div>
+                        <div className="form-group">
+                            <input disabled={start} {...register("name2", {
+                                                    required: "Field is required",
+                                                    maxLength: 50} 
+                                    )} type="text" className="form-control" id="textSchoolName3" placeholder="Отчество" />
+                        </div>
+                        {(!context.isMobile) && (
+                            <input id="buttonSchoolSetName" type="submit" className={(start || (context.isMobile && !props.options.settings))?"hide":"btn btn-success"} value="Начать" />
+                        )}
+                </form>
         <form id="collapseConf">
             <div id="examSizePanel" className="form-group">
                 <label>Вопросов</label>
-                <label className="radio-inline">
-                    <input disabled={start} onChange={(e)=>handleChangeOption(e, 'num')} type="radio" checked={Options.num==20} name="examSize" id="examSize20" value="20"/>20
-                </label>
-                <label className="radio-inline">
-                    <input disabled={start} onChange={(e)=>handleChangeOption(e, 'num')} type="radio" checked={Options.num==40} name="examSize" id="examSize40" value="40"/>40
-                </label>
-                <label className="radio-inline">
-                    <input disabled={start} onChange={(e)=>handleChangeOption(e, 'num')} type="radio"  checked={Options.num==60} name="examSize" id="examSize60" value="60"/>60
-                </label>
-                <label className="radio-inline">
-                    <input disabled={start} onChange={(e)=>handleChangeOption(e, 'num')} type="radio"  checked={Options.num==80} name="examSize" id="examSize80" value="80"/>80
-                </label>
-                <label className="radio-inline">
-                    <input disabled={start} onChange={(e)=>handleChangeOption(e, 'num')} type="radio"  checked={Options.num==100} name="examSize" id="examSize100" value="100"/>100
-                </label>
-                &nbsp;&nbsp;&nbsp;
+                {(context.isMobile) ? (
+                    <>
+                      <select onChange={(e)=>handleChangeOption(e, 'num')} className="select-mobile" name="examSize">
+                        <option selected={Options.num==20} value="20">20</option>
+                        <option selected={Options.num==40} value="40">40</option>
+                        <option selected={Options.num==60} value="60">60</option>
+                        <option selected={Options.num==80} value="80">80</option>
+                        <option selected={Options.num==100} value="100">100</option>
+                    </select>
+                    </>
+                ) 
+                :
+                (
+                    <>
+                        <label className="radio-inline">
+                            <input disabled={start} onChange={(e)=>handleChangeOption(e, 'num')} type="radio" checked={Options.num==20} name="examSize" id="examSize20" value="20"/>20
+                        </label>
+                        <label className="radio-inline">
+                            <input disabled={start} onChange={(e)=>handleChangeOption(e, 'num')} type="radio" checked={Options.num==40} name="examSize" id="examSize40" value="40"/>40
+                        </label>
+                        <label className="radio-inline">
+                            <input disabled={start} onChange={(e)=>handleChangeOption(e, 'num')} type="radio"  checked={Options.num==60} name="examSize" id="examSize60" value="60"/>60
+                        </label>
+                        <label className="radio-inline">
+                            <input disabled={start} onChange={(e)=>handleChangeOption(e, 'num')} type="radio"  checked={Options.num==80} name="examSize" id="examSize80" value="80"/>80
+                        </label>
+                        <label className="radio-inline">
+                            <input disabled={start} onChange={(e)=>handleChangeOption(e, 'num')} type="radio"  checked={Options.num==100} name="examSize" id="examSize100" value="100"/>100
+                        </label>
+                        &nbsp;&nbsp;&nbsp;
+                    </>
+                )}
             </div>
             <div className="form-group">
                 <label style={{display: "inline-block !important"}}>Ошибок &nbsp; </label>
                 <input disabled={start} id="examErrorSize" onChange={(e)=>handleChangeOption(e, 'max_error')} value={Options.max_error} type="number" min={1} max={100} />&nbsp;&nbsp;&nbsp;
             </div>
+            {(context.isMobile) && (
+                <br/>
+            )
+            }
             <div className="checkbox">
                 <label>
                     <input disabled={start} id="btnConfDoubleClick" onChange={(e)=>handleChangeOption(e, 'dblclick')} checked={Options.dblclick} type="checkbox"/> Двойной клик
@@ -555,10 +572,13 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
                     <input disabled={start} id="btnConfRandomVariants" onChange={(e)=>handleChangeOption(e, 'random')} checked={Options.random} type="checkbox"/> Перемешивать вопросы
                 </label>
                 </div>
+                {(context.isMobile) && (
+                    <input id="buttonSchoolSetName" onClick={(e)=>{e.preventDefault(); if(!context.logged) handleSubmit(onSubmit)(); else handleStartTest();}} type="submit" className={(start || (context.isMobile && !props.options.settings))?"hide":"btn btn-success"} value="Начать" />
+                )}
             </form>
             </div>
         </div>
-            { (props.options.settings && !start && context.settings["image_title_exam"]!='') && (
+            { (props.options.settings && !start && context.settings["image_title_exam"]!='' && !context.isMobile) && (
                 <div className="titleImage">
                     <img width='auto' height='auto' src={'./img/'+context.settings["image_title_exam"]}/>
                 </div>

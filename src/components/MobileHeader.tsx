@@ -26,7 +26,8 @@ import {AppContext} from '../app'
 const useStyles = makeStyles({
     drawerPaper: {
       marginTop: "7vh",
-      width: "80vw"
+      width: "80vw",
+      backgrounColor: '#aec1bd'
     }
   });
 
@@ -113,7 +114,7 @@ export default () => {
         <Box
           role="presentation"
           onKeyDown={toggleDrawer(false)}
-          sx={{"& .MuiList-root":{width: "100%"}}}
+          sx={{"& .MuiList-root":{width: "100%", backgrounColor: '#aec1bd'}}}
         >
           <List sx={{"& .MuiTypography-root":{fontSize: "2.5vh", color: "#333", fontWeight: "500"}, "& .MuiButtonBase-root":{width: "100%", paddingLeft: "3vw", paddingRight: "15px", paddingTop: "2vh", paddingBottom: "2vh"}}}>
             {Object.entries(TopMenu).map(
@@ -155,6 +156,7 @@ export default () => {
 
     const Logout = (e: React.MouseEvent) => {
         request({method: 'post', data:{ action: 'Logout'}});
+        window.localStorage.removeItem('user');
         document.location.href = "./";
       }
 
@@ -199,7 +201,7 @@ export default () => {
                 classes={{
                     paper: classes.drawerPaper
                   }}
-                sx={{marginTop: "70px"}}
+                sx={{marginTop: "70px", backgroundColor: '#aec1bd'}}
                 anchor='left'
                 open={anchorLeft}
                 onClose={toggleDrawer(false)}
