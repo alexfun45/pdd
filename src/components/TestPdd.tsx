@@ -16,6 +16,7 @@ type answersType = {
 type ErrorType = {
     ticket: string;
     comment: string;
+    title: string;
 }
 
 type InputSettings = {
@@ -343,7 +344,7 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
        if(results.current[currentTicket]==1 || results.current[currentTicket]==0) return;
        if(selectedVar != parseInt(pdd_questions[currentTicket].success)){
             errors++;
-            errors_array.push({ticket: currentTicket.toString(), comment: currentQuestion.variants[selectedVar].comment});
+            errors_array.push({ticket: currentTicket.toString(), title: pdd_questions[currentTicket].title, comment: currentQuestion.variants[selectedVar].comment});
             results.current[currentTicket] = 1;
        }
        else{
@@ -662,7 +663,7 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
                                                     }
                                                         </th></tr>
                                                     { errors_array.map((v, i)=>(
-                                                        <tr><td>{parseInt(v.ticket)+1}</td><td>Неправильный ответ</td><td>{v.comment}</td></tr>
+                                                        <tr><td>{parseInt(v.ticket)+1}</td><td>{v.title}</td><td>{v.comment}</td></tr>
                                                         ))
                                                     }
                                                 </table>
