@@ -13,6 +13,11 @@ type answersType = {
     comment: string;
 }
 
+type ErrorType = {
+    ticket: string;
+    comment: string;
+}
+
 type InputSettings = {
     surname: string;
     name: string;
@@ -178,6 +183,7 @@ let numPageItems = 10,
     firstRunning = 0,
     availableWidth = 0,
     itemWidth = 50,
+    errors_array:ErrorType[] = [],
     requiredWidth = 0,
     variantBackgroundColor = "transparent";
 
@@ -337,6 +343,7 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
        if(results.current[currentTicket]==1 || results.current[currentTicket]==0) return;
        if(selectedVar != parseInt(pdd_questions[currentTicket].success)){
             errors++;
+            errors_array.push({ticket: currentTicket.toString(), comment: currentQuestion.variants[selectedVar].comment});
             results.current[currentTicket] = 1;
        }
        else{
@@ -656,16 +663,31 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
                             <div className={(endTest===true)?"row":"hide row"}>
                                 <div className="col-md-12">
                                     <div className="panel panel-primary">
-                                        <div className="panel-heading lead">
+                                        {/*<div className="panel-heading lead">
                                             ошибок <span id="resultErrors" className="label label-danger">{errors}</span> из <span id="resultCount" className="label label-default">{Options.num}</span>
-                                        </div>
+                                        </div>*/}
                                         <div className="panel-body">
-                                            <p id="resultText" className="lead">
+                                            {/*<p id="resultText" className="lead">
                                                 {(Options.max_error<errors) ?
                                                     (<><i style={{color: "#222", fontSize: "18px"}} className="bi bi-x-lg"></i> Экзамен не сдан. У вас более {Options.max_error} ошибок</>)
                                                     :
                                                     (<><i style={{color: "green"}} className="bi bi-check-lg"></i> Экзамен сдан</>)
                                                 }
+                                            </p>*/}
+                                            <p>
+                                                <table className="result_table">
+                                                    <tr><th>№</th><th>ошибок <span id="resultErrors" className="label label-danger">{errors}</span> из <span id="resultCount" className="label label-default">{Options.num}</span></th><th>
+                                                    {(Options.max_error<errors) ?
+                                                    (<><i style={{color: "#222", fontSize: "18px"}} className="bi bi-x-lg"></i> Экзамен не сдан. У вас более {Options.max_error} ошибок</>)
+                                                    :
+                                                    (<><i style={{color: "green"}} className="bi bi-check-lg"></i> Экзамен сдан</>)
+                                                    }
+                                                        </th></tr>
+                                                    { errors_array.map((v, i)=>(
+                                                        <tr><td>{parseInt(v.ticket)+1}</td><td>Неправильный ответ</td><td>{v.comment}</td></tr>
+                                                        ))
+                                                    }
+                                                </table>
                                             </p>
                                         </div>
                                     </div>      
