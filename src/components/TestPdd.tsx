@@ -188,7 +188,7 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
           [startTime, setStartTime] = useState(0),
           [iterator, setIterator] = useState(1),
           [Options, setOptions] = useState({...props.options}),
-          [selectedTicket, setTicket] = useState('0'),
+          [selectedTicket, setTicket] = useState(0),
           [currentTicket, setCurrentTicket] = useState<number>(0),
           results = useRef([]),
           //[results, setResults] = useState([]),
@@ -232,7 +232,7 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
     }, [qNum]);
 
     useEffect(()=>{
-        if(selectedTicket!='0' && (props.options.settings==false)){
+        if(selectedTicket!=0 && (props.options.settings==false)){
             startTest();
         }
         firstRunning++;
@@ -285,10 +285,11 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
     function getTickets(){
         request({method: 'post', data: {action: "getTickets"}}).then(response => {
             const {data} = response;
-            setTickets(data);
-            //options.selectedTicket = data[0].id;
             setOptions({...Options, selectedTicket: data[0].id});
             setTicket(data[0].id);
+            setTickets(data);
+            //options.selectedTicket = data[0].id;
+            
         });
     }
 
@@ -363,7 +364,7 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
     }
 
     function handleChangeTicket(event: SelectChangeEvent){
-        setTicket(event.target.value);
+        setTicket(parseInt(event.target.value));
         Options.selectedTicket = event.target.value;
     }
 
@@ -407,7 +408,7 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
         setOpened([]);
         setCurrentTicket(0);
         setCurrentQuestion(undefined);
-        setTicket('0');
+        setTicket(0);
         setqPages([]);
         selected = [];
         clearInterval(Timer);
@@ -478,7 +479,7 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
                             labelId="demo-simple-select-helper-label"
                             sx={{"& .MuiSelect-select": {padding: "5px 14px"}}}
                             id="demo-simple-select-helper"
-                            value={selectedTicket}
+                            value={Options.selectedTicket}
                             onChange={handleChangeTicket}>
                                 {
                                     tickets.map((v, i)=>(
@@ -558,7 +559,7 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
                 <label style={{display: "inline-block !important"}}>Ошибок &nbsp; </label>
                 <input disabled={start} id="examErrorSize" onChange={(e)=>handleChangeOption(e, 'max_error')} value={Options.max_error} type="number" min={1} max={100} />&nbsp;&nbsp;&nbsp;
             </div>
-            {(context.isMobile) && (
+            {(context.isMobile || context.logged) && (
                 <br/>
             )
             }
@@ -572,7 +573,7 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
                     <input disabled={start} id="btnConfRandomVariants" onChange={(e)=>handleChangeOption(e, 'random')} checked={Options.random} type="checkbox"/> Перемешивать вопросы
                 </label>
                 </div>
-                {(context.isMobile) && (
+                {(context.isMobile || context.logged) && (
                     <input id="buttonSchoolSetName" onClick={(e)=>{e.preventDefault(); if(!context.logged) handleSubmit(onSubmit)(); else handleStartTest();}} type="submit" className={(start || (context.isMobile && !props.options.settings))?"hide":"btn btn-success"} value="Начать" />
                 )}
             </form>

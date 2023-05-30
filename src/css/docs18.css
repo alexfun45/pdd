@@ -376,6 +376,7 @@ p{
 .pause-btn{
     font-size: 20px;
     color: #FFF !important;
+    vertical-align: middle;
 }
 
 .row{
@@ -384,7 +385,7 @@ p{
 
 .label{
     display: inline;
-    padding: .2em .6em .3em;
+    padding: .4em .6em .3em;
     font-size: 75%;
     font-weight: 700;
     line-height: 1;
@@ -453,6 +454,7 @@ p{
     }
     .myheader span {
         font-size: 1.2rem;
+        vertical-align: middle;
     }
 }
 
@@ -598,6 +600,7 @@ p{
     }
     .myheader span {
         font-size: 16px;
+        vertical-align: middle;
     }
     .container {
         padding:4px;
@@ -1563,9 +1566,8 @@ div.suggestPopupContent div table tbody tr td.item-selected{
       }
 
     .label-info{  
-        margin-top: 15px;
         background-color: #4298d1;
-        height: 34px;
+        height: 40px;
         display: inline-block;
         vertical-align: middle;
         border: 1px solid #2a7db4;
@@ -1574,7 +1576,6 @@ div.suggestPopupContent div table tbody tr td.item-selected{
 
     .lead {
         font-size: 20px;
-        margin-bottom: 20px;
         font-weight: 300;        
       }
 
@@ -1622,8 +1623,7 @@ div.suggestPopupContent div table tbody tr td.item-selected{
         background-color: #4298d1;
         color: #FFF;
         font-size: 1.2rem;
-        padding: .050rem .95rem;
-        margin-bottom: 1px;
+        padding: .2em .6em .3em;
     }
 
     .right-panel{
