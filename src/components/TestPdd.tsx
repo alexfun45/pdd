@@ -586,7 +586,7 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
             </form>
             </div>
         </div>
-            { (props.options.settings && !start && context.settings["image_title_exam"]!='' && !context.isMobile) && (
+            { (props.options.settings && !start && context.settings["image_title_exam"]!='' && !context.isMobile && !endTest) && (
                 <div className="titleImage">
                     <img width='auto' height='auto' src={'./img/'+context.settings["image_title_exam"]}/>
                 </div>
@@ -663,17 +663,22 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
                             <div className={(endTest===true)?"row":"hide row"}>
                                 <div className="col-md-12">
                                     <div className="panel panel-primary">
-                                        {/*<div className="panel-heading lead">
+                                        {(props.options.settings) && (
+                                            <div className="panel-heading lead">
                                             ошибок <span id="resultErrors" className="label label-danger">{errors}</span> из <span id="resultCount" className="label label-default">{Options.num}</span>
-                                        </div>*/}
+                                        </div>
+                                        )}
                                         <div className="panel-body">
-                                            {/*<p id="resultText" className="lead">
+                                        {(props.options.settings) && (
+                                            <p id="resultText" className="lead">
                                                 {(Options.max_error<errors) ?
                                                     (<><i style={{color: "#222", fontSize: "18px"}} className="bi bi-x-lg"></i> Экзамен не сдан. У вас более {Options.max_error} ошибок</>)
                                                     :
                                                     (<><i style={{color: "green"}} className="bi bi-check-lg"></i> Экзамен сдан</>)
                                                 }
-                                            </p>*/}
+                                            </p>
+                                        )}
+                                        {(!props.options.settings) && (
                                             <p>
                                                 <table className="result_table">
                                                     <tr><th>№</th><th>ошибок <span id="resultErrors" className="label label-danger">{errors}</span> из <span id="resultCount" className="label label-default">{Options.num}</span></th><th>
@@ -689,6 +694,7 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
                                                     }
                                                 </table>
                                             </p>
+                                        )}
                                         </div>
                                     </div>      
                                 </div>
