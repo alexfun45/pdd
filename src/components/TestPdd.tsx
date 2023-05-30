@@ -412,6 +412,7 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
     const resetTest = () => {
         if(props.options.settings===false)
             setOptions({...props.options});
+        errors_array = [];
         setOpened([]);
         setCurrentTicket(0);
         setCurrentQuestion(undefined);
@@ -629,38 +630,7 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
             </div>
             )}
             <div style={{marginTop: 0}} className="row testrow">
-                <div className="col-lg-8 col-md-9 col-sm-12 mini-wrapper"   >
-                    <div className="block-ticket">
-                        <div className="col-md-12">
-                            <div id="questPanel" >
-                                <img id="questImage" className={(start)?"img-responsive":"hide"} width="100%" style={{maxWidth: "100%"}}
-                                        src={(currentQuestion!==undefined)?currentQuestion.image:""}
-                                        onError={(e)=>{if (e.currentTarget.src != './img/no_picture.png') e.currentTarget.src = './img/default_bilet_images.png';}}
-                                        />
-                                <div id="questText" className={(start)?"questtext":"hide"}>{(currentQuestion!==undefined)?currentQuestion.title:""}</div>
-                                <div className={(start)?"list-group":"hide"}>
-                                    <Variants dblclick={Options.dblclick} key={+props.options.settings} />
-                                    {/*<div key={+props.options.settings-1} id="qlist">
-                                        { (currentQuestion!=undefined) && (
-                                            currentQuestion.variants.map((v,i)=>(
-                                                //if(Options.dblclick)
-                                                  //  return (<a key={+props.options.settings+"var_"+i} onDoubleClick={()=>selectAnswer(i)} id={i.toString()} className={"list-group-item questvariant "+showResult(i)}>{i+1}. {v.answer}</a>)
-                                                //else
-                                                  //  return <a key={+props.options.settings+"var_"+i} onClick={()=>selectAnswer(i)} id={i.toString()} className={"list-group-item questvariant "+showResult(i)}>{i+1}. {v.answer}</a>
-                                                <a key={"var_"+i} onDoubleClick={()=>{if(Options.dblclick) selectAnswer(i)}} onClick={()=>{if(!Options.dblclick) selectAnswer(i)}} id={i.toString()} className={"list-group-item questvariant "+showResult(i)}>{i+1}. {v.answer}</a>
-                                                    //return <a style={{backgroundColor: ((opened.indexOf(i) != -1))?"":ticketBg}} onDoubleClick={()=>{if(options.dblclick) selectAnswer(i)}} onClick={()=>{if(!options.dblclick) selectAnswer(i)}} id={i.toString()} className={"list-group-item questvariant "+showResult(i)}>{i+1}. {v.answer}</a>
-                                            )
-                                        ))
-                                        }
-                                    </div>
-                                    */}
-                                    <div id="commentPanel" className={(!start)?"hide":((opened.length>0)?"":"hide")}>
-                                        <button onClick={next} id="questNext" type="button" className="list-group-item active">Далее <small className="text-warning small hidden-xs"> - Enter &nbsp;&nbsp;&nbsp; 1,2,3 - выбор &nbsp;&nbsp;&nbsp; &larr; назад &nbsp; вперед &rarr;</small></button>
-                                        <div id="questComment" className="">{(currentQuestion!==undefined && currentQuestion.variants.length>selectedVariant)?currentQuestion.variants[selectedVariant].comment:""}</div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className={(endTest===true)?"row":"hide row"}>
+                    <div className={(endTest===true)?"row":"hide row"}>
                                 <div className="col-md-12">
                                     <div className="panel panel-primary">
                                         {(props.options.settings) && (
@@ -678,6 +648,9 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
                                                 }
                                             </p>
                                         )}
+                                        </div>
+                                        </div>
+                                        <div className="panel-result">
                                         {(!props.options.settings) && (
                                             <p>
                                                 <table className="result_table">
@@ -695,10 +668,27 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
                                                 </table>
                                             </p>
                                         )}
-                                        </div>
-                                    </div>      
+                                    </div> 
                                 </div>
                             </div>
+                <div className="col-lg-8 col-md-9 col-sm-12 mini-wrapper">
+                    <div className="block-ticket">
+                        <div className="col-md-12">
+                            <div id="questPanel">
+                                <img id="questImage" className={(start)?"img-responsive":"hide"} width="100%" style={{maxWidth: "100%"}}
+                                        src={(currentQuestion!==undefined)?currentQuestion.image:""}
+                                        onError={(e)=>{if (e.currentTarget.src != './img/no_picture.png') e.currentTarget.src = './img/default_bilet_images.png';}}
+                                        />
+                                <div id="questText" className={(start)?"questtext":"hide"}>{(currentQuestion!==undefined)?currentQuestion.title:""}</div>
+                                <div className={(start)?"list-group":"hide"}>
+                                    <Variants dblclick={Options.dblclick} key={+props.options.settings} />
+                                    <div id="commentPanel" className={(!start)?"hide":((opened.length>0)?"":"hide")}>
+                                        <button onClick={next} id="questNext" type="button" className="list-group-item active">Далее <small className="text-warning small hidden-xs"> - Enter &nbsp;&nbsp;&nbsp; 1,2,3 - выбор &nbsp;&nbsp;&nbsp; &larr; назад &nbsp; вперед &rarr;</small></button>
+                                        <div id="questComment" className="">{(currentQuestion!==undefined && currentQuestion.variants.length>selectedVariant)?currentQuestion.variants[selectedVariant].comment:""}</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
                         </div>
                     </div>
                 </div>
