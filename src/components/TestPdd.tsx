@@ -634,13 +634,13 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
                     <div className={(endTest===true)?"row":"hide row"}>
                                 <div className="col-md-12">
                                     <div className="panel panel-primary">
-                                        {(props.options.settings) && (
+                                       
                                             <div className="panel-heading lead">
                                             ошибок <span id="resultErrors" className="label label-danger">{errors}</span> из <span id="resultCount" className="label label-default">{Options.num}</span>
                                         </div>
-                                        )}
+                                     
                                         <div className="panel-body">
-                                        {(props.options.settings) && (
+                                       
                                             <p id="resultText" className="lead">
                                                 {(Options.max_error<errors) ?
                                                     (<><i style={{color: "#222", fontSize: "18px"}} className="bi bi-x-lg"></i> Экзамен не сдан. У вас более {Options.max_error} ошибок</>)
@@ -648,20 +648,14 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
                                                     (<><i style={{color: "green"}} className="bi bi-check-lg"></i> Экзамен сдан</>)
                                                 }
                                             </p>
-                                        )}
+                                     
                                         </div>
                                         </div>
                                         <div className="panel-result">
                                         {(!props.options.settings) && (
                                             <p>
                                                 <table className="result_table">
-                                                    <tr><th>№</th><th>ошибок <span id="resultErrors" className="label label-danger">{errors}</span> из <span id="resultCount" className="label label-default">{Options.num}</span></th><th>
-                                                    {(Options.max_error<errors) ?
-                                                    (<><i style={{color: "#222", fontSize: "18px"}} className="bi bi-x-lg"></i> Экзамен не сдан. У вас более {Options.max_error} ошибок</>)
-                                                    :
-                                                    (<><i style={{color: "green"}} className="bi bi-check-lg"></i> Экзамен сдан</>)
-                                                    }
-                                                        </th></tr>
+                                                    <tr><th>№</th><th>Вопрос</th><th>Комментарий</th></tr>
                                                     { errors_array.map((v, i)=>(
                                                         <tr><td>{parseInt(v.ticket)+1}</td><td>{v.title}</td><td>{v.comment}</td></tr>
                                                         ))
