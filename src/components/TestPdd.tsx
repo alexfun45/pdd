@@ -265,7 +265,7 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
                         goToPage(currentTicket-1);
                 }
                 if(e.keyCode==39){
-                    if((currentTicket+1)<qNum && ((currentTicket+1)<=question_answered || !Options.settings))
+                    if((currentTicket+1)<qNum && ((currentTicket+1)<=question_answered))
                         goToPage(currentTicket+1);
                 }
             });
@@ -389,7 +389,7 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
                 setOpened([]);
             setCurrentTicket(ticketIndx);
         }
-        else if(ticketIndx==question_answered || !Options.settings){
+        else if(ticketIndx==question_answered){
             setOpened([]);
             setCurrentTicket(ticketIndx);
         }
