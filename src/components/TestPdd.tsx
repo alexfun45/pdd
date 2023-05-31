@@ -191,7 +191,7 @@ let numPageItems = 10,
 const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
 
     const [time, setTime] = useState("0:00"),
-          [selectedVariant, setSelectedVar] = useState(0),
+          [selectedVariant, setSelectedVar] = useState(-1),
           [startTime, setStartTime] = useState(0),
           [iterator, setIterator] = useState(1),
           [Options, setOptions] = useState({...props.options}),
@@ -362,6 +362,7 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
     }
 
     function next(){
+        setSelectedVar(-1);
         if(question_answered<pdd_questions.length && question_answered<=Options.num){
             goToPage(question_answered);
         }
@@ -469,7 +470,8 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
             <div id="qlist">
                 { (currentQuestion!=undefined) && (
                     currentQuestion.variants.map((v,i)=>(
-                        <a key={"var_"+i} onDoubleClick={()=>{if(props.dblclick) selectAnswer(i)}} onClick={()=>{if(!props.dblclick) selectAnswer(i)}} id={i.toString()} className={"list-group-item questvariant "+showResult(i)}>{i+1}. {v.answer}</a>
+                        (selectedVariant==i || selectedVariant==-1) &&
+                            <a key={"var_"+i} onDoubleClick={()=>{if(props.dblclick) selectAnswer(i)}} onClick={()=>{if(!props.dblclick) selectAnswer(i)}} id={i.toString()} className={"list-group-item questvariant "+showResult(i)}>{i+1}. {v.answer}</a>
                         )
                     ))
                 }
@@ -634,7 +636,6 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
                     <div className={(endTest===true)?"row":"hide row"}>
                                 <div className="col-md-12">
                                     <div className="panel panel-primary">
-                                       
                                             <div className="panel-heading lead">
                                             ошибок <span id="resultErrors" className="label label-danger">{errors}</span> из <span id="resultCount" className="label label-default">{Options.num}</span>
                                         </div>
@@ -676,10 +677,10 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
                                         />
                                 <div id="questText" className={(start)?"questtext":"hide"}>{(currentQuestion!==undefined)?currentQuestion.title:""}</div>
                                 <div className={(start)?"list-group":"hide"}>
-                                    <Variants dblclick={Options.dblclick} key={+props.options.settings} />
+                                    <Variants dblclick={Options.dblclick} key={currentTicket} />
                                     <div id="commentPanel" className={(!start)?"hide":((opened.length>0)?"":"hide")}>
                                         <button onClick={next} id="questNext" type="button" className="list-group-item active">Далее <small className="text-warning small hidden-xs"> - Enter &nbsp;&nbsp;&nbsp; 1,2,3 - выбор &nbsp;&nbsp;&nbsp; &larr; назад &nbsp; вперед &rarr;</small></button>
-                                        <div id="questComment" className="">{(currentQuestion!==undefined && currentQuestion.variants.length>selectedVariant)?currentQuestion.variants[selectedVariant].comment:""}</div>
+                                        <div id="questComment" className="">{(currentQuestion!==undefined && currentQuestion.variants.length>selectedVariant)?currentQuestion.variants[(selectedVariant==-1)?0:selectedVariant].comment:""}</div>
                                     </div>
                                 </div>
                             </div>
