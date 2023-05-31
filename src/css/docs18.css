@@ -508,6 +508,7 @@ p{
 
 #buttonSchoolSetName{
     height: 40px;
+    margin-left: 5px;
 }
 
 .mobileWrapper #buttonSchoolSetName{
@@ -1497,6 +1498,8 @@ div.suggestPopupContent div table tbody tr td.item-selected{
         text-align: center;
         overflow-wrap: break-word;
         position:relative;
+        height: 40px;
+        vertical-align: middle;
     }
 
     .button-slider{
@@ -1574,7 +1577,7 @@ div.suggestPopupContent div table tbody tr td.item-selected{
         display: inline-block;
         vertical-align: middle;
         border: 1px solid #2a7db4;
-        margin-left: 2px;
+        margin-left: 40px;
     }
 
     .lead {

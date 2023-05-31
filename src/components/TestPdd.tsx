@@ -182,7 +182,7 @@ const Watch = ({start, setEndTest, endTest, pause, _continue, iterator=1, startT
 let numPageItems = 10,
     firstRunning = 0,
     availableWidth = 0,
-    itemWidth = 50,
+    itemWidth = 45,
     errors_array:ErrorType[] = [],
     requiredWidth = 0,
     variantBackgroundColor = "transparent";
@@ -364,6 +364,8 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
         setSelectedVar(-1);
         if(question_answered<pdd_questions.length && question_answered<=Options.num){
             goToPage(question_answered);
+            if(question_answered%10==0 && question_answered!=0)
+                toNextPage();
         }
         else if(question_answered>=props.options.num || question_answered>=pdd_questions.length){
             setEndTest(true);
@@ -396,6 +398,7 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
             else
                 setOpened([]);
             setCurrentTicket(ticketIndx);
+            
         }
         else if(ticketIndx==question_answered){
             setOpened([]);
@@ -405,7 +408,6 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
 
     // handle change test options
     const handleChangeOption = (event: any, optionName: any) => {
-        
         //let value = (optionName=="dblclick" || optionName=="random") ? (event.target.value=="on"):event.target.value;
         setOptions({...Options, [optionName]: event.target.value});
     }
@@ -590,7 +592,7 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
             </form>
             </div>
         </div>
-            { (props.options.settings && !start && context.settings["image_title_exam"]!='' && !context.isMobile && !endTest) && (
+            { (props.options.settings && !start && context.settings["image_title_exam"]!='' && !context.isMobile && !endTest && currentQuestion===undefined) && (
                 <div className="titleImage">
                     <img width='auto' height='auto' src={'./img/'+context.settings["image_title_exam"]}/>
                 </div>
@@ -600,33 +602,30 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
                 <div className="slide-wrapper" style={{width: (requiredWidth+"px")}}>
                     <i onClick={toPrevPage} className={start?"bi bi-caret-left arrow-btn arrow-left-btn":"hide"}></i>
                     <div className="button-slider">
-                        <div key={selectedTicket} id="buttonPanel" style={{left: leftShift+"px"}} className={(start)?"btn-group btn-group-xs":"hide"}>
+                        <div key={selectedTicket} id="buttonPanel" style={{left: leftShift+"px"}} className={(!start && props.options.settings)?"hide":"btn-group btn-group-xs"}>
                             {
-                                //getBtns(results)
                                 <BtnQuestion key={selectedTicket} results={results.current} qpages={qpages} goToPage={goToPage} currentTicket={currentTicket}/>
-                                //qpages.map((v, i)=>{
-                                    //return <BtnQuestion key={selectedTicket+"_"+qpages.length} i={i} qpages={qpages} goToPage={goToPage} getBtnpageClass={getBtnpageClass}/>
-                                    //return <button key={"btn_"+qpages.length+"_"+i} onClick={()=>goToPage(i)} id={"btn_"+i} className={getBtnpageClass(i, results)} type="button">{i+1}</button>
-                                //})
                             }
+                            
                         </div>
+                       
                     </div>
                     <i onClick={toNextPage} className={start?"bi bi-caret-right arrow-btn arrow-right-btn":"hide"}></i>
                 </div>
+                { (!context.isMobile && (currentQuestion!==undefined) && !endTest) && (
+                                <>
+                                    <Watch start={start} setEndTest={setEndTest} endTest={endTest} pause={testPause} _continue={continueTest} iterator={iterator} startTime={startTime} btnView="icon"/>  
+                                    <input onClick={startTest} id="buttonSchoolSetName" type="submit" className={(start || props.options.settings===true || context.isMobile)?"hide":"btn btn-start"} value="Начать" />
+                                </>
+                            )} 
             </div>
             { (!context.isMobile) && (
-            <div style={{marginTop: 0, position: 'relative', top: '-15px'}} className="row testrow centered-row">
+            <div style={{marginTop: 0, position: 'relative', top: '-15px'}} className="row testrow centered-row hide">
                 <div className="col-lg-8 col-md-8 col-sm-8">    
 
                     <div style={{marginTop: 0}} className="row testrow">
                         <div className="col-md-12 col-sm-12 myheader">
-                            <span id="labelCategory" className="hide"> ABM </span>
-                            { (currentQuestion!=undefined && !context.isMobile) && (
-                                    <Watch start={start} setEndTest={setEndTest} endTest={endTest} pause={testPause} _continue={continueTest} iterator={iterator} startTime={startTime} btnView="icon"/>  
-                                 )}
-                                <input onClick={startTest} id="buttonSchoolSetName" type="submit" className={(start || props.options.settings===true || context.isMobile)?"hide":"btn btn-start"} value="Начать" />
-                            
-                            <span id="labelBookmark" data-toggle="tooltip" data-placement="left" title="В закладки" style={{fontSize: "20px", color: "#5bc0de", cursor: "pointer"}} className="pull-right glyphicon glyphicon-star-empty"></span>
+                       
                         </div>
                     </div>
                 </div>
@@ -651,7 +650,7 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
                                             </p>
                                             {(endTest===true) && (
                                                 <p>
-                                                    Затрачено времени на <span style={{fontWeight: 'bold'}}>{tickets[selectedTicket].name}: {getTimeString(timer)}</span>
+                                                    Затрачено времени на <span style={{fontWeight: 'bold'}}>{(selectedTicket)?tickets[selectedTicket].name:"экзамен"}: {getTimeString(timer)}</span>
                                                 </p>
                                             )}
                                         </div>
