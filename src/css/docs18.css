@@ -1539,7 +1539,6 @@ div.suggestPopupContent div table tbody tr td.item-selected{
         border-color: #337ab7;
         text-align: center;
         display: inline-block;
-        max-width: 450px;
       }
 
     .panel {
@@ -1950,7 +1949,7 @@ div.suggestPopupContent div table tbody tr td.item-selected{
     line-height: 1.1;
     width: 100%;
     text-align: left;
-    padding: .75rem 0.4rem !important;
+    padding: .1rem 10px 0.5rem !important;
     background-color: transparent;
     font-weight: 450;
     color: #777;

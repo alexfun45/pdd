@@ -99,6 +99,13 @@ const BtnQuestion = (props: any)  => {
     //return <button key={"btn_"+props.qpages.length+"_"+props.i} onClick={()=>props.goToPage(props.i)} id={"btn_"+props.i} className={props.getBtnpageClass(props.i)} type="button">{props.i+1}</button>
 }
 
+function getTimeString(__seconds: number){
+    let minutes = Math.floor(__seconds/60),
+            seconds = __seconds%60,
+            __time = (__seconds<10)?("0"+seconds):seconds.toString();
+    return minutes+":"+__time;
+}
+
 const Watch = ({start, setEndTest, endTest, pause, _continue, iterator=1, startTime=0, btnView='icon'}: {start: boolean, setEndTest: Function, endTest: boolean, pause: Function, _continue: Function, iterator: number, startTime: number, btnView: string}) => {
 
     const [time, setTime] = useState("0:00"),
@@ -110,10 +117,8 @@ const Watch = ({start, setEndTest, endTest, pause, _continue, iterator=1, startT
             Pause();
             setEndTest(true);
         }
-        let minutes = Math.floor(timer/60),
-            seconds = timer%60,
-            __time = (seconds<10)?("0"+seconds):seconds.toString();
-        setTime(minutes+":"+__time);
+        let timeString = getTimeString(timer);
+        setTime(timeString);
     }
 
     function Pause(){
@@ -126,12 +131,6 @@ const Watch = ({start, setEndTest, endTest, pause, _continue, iterator=1, startT
     function Continue(){
         setPause(false);
         _continue();
-    }
-
-    function getTimeString(seconds: number){
-        let minutes = Math.ceil(seconds/60),
-            __seconds = seconds%60;
-        return ((minutes<10)?("0"+minutes):minutes)+((__seconds<10)?("0"+__seconds):__seconds.toString());
     }
 
     useEffect(()=>{
@@ -470,6 +469,7 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
             <div id="qlist">
                 { (currentQuestion!=undefined) && (
                     currentQuestion.variants.map((v,i)=>(
+                        // выводить только выбранный вариант(selectedVariant==i), либо все варианты если ни один еще не выбран(selectedVariant==-1)
                         (selectedVariant==i || selectedVariant==-1) &&
                             <a key={"var_"+i} onDoubleClick={()=>{if(props.dblclick) selectAnswer(i)}} onClick={()=>{if(!props.dblclick) selectAnswer(i)}} id={i.toString()} className={"list-group-item questvariant "+showResult(i)}>{i+1}. {v.answer}</a>
                         )
@@ -639,7 +639,7 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
                                             <div className="panel-heading lead">
                                             ошибок <span id="resultErrors" className="label label-danger">{errors}</span> из <span id="resultCount" className="label label-default">{Options.num}</span>
                                         </div>
-                                     
+
                                         <div className="panel-body">
                                        
                                             <p id="resultText" className="lead">
@@ -649,7 +649,11 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
                                                     (<><i style={{color: "green"}} className="bi bi-check-lg"></i> Экзамен сдан</>)
                                                 }
                                             </p>
-                                     
+                                            {(endTest===true) && (
+                                                <p>
+                                                    Затрачено времени на <span style={{fontWeight: 'bold'}}>{tickets[selectedTicket].name}: {getTimeString(timer)}</span>
+                                                </p>
+                                            )}
                                         </div>
                                         </div>
                                         <div className="panel-result">
@@ -679,8 +683,8 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
                                 <div className={(start)?"list-group":"hide"}>
                                     <Variants dblclick={Options.dblclick} key={currentTicket} />
                                     <div id="commentPanel" className={(!start)?"hide":((opened.length>0)?"":"hide")}>
-                                        <button onClick={next} id="questNext" type="button" className="list-group-item active">Далее <small className="text-warning small hidden-xs"> - Enter &nbsp;&nbsp;&nbsp; 1,2,3 - выбор &nbsp;&nbsp;&nbsp; &larr; назад &nbsp; вперед &rarr;</small></button>
                                         <div id="questComment" className="">{(currentQuestion!==undefined && currentQuestion.variants.length>selectedVariant)?currentQuestion.variants[(selectedVariant==-1)?0:selectedVariant].comment:""}</div>
+                                        <button onClick={next} id="questNext" type="button" className="list-group-item active">Далее <small className="text-warning small hidden-xs"> - Enter &nbsp;&nbsp;&nbsp; 1,2,3 - выбор &nbsp;&nbsp;&nbsp; &larr; назад &nbsp; вперед &rarr;</small></button>
                                     </div>
                                 </div>
                             </div>
