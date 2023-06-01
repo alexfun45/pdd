@@ -197,7 +197,7 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
           [selectedTicket, setTicket] = useState(0),
           [currentTicket, setCurrentTicket] = useState<number>(0),
           results = useRef([]),
-          //[results, setResults] = useState([]),
+          [TicketName, setTicketName] = useState(),
           [currentQuestion, setCurrentQuestion] = useState<TicketPdd>(),
           [start, setStart] = useState(false),
           [opened, setOpened] = useState<Number[]>([]),
@@ -205,7 +205,6 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
           [ticketBg, setTicketBg] = useState("transparent"),
           [tickets, setTickets] = useState([]),
           [qpages, setqPages] = useState([]),
-          //[opened, setOpened] = useState<Array<number[]>>([]),
           [leftShift, setLeftShift] = useState(0),
           [endTest, setEndTest] = useState(false);
     
@@ -219,9 +218,10 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
             numPageItems = +((availableWidth / itemWidth).toFixed(0));
             requiredWidth = availableWidth;
         }
-        
-        if(!props.options.settings)
+        if(!props.options.settings){
+            resetTest();
             getTickets();        
+        }
     }, [props.options]);
 
     useEffect(()=>{
@@ -242,17 +242,7 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
             startTest();
         }
         firstRunning++;
-    }, [selectedTicket])
-
-    /*useEffect(()=>{
-        if(context.settings['background-color-tickets']!=""){
-            document.body.style.backgroundColor = context.settings['background-color-tickets'];
-        }
-        if(context.settings['background-image-tickets']){
-            let src = "./img/" + context.settings['background-image-tickets'];
-            document.body.style.backgroundImage = `url(${src})`;
-            }
-    }, [context.settings]);*/
+    }, [selectedTicket]);
 
     useEffect(()=>{
         if(currentQuestion){
@@ -291,11 +281,12 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
     function getTickets(){
         request({method: 'post', data: {action: "getTickets"}}).then(response => {
             const {data} = response;
-            setOptions({...Options, selectedTicket: data[0].id});
+            let opts = {...props.options};
+            opts['selectedTicket'] = data[0].id;
+            setOptions(opts);
             setTicket(data[0].id);
             setTickets(data);
-            //options.selectedTicket = data[0].id;
-            
+            setTicketName(data[0].name);
         });
     }
 
@@ -307,7 +298,7 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
     }
 
     function startTest(){
-        resetTest();
+        //resetTest();
         setStart(true);
         setEndTest(false);
         if(props.options.settings===false)
@@ -378,19 +369,6 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
         Options.selectedTicket = event.target.value;
     }
 
-    function getBtnpageClass2(i: number, res: any){
-        let classname = "btn btn-page btn-default";
-        if(currentTicket==i && results.current[i]!=1 && results.current[i]!=0)
-            classname += " current-button";
-        else if(currentTicket==i)
-            classname += " current-finished-button";
-        if(results.current[i]==1)
-            classname += " btn-danger";
-        else if(results.current[i]==0)   
-             classname+= " btn-success";
-        return classname;        
-    }
-
     function goToPage(ticketIndx: any){
         if(ticketIndx<pdd_questions.length && ticketIndx<question_answered){
             if(selected[ticketIndx])
@@ -413,8 +391,9 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
     }
 
     const resetTest = () => {
-        if(props.options.settings===false)
+        if(props.options.settings===false){
             setOptions({...props.options});
+        }
         errors_array = [];
         setOpened([]);
         setCurrentTicket(0);
@@ -467,6 +446,7 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
     }
 
     const Variants = (props:{dblclick: boolean}) => {
+       
         return (
             <div id="qlist">
                 { (currentQuestion!=undefined) && (
@@ -486,7 +466,7 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
             <div style={{marginTop: 0}} className={(props.options.settings===false)?"row testrow":"hide"}>
                 <div className="exam-title">
                     <label>{context.settings.exam_title}</label>
-                    <FormControl className="form-ticket" sx={{m: 1, minWidth: 120, marginTop: '5px', verticalAlign: 'middle'}}>
+                    <FormControl key={selectedTicket} className="form-ticket" sx={{m: 1, minWidth: 120, marginTop: '5px', verticalAlign: 'middle'}}>
                         <Select
                             disabled={start?true:false}
                             labelId="demo-simple-select-helper-label"
@@ -650,7 +630,7 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
                                             </p>
                                             {(endTest===true) && (
                                                 <p>
-                                                    Затрачено времени на <span style={{fontWeight: 'bold'}}>{(selectedTicket)?tickets[selectedTicket].name:"экзамен"}: {getTimeString(timer)}</span>
+                                                    Затрачено времени на <span style={{fontWeight: 'bold'}}>{(selectedTicket)?TicketName:"экзамен"}: {getTimeString(timer)}</span>
                                                 </p>
                                             )}
                                         </div>
