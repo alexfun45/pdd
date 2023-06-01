@@ -67,15 +67,15 @@ export default () => {
         if(location.pathname=="/pdd-online" || location.pathname=="/pdd_for_school"){
           if(context.settings['background-color-tickets'])
             document.body.style.backgroundColor = context.settings['background-color-tickets'];
-          if(context.settings['background-image-tickets']){
-            let src = "./img/" + context.settings['background-image-tickets'];
+          if(context.settings['background-image-tickets-mobile']){
+            let src = "./img/" + context.settings['background-image-tickets-mobile'];
             document.body.style.backgroundImage = `url(${src})`;
           }
         }
         else{
           if(context.settings['background-color'])
             document.body.style.backgroundColor = context.settings['background-color'];
-          if(context.settings['background-image-tickets']){
+          if(context.settings['background-image']){
             let src = "./img/" + context.settings['background-image'];
             document.body.style.backgroundImage = `url(${src})`;
           }

@@ -466,11 +466,11 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
             <div style={{marginTop: 0}} className={(props.options.settings===false)?"row testrow":"hide"}>
                 <div className="exam-title">
                     <label>{context.settings.exam_title}</label>
-                    <FormControl key={selectedTicket} className="form-ticket" sx={{m: 1, minWidth: 120, marginTop: '5px', verticalAlign: 'middle'}}>
+                    <FormControl key={selectedTicket} className="form-ticket" sx={{m: 1, minWidth: 120, marginTop: '5px', verticalAlign: 'middle', '& > .MuiPaper-root':{top: '60px', maxHeight: 'calc(100% - 62px)'}}}>
                         <Select
                             disabled={start?true:false}
                             labelId="demo-simple-select-helper-label"
-                            sx={{"& .MuiSelect-select": {padding: "5px 14px"}}}
+                            sx={{"& .MuiSelect-select": {padding: "5px 14px", top: '30px'}}}
                             id="demo-simple-select-helper"
                             value={Options.selectedTicket}
                             onChange={handleChangeTicket}>
@@ -572,9 +572,9 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
             </form>
             </div>
         </div>
-            { (props.options.settings && !start && context.settings["image_title_exam"]!='' && !context.isMobile && !endTest && currentQuestion===undefined) && (
+            { (props.options.settings && !start && !endTest && currentQuestion===undefined && ( (context.isMobile && context.settings["image_title_exam_mobile"]!="") || (!context.isMobile && context.settings["image_title_exam"]) )) && (
                 <div className="titleImage">
-                    <img width='auto' height='auto' src={'./img/'+context.settings["image_title_exam"]}/>
+                    <img width='auto' height='auto' src={'./img/'+((context.isMobile)?context.settings["image_title_exam_mobile"]:context.settings["image_title_exam"])}/>
                 </div>
             )
             }

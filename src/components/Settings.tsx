@@ -17,6 +17,8 @@ export default ({allPages = []} : any) => {
             'background-image': '',
             'background-color-tickets': '#FFF',
             'background-image-tickets': '',
+            'background-image-tickets-mobile': '',
+            'image_title_exam_mobile': '',
             'showLogo': '1',
             'start_page': {id: 1, name: 'OOO', title: 'Общие правила'},
             'exam_title': ''
@@ -155,7 +157,7 @@ export default ({allPages = []} : any) => {
             formData.append('file', file);
         }
 
-        const uploadImage2 =(e: React.ChangeEvent<HTMLInputElement>) => {
+        const uploadImage2 = (e: React.ChangeEvent<HTMLInputElement>) => {
           let file = (e.target.files) ? e.target.files[0]:'';
           var reader = new FileReader();
           if(e.target.files!=null)
@@ -173,18 +175,44 @@ export default ({allPages = []} : any) => {
         formData.append('file_titleimg', file);
     } 
 
+    const uploadImageTitleExamMobile = (e: React.ChangeEvent<HTMLInputElement>) => {
+      let file = (e.target.files) ? e.target.files[0]:'';
+      var reader = new FileReader();
+      if(e.target.files!=null)
+        reader.readAsDataURL(e.target.files[0]);
+      formData.delete('file_titleimg_mobile');
+      formData.append('file_titleimg_mobile', file);
+  } 
 
-      const removeBgImage = () => {
+    const uploadImageMobile = (e: React.ChangeEvent<HTMLInputElement>) => {
+      let file = (e.target.files) ? e.target.files[0]:'';
+      var reader = new FileReader();
+      if(e.target.files!=null)
+        reader.readAsDataURL(e.target.files[0]);
+      formData.delete('file_tickets_mobile');
+      formData.append('file_tickets_mobile', file);
+    }
+
+    const removeBgImageMobile = () => {
+      request({method: "post", data: {action: "removeBgImageMobile"}});
+      document.body.style.backgroundImage = "";
+    }
+
+    const removeBgImage = () => {
           request({method: "post", data: {action: "removeBgImage"}});
           document.body.style.backgroundImage = "";
         }
 
-      const removeBgImage2  = () => {
+    const removeBgImage2  = () => {
           request({method: "post", data: {action: "removeBgTicketsImage"}});
         }
 
       const removeImageTitleExam = () => {
         request({method: "post", data: {action: "removeImageTitleExam"}});
+      }
+
+      const removeImageTitleExamMobile = () => {
+        request({method: "post", data: {action: "removeImageTitleExamMobile"}});
       }
 
         const saveSettings = () => {
@@ -250,17 +278,31 @@ export default ({allPages = []} : any) => {
                 </td>
             </tr>
             <tr>
-              <td>Фоновое изображение раздела Билеты</td>
+              <td>Фоновое изображение раздела Билеты(desktop)</td>
               <td>
                 <input name="bgimg_tickets" onChange={uploadImage2} accept="image/png, image/gif, image/jpeg" type='file' />
                 <Button onClick={removeBgImage2} variant="warning">Удалить</Button>
               </td>
             </tr>
             <tr>
-              <td>Начальное изображение раздела Внутреннего экзамена</td>
+              <td>Начальное изображение раздела Внутреннего экзамена(desktop)</td>
               <td>
                 <input name="bgimg_tickets" onChange={uploadImageTitleExam} accept="image/png, image/gif, image/jpeg" type='file' />
                 <Button onClick={removeImageTitleExam} variant="warning">Удалить</Button>
+              </td>
+            </tr>
+            <tr>
+              <td>Фоновое изображение раздела Билеты(mobile)</td>
+              <td>
+                <input name="bgimg_tickets" onChange={uploadImageMobile} accept="image/png, image/gif, image/jpeg" type='file' />
+                <Button onClick={removeBgImageMobile} variant="warning">Удалить</Button>
+              </td>
+            </tr>
+            <tr>
+              <td>Начальное изображение раздела Внутреннего экзамена(mobile)</td>
+              <td>
+                <input name="bgimg_tickets" onChange={uploadImageTitleExamMobile} accept="image/png, image/gif, image/jpeg" type='file' />
+                <Button onClick={removeImageTitleExamMobile} variant="warning">Удалить</Button>
               </td>
             </tr>
             <tr>

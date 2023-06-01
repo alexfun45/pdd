@@ -23,7 +23,17 @@ const AppContext = createContext({
   userRole: 3,
   logged: false,
   isMobile: false,
-  settings: {start_page:{name:""}, exam_title: "",'background-color':'', 'background-image':'', 'background-color-tickets': '', 'background-image-tickets': '', 'image_title_exam': ''},
+  settings: {
+    start_page:{name:""},
+    exam_title: "",
+    'background-color':'',
+    'background-image':'',
+    'background-color-tickets': '',
+    'background-image-tickets': '',
+    'image_title_exam': '',
+    'background-image-tickets-mobile': '',
+    'image_title_exam_mobile': ''
+  },
   pageTitle: "",
   setPageTitle: null
 });
@@ -44,7 +54,7 @@ export default function App(){
         [pageTitle, setPageTitle] = useState(""),
         [user, setUser] = useState<userType>(defaultUser),
         [role, setRole] = useState(3),
-        [settings, setSettings] = useState({showLogo: '1', start_page: {name: ""}, exam_title: "", 'background-color':'', 'background-image':'', 'background-color-tickets': '', 'background-image-tickets':'', 'image_title_exam':''}),
+        [settings, setSettings] = useState({showLogo: '1', start_page: {name: ""}, exam_title: "", 'background-color':'', 'background-image':'', 'background-color-tickets': '', 'background-image-tickets':'', 'image_title_exam':'', 'background-image-tickets-mobile':'', 'image_title_exam_mobile': ''}),
         [displayWidth, setDisplayWidth] = useState(window.innerWidth);
   
   const getRoutes = (allRoutes: Array<{route:string, key: string, component: object, auth?: boolean}>) =>
