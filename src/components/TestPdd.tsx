@@ -82,9 +82,9 @@ const BtnQuestion = (props: any)  => {
 
     function getBtnpageClass(i: number){
         let classname = "btn btn-page btn-default";
-        if(props.currentTicket==i && props.results[i]!=1 && props.results[i]!=0)
+        if(props.currentQuestionIndex==i && props.results[i]!=1 && props.results[i]!=0)
             classname += " current-button";
-        else if(props.currentTicket==i)
+        else if(props.currentQuestionIndex==i)
             classname += " current-finished-button";
         if(props.results[i]==1)
             classname += " btn-danger";
@@ -185,19 +185,19 @@ let numPageItems = 10,
     itemWidth = 45,
     errors_array:ErrorType[] = [],
     requiredWidth = 0,
-    variantBackgroundColor = "transparent";
+    variantBackgroundColor = "transparent",
+    currentQuestionIndex = 0;
 
 const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
 
-    const [time, setTime] = useState("0:00"),
-          [selectedVariant, setSelectedVar] = useState(-1),
+    const [selectedVariant, setSelectedVar] = useState(-1),
           [startTime, setStartTime] = useState(0),
           [iterator, setIterator] = useState(1),
           [Options, setOptions] = useState({...props.options}),
           [selectedTicket, setTicket] = useState(0),
-          [currentTicket, setCurrentTicket] = useState<number>(0),
+          //[currentTicket, setCurrentTicket] = useState<number>(0),
           results = useRef([]),
-          [TicketName, setTicketName] = useState(),
+          [TicketName, setTicketName] = useState(""),
           [currentQuestion, setCurrentQuestion] = useState<TicketPdd>(),
           [start, setStart] = useState(false),
           [opened, setOpened] = useState<Number[]>([]),
@@ -239,9 +239,9 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
 
     useEffect(()=>{
         if(selectedTicket!=0 && (props.options.settings==false)){
+            resetTest();
             startTest();
         }
-        firstRunning++;
     }, [selectedTicket]);
 
     useEffect(()=>{
@@ -249,20 +249,22 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
             $(document).on('keydown', function(event: any){
                 let e = event.originalEvent;
                
-                if(e.which==13 && !Options.settings && (currentTicket==(question_answered-1))){
+                if(e.which==13 && !Options.settings && (currentQuestionIndex==(question_answered-1))){
                     next();
                 }
-                let selectedAnswer = parseInt(e.key); 
-                if(currentQuestion && selectedAnswer<=(currentQuestion.variants.length) && e.key>0){
+                
+                let selectedAnswer = parseInt(e.key);
+                if(currentQuestion && selectedAnswer<=(currentQuestion.variants.length) && e.key>0 && question_answered==currentQuestionIndex){
                     selectAnswer(selectedAnswer-1);  
                 }
+              
                 if(e.keyCode==37){
-                    if((currentTicket-1)>0)
-                        goToPage(currentTicket-1);
+                    if((currentQuestionIndex-1)>0)
+                        goToPage(currentQuestionIndex-1);
                 }
                 if(e.keyCode==39){
-                    if((currentTicket+1)<qNum && ((currentTicket+1)<=question_answered))
-                        goToPage(currentTicket+1);
+                    if((currentQuestionIndex+1)<qNum && ((currentQuestionIndex+1)<=question_answered))
+                        goToPage(currentQuestionIndex+1);
                 }
             });
         }
@@ -291,14 +293,14 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
     }
 
     function setQuestion(){
-        if(pdd_questions.length>0 && pdd_questions.length-1>=currentTicket){
+        if(pdd_questions.length>0 && pdd_questions.length-1>=currentQuestionIndex){
+            setCurrentQuestion(pdd_questions[currentQuestionIndex]);
             setqNum(Math.min(Options.num, pdd_questions.length));
-            setCurrentQuestion(pdd_questions[currentTicket]);
+            //setCurrentQuestion(pdd_questions[question_answered]);
         }
     }
 
     function startTest(){
-        //resetTest();
         setStart(true);
         setEndTest(false);
         if(props.options.settings===false)
@@ -322,38 +324,41 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
     }
 
     function selectAnswer(selectedVar: any){
-        if(Options.settings && currentTicket<question_answered) return;
-        let _opened = [...opened];
-        _opened.push(selectedVar);
+        if(Options.settings && currentQuestionIndex<question_answered) return;
+        //let _opened = [...opened];
+        //_opened.push(selectedVar);
         setSelectedVar(selectedVar);
         selectedAnswer = selectedVar
         // save selected answer
-        selected[currentTicket] = [..._opened];
+        //selected[currentQuestionIndex] = [..._opened];
+        selected[currentQuestionIndex] = selectedVar;
         // current opened answers
-        setOpened(_opened);
-       if(results.current[currentTicket]==1 || results.current[currentTicket]==0) return;
-       if(selectedVar != parseInt(pdd_questions[currentTicket].success)){
+        //setOpened(_opened);
+       if(results.current[currentQuestionIndex]==1 || results.current[currentQuestionIndex]==0) return;
+       if(selectedVar != parseInt(pdd_questions[currentQuestionIndex].success)){
             errors++;
-            errors_array.push({ticket: currentTicket.toString(), title: pdd_questions[currentTicket].title, comment: currentQuestion.variants[selectedVar].comment});
-            results.current[currentTicket] = 1;
+            console.log("errors", errors);
+            errors_array.push({ticket: currentQuestionIndex.toString(), title: pdd_questions[currentQuestionIndex].title, comment: currentQuestion.variants[selectedVar].comment});
+            results.current[currentQuestionIndex] = 1;
        }
        else{
-            results.current[currentTicket] = 0;
+            results.current[currentQuestionIndex] = 0;
         }
-            
-
         question_answered++;
-        if(Options.settings && currentTicket==question_answered-1)
+        if(Options.settings && currentQuestionIndex==question_answered-1)
             next();
     }
 
+    // если выбран хотя бы один вариант ответа(selectedVariant!=-1), то вернуть класс, соответствующий тому верен ли ответ
     function showResult(indx: number){
-        return (opened.indexOf(indx) != -1) ? ( (parseInt(pdd_questions[currentTicket].success)==indx) ? "success":"warning" ) : "";
+        return (selectedVariant!=-1)? ((parseInt(pdd_questions[currentQuestionIndex].success)==indx) ? "success":"warning"):"";
+        //return (opened.indexOf(indx) != -1) ? ( (parseInt(pdd_questions[currentQuestionIndex].success)==indx) ? "success":"warning" ) : "";
     }
 
     function next(){
         setSelectedVar(-1);
         if(question_answered<pdd_questions.length && question_answered<=Options.num){
+            currentQuestionIndex++;
             goToPage(question_answered);
             if(question_answered%10==0 && question_answered!=0)
                 toNextPage();
@@ -371,22 +376,17 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
 
     function goToPage(ticketIndx: any){
         if(ticketIndx<pdd_questions.length && ticketIndx<question_answered){
-            if(selected[ticketIndx])
-                setOpened(selected[ticketIndx]);
-            else
-                setOpened([]);
-            setCurrentTicket(ticketIndx);
-            
+            setSelectedVar(selected[ticketIndx]);
         }
-        else if(ticketIndx==question_answered){
+        else if(ticketIndx==question_answered)
             setOpened([]);
-            setCurrentTicket(ticketIndx);
-        }
+
+        currentQuestionIndex = ticketIndx;
+        
     }
 
     // handle change test options
     const handleChangeOption = (event: any, optionName: any) => {
-        //let value = (optionName=="dblclick" || optionName=="random") ? (event.target.value=="on"):event.target.value;
         setOptions({...Options, [optionName]: event.target.value});
     }
 
@@ -396,27 +396,28 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
         }
         errors_array = [];
         setOpened([]);
-        setCurrentTicket(0);
+        question_answered = 0;
+        setqPages([]);
+        currentQuestionIndex = 0;
         setCurrentQuestion(undefined);
         setTicket(0);
-        setqPages([]);
         selected = [];
         clearInterval(Timer);
-        setTime("0:00");
+        //setTime("0:00");
         Timer = 0;
         setqNum(0);
         results.current = [];
         errors = 0;
-        question_answered = 0
         timer = 0;
+        toStartPage();
         setStart(false);
         setEndTest(false);
     }
 
     useEffect(()=>{
         setQuestion();
-    }, [currentTicket]);
-    
+    }, [currentQuestionIndex]);
+
     useEffect(()=>{
         resetTest();
         if(props.options.settings===true){
@@ -430,6 +431,10 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
             setOptions({...props.options});
         }
     }, [props.options.settings]);
+
+    const toStartPage = () => {
+        setLeftShift(0);
+    }
 
     const toNextPage = () => {
         if((qNum-(numPageItems*(page+1)))>0){
@@ -584,7 +589,7 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
                     <div className="button-slider">
                         <div key={selectedTicket} id="buttonPanel" style={{left: leftShift+"px"}} className={(!start && props.options.settings)?"hide":"btn-group btn-group-xs"}>
                             {
-                                <BtnQuestion key={selectedTicket} results={results.current} qpages={qpages} goToPage={goToPage} currentTicket={currentTicket}/>
+                                <BtnQuestion key={selectedTicket} results={results.current} qpages={qpages} goToPage={goToPage} currentQuestionIndex={currentQuestionIndex}/>
                             }
                             
                         </div>
@@ -630,7 +635,7 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
                                             </p>
                                             {(endTest===true) && (
                                                 <p>
-                                                    Затрачено времени на <span style={{fontWeight: 'bold'}}>{(selectedTicket)?TicketName:"экзамен"}: {getTimeString(timer)}</span>
+                                                    Затрачено времени на <span style={{fontWeight: 'bold'}}>{(TicketName!="")?TicketName:"экзамен"}: {getTimeString(timer)}</span>
                                                 </p>
                                             )}
                                         </div>
@@ -660,8 +665,8 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
                                         />
                                 <div id="questText" className={(start)?"questtext":"hide"}>{(currentQuestion!==undefined)?currentQuestion.title:""}</div>
                                 <div className={(start)?"list-group":"hide"}>
-                                    <Variants dblclick={Options.dblclick} key={currentTicket} />
-                                    <div id="commentPanel" className={(!start)?"hide":((opened.length>0)?"":"hide")}>
+                                    <Variants dblclick={Options.dblclick} key={currentQuestionIndex} />
+                                    <div id="commentPanel" className={(!start)?"hide":((selectedVariant!=-1)?"":"hide")}>
                                         <div id="questComment" className="">{(currentQuestion!==undefined && currentQuestion.variants.length>selectedVariant)?currentQuestion.variants[(selectedVariant==-1)?0:selectedVariant].comment:""}</div>
                                         <button onClick={next} id="questNext" type="button" className="list-group-item active">Далее <small className="text-warning small hidden-xs"> - Enter &nbsp;&nbsp;&nbsp; 1,2,3 - выбор &nbsp;&nbsp;&nbsp; &larr; назад &nbsp; вперед &rarr;</small></button>
                                     </div>
