@@ -185,8 +185,8 @@ let numPageItems = 10,
     itemWidth = 45,
     errors_array:ErrorType[] = [],
     requiredWidth = 0,
-    variantBackgroundColor = "transparent",
-    currentQuestionIndex = 0;
+    variantBackgroundColor = "transparent";
+    //currentQuestionIndex = 0;
 
 const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
 
@@ -195,7 +195,7 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
           [iterator, setIterator] = useState(1),
           [Options, setOptions] = useState({...props.options}),
           [selectedTicket, setTicket] = useState(0),
-          //[currentTicket, setCurrentTicket] = useState<number>(0),
+          [currentQuestionIndex, setCurrentTicket] = useState<number>(0),
           results = useRef([]),
           [TicketName, setTicketName] = useState(""),
           [currentQuestion, setCurrentQuestion] = useState<TicketPdd>(),
@@ -244,34 +244,28 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
         }
     }, [selectedTicket]);
 
-    useEffect(()=>{
+    /*useEffect(()=>{
         if(currentQuestion){
             $(document).on('keydown', function(event: any){
                 let e = event.originalEvent;
-               
+                //if(e.which==13){
+                    //console.log("currentQuestionIndex", currentQuestionIndex);
+                    //console.log("question_answered", question_answered);
+                //}
                 if(e.which==13 && !Options.settings && (currentQuestionIndex==(question_answered-1))){
                     next();
+                    return;
                 }
-                
                 let selectedAnswer = parseInt(e.key);
                 if(currentQuestion && selectedAnswer<=(currentQuestion.variants.length) && e.key>0 && question_answered==currentQuestionIndex){
                     selectAnswer(selectedAnswer-1);  
-                }
-              
-                if(e.keyCode==37){
-                    if((currentQuestionIndex-1)>0)
-                        goToPage(currentQuestionIndex-1);
-                }
-                if(e.keyCode==39){
-                    if((currentQuestionIndex+1)<qNum && ((currentQuestionIndex+1)<=question_answered))
-                        goToPage(currentQuestionIndex+1);
                 }
             });
         }
         return ()=>{
             $(document).off('keydown'); 
         }
-    }, [currentQuestion]);
+    }, [currentQuestion]);*/
 
     const {register, handleSubmit, setError, watch, setValue, formState: {errors: errors2} } = useForm<InputSettings>({mode: 'onBlur'});
 
@@ -337,7 +331,6 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
        if(results.current[currentQuestionIndex]==1 || results.current[currentQuestionIndex]==0) return;
        if(selectedVar != parseInt(pdd_questions[currentQuestionIndex].success)){
             errors++;
-            console.log("errors", errors);
             errors_array.push({ticket: currentQuestionIndex.toString(), title: pdd_questions[currentQuestionIndex].title, comment: currentQuestion.variants[selectedVar].comment});
             results.current[currentQuestionIndex] = 1;
        }
@@ -357,9 +350,11 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
 
     function next(){
         setSelectedVar(-1);
+        //console.log("question_answered", question_answered);
         if(question_answered<pdd_questions.length && question_answered<=Options.num){
-            currentQuestionIndex++;
-            goToPage(question_answered);
+            setCurrentTicket(currentQuestionIndex+1);
+            //goToPage(question_answered);
+            // свдинуть окно списка вопросов на 10 вправо, если достигли предела отображения
             if(question_answered%10==0 && question_answered!=0)
                 toNextPage();
         }
@@ -376,13 +371,13 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
 
     function goToPage(ticketIndx: any){
         if(ticketIndx<pdd_questions.length && ticketIndx<question_answered){
+            setCurrentTicket(ticketIndx);            
             setSelectedVar(selected[ticketIndx]);
         }
-        else if(ticketIndx==question_answered)
-            setOpened([]);
-
-        currentQuestionIndex = ticketIndx;
-        
+        else if(ticketIndx==question_answered){
+            setCurrentTicket(ticketIndx);
+            setSelectedVar(-1);
+        }
     }
 
     // handle change test options
@@ -398,12 +393,11 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
         setOpened([]);
         question_answered = 0;
         setqPages([]);
-        currentQuestionIndex = 0;
+        setCurrentTicket(0);
         setCurrentQuestion(undefined);
         setTicket(0);
         selected = [];
         clearInterval(Timer);
-        //setTime("0:00");
         Timer = 0;
         setqNum(0);
         results.current = [];
@@ -668,7 +662,7 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
                                     <Variants dblclick={Options.dblclick} key={currentQuestionIndex} />
                                     <div id="commentPanel" className={(!start)?"hide":((selectedVariant!=-1)?"":"hide")}>
                                         <div id="questComment" className="">{(currentQuestion!==undefined && currentQuestion.variants.length>selectedVariant)?currentQuestion.variants[(selectedVariant==-1)?0:selectedVariant].comment:""}</div>
-                                        <button onClick={next} id="questNext" type="button" className="list-group-item active">Далее <small className="text-warning small hidden-xs"> - Enter &nbsp;&nbsp;&nbsp; 1,2,3 - выбор &nbsp;&nbsp;&nbsp; &larr; назад &nbsp; вперед &rarr;</small></button>
+                                        <button onClick={next} id="questNext" type="button" className="list-group-item active">Далее</button>
                                     </div>
                                 </div>
                             </div>
