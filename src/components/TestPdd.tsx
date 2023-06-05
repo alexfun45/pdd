@@ -185,8 +185,8 @@ let numPageItems = 10,
     itemWidth = 45,
     errors_array:ErrorType[] = [],
     requiredWidth = 0,
-    variantBackgroundColor = "transparent";
-    //currentQuestionIndex = 0;
+    variantBackgroundColor = "transparent",
+    currentQuestionIndex = 0;
 
 const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
 
@@ -195,7 +195,7 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
           [iterator, setIterator] = useState(1),
           [Options, setOptions] = useState({...props.options}),
           [selectedTicket, setTicket] = useState(0),
-          [currentQuestionIndex, setCurrentTicket] = useState<number>(0),
+          //[currentQuestionIndex, setCurrentTicket] = useState<number>(0),
           results = useRef([]),
           [TicketName, setTicketName] = useState(""),
           [currentQuestion, setCurrentQuestion] = useState<TicketPdd>(),
@@ -211,18 +211,30 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
     const context = React.useContext(AppContext);
    
     useEffect(()=>{
-        setOptions({...props.options});
         availableWidth = $(".testrow").width()*0.7;
         requiredWidth = numPageItems * itemWidth;
+        if(props.options.settings===true){
+            setStartTime(20*60);
+            setIterator(-1);
+            setOptions({...props.options});
+        }
+        else{
+            setStartTime(0);
+            setIterator(1);
+            setOptions({...props.options});
+        }
+        resetTest();
         if(availableWidth < requiredWidth){
             numPageItems = +((availableWidth / itemWidth).toFixed(0));
             requiredWidth = availableWidth;
         }
         if(!props.options.settings){
-            resetTest();
-            getTickets();        
+            getTickets((ticketId: number)=>{
+                //console.log("ticketId", ticketId);
+                //setTicket(ticketId);
+            });    
         }
-    }, [props.options]);
+    }, [props.options.settings]);
 
     useEffect(()=>{
         variantBackgroundColor = context.settings['background-color'];
@@ -244,14 +256,11 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
         }
     }, [selectedTicket]);
 
-    /*useEffect(()=>{
+    useEffect(()=>{
         if(currentQuestion){
+            console.log("set keydown event");
             $(document).on('keydown', function(event: any){
                 let e = event.originalEvent;
-                //if(e.which==13){
-                    //console.log("currentQuestionIndex", currentQuestionIndex);
-                    //console.log("question_answered", question_answered);
-                //}
                 if(e.which==13 && !Options.settings && (currentQuestionIndex==(question_answered-1))){
                     next();
                     return;
@@ -263,26 +272,29 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
             });
         }
         return ()=>{
-            $(document).off('keydown'); 
+            $(document).off('keydown');
         }
-    }, [currentQuestion]);*/
+    }, [currentQuestion]);
 
     const {register, handleSubmit, setError, watch, setValue, formState: {errors: errors2} } = useForm<InputSettings>({mode: 'onBlur'});
 
     const onSubmit = (data: InputSettings) => {
         handleStartTest();
     };
-
+    let obj = this;
     // getting tickets with questions
-    function getTickets(){
+    function getTickets(callback: Function){
         request({method: 'post', data: {action: "getTickets"}}).then(response => {
             const {data} = response;
             let opts = {...props.options};
             opts['selectedTicket'] = data[0].id;
             setOptions(opts);
-            setTicket(data[0].id);
             setTickets(data);
             setTicketName(data[0].name);
+            setTicket(data[0].id);
+            //if(callback){
+                //callback.call(obj, data[0].id)
+            //}
         });
     }
 
@@ -297,8 +309,9 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
     function startTest(){
         setStart(true);
         setEndTest(false);
-        if(props.options.settings===false)
+        if(props.options.settings===false){
 		    getQuestions({...Options, selectedTicket:selectedTicket, settings: false}, setQuestion);
+        }
         else
             getQuestions(Options, setQuestion);
     }
@@ -350,9 +363,10 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
 
     function next(){
         setSelectedVar(-1);
-        //console.log("question_answered", question_answered);
         if(question_answered<pdd_questions.length && question_answered<=Options.num){
-            setCurrentTicket(currentQuestionIndex+1);
+            //setCurrentTicket(currentQuestionIndex+1);
+            currentQuestionIndex = currentQuestionIndex + 1;
+            setQuestion();
             //goToPage(question_answered);
             // свдинуть окно списка вопросов на 10 вправо, если достигли предела отображения
             if(question_answered%10==0 && question_answered!=0)
@@ -371,12 +385,14 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
 
     function goToPage(ticketIndx: any){
         if(ticketIndx<pdd_questions.length && ticketIndx<question_answered){
-            setCurrentTicket(ticketIndx);            
-            setSelectedVar(selected[ticketIndx]);
+            currentQuestionIndex = ticketIndx;         
+            setSelectedVar(selected[ticketIndx]); 
+            setQuestion(); 
         }
         else if(ticketIndx==question_answered){
-            setCurrentTicket(ticketIndx);
+            currentQuestionIndex = ticketIndx;
             setSelectedVar(-1);
+            setQuestion();
         }
     }
 
@@ -389,13 +405,14 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
         if(props.options.settings===false){
             setOptions({...props.options});
         }
+        else
+            setTicket(0);
         errors_array = [];
         setOpened([]);
         question_answered = 0;
         setqPages([]);
-        setCurrentTicket(0);
+        currentQuestionIndex = 0;
         setCurrentQuestion(undefined);
-        setTicket(0);
         selected = [];
         clearInterval(Timer);
         Timer = 0;
@@ -408,23 +425,10 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
         setEndTest(false);
     }
 
-    useEffect(()=>{
-        setQuestion();
-    }, [currentQuestionIndex]);
-
-    useEffect(()=>{
-        resetTest();
-        if(props.options.settings===true){
-            setStartTime(20*60);
-            setIterator(-1);
-            setOptions({...props.options});
-        }
-        else{
-            setStartTime(0);
-            setIterator(1);
-            setOptions({...props.options});
-        }
-    }, [props.options.settings]);
+   
+    //useEffect(()=>{
+    //    setQuestion();
+    //}, [currentQuestionIndex]);
 
     const toStartPage = () => {
         setLeftShift(0);
@@ -471,7 +475,7 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
                             labelId="demo-simple-select-helper-label"
                             sx={{"& .MuiSelect-select": {padding: "5px 14px", top: '30px'}}}
                             id="demo-simple-select-helper"
-                            value={Options.selectedTicket}
+                            value={selectedTicket.toString()}
                             onChange={handleChangeTicket}>
                                 {
                                     tickets.map((v, i)=>(
@@ -591,7 +595,7 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
                     </div>
                     <i onClick={toNextPage} className={start?"bi bi-caret-right arrow-btn arrow-right-btn":"hide"}></i>
                 </div>
-                { (!context.isMobile && (currentQuestion!==undefined) && !endTest) && (
+                { (!context.isMobile && currentQuestion!==undefined && !endTest) && (
                                 <>
                                     <Watch start={start} setEndTest={setEndTest} endTest={endTest} pause={testPause} _continue={continueTest} iterator={iterator} startTime={startTime} btnView="icon"/>  
                                     <input onClick={startTest} id="buttonSchoolSetName" type="submit" className={(start || props.options.settings===true || context.isMobile)?"hide":"btn btn-start"} value="Начать" />
