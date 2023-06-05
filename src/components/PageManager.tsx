@@ -1,4 +1,4 @@
-import {useState, useEffect} from "react";
+import {useState, useEffect, ChangeEventHandler} from "react";
 import request from '../utils/request'
 import {ListGroup, Button} from 'react-bootstrap';
 import Form from 'react-bootstrap/Form';
@@ -44,6 +44,7 @@ export default function PageManager({setpageTabtype, setKey, setEditPageName, __
           [menuName, setMenuName] = useState(""),
           [menuTitle, setMenuTitle] = useState(""),
           [search, setSearchValue] = useState<string>(""),
+          [showOpenedPages, setShowOpenedPages] = useState(false),
           [filtered, setFiltered] = useState<PageType[] | []>([]);
 
     const selectItem = (menu_id: number) => {
@@ -306,6 +307,10 @@ export default function PageManager({setpageTabtype, setKey, setEditPageName, __
         setAllPages(allPages);
     }
 
+    const handleCheckOpenPages = (e: any) => {
+        setShowOpenedPages((e.target)?e.target.checked:false);
+    }
+
     return (
         <div className="block-wrapper">
             <DeleteDialog show={showRemovePageDialog} setShow={setRemovePageDialog} title="Вы действительно хотите произвести удаление?" removeMethod={removeMethod}/>
@@ -336,7 +341,15 @@ export default function PageManager({setpageTabtype, setKey, setEditPageName, __
                     <i onClick={addPageToMenu} className={"bi bi-arrow-left "+((selectedPage!==undefined || selectedMenuId!==undefined)?"":"hide")}></i>    
                 </div>
                 <div className="col-30">
-                    <div className="col-title">Все страницы <Button onClick={createPage} variant="outline-success">+ Создать</Button></div>
+                    <div className="col-title">Все страницы <Button onClick={createPage} variant="outline-success">+ Создать</Button> 
+                        <Form.Check
+                            checked={showOpenedPages}
+                            onChange={handleCheckOpenPages}
+                            type='checkbox'
+                            label={`отображать только открытые страницы`}
+                            id='check-opened-pages'
+                        />
+                    </div>
                     <Autocomplete
                         style={{width: '100%'}}
                         value={search}
@@ -357,7 +370,7 @@ export default function PageManager({setpageTabtype, setKey, setEditPageName, __
                         {
                             (filtered.length==0 ? 
                                 allPages.map((v:PageType, i: number)=>(
-                                    <ListGroup.Item onDoubleClick={()=>handleRenameEventPage(v.id)} action onClick={(e)=>selectPage(v)} eventKey={v.name}><span className={pageItemRename==v.id?"":"hide"}><TextField defaultValue={v.title} onKeyDown={(e)=>handleKeyDown(i, e)} onChange={handleChangePageName} style={{width: '80%'}} label="" /></span><span className={pageItemRename==v.id?"hide":""}>{v.title}</span><div className="right-panel"><span className={pageItemRename==v.id?"hide":""}><i onClick={()=>lockPage(v)} className={(v.private==0)?"bi bi-unlock-fill":"bi bi-lock-fill"}></i><i onClick={()=>handleEditPage(v)} className="bi bi-pencil-fill"></i><i onClick={()=>handleRemovePage(v)} className="bi bi-trash3-fill"></i></span><span><Button onClick={()=>cancelEdit()} className={pageItemRename==v.id?"":"hide"} style={{fontSize:"11px", marginTop: '7px'}} variant="danger">отмена</Button></span></div></ListGroup.Item> 
+                                    <ListGroup.Item className={(v.private==1 && showOpenedPages===true)?"hide":""} onDoubleClick={()=>handleRenameEventPage(v.id)} action onClick={(e)=>selectPage(v)} eventKey={v.name}><span className={pageItemRename==v.id?"":"hide"}><TextField defaultValue={v.title} onKeyDown={(e)=>handleKeyDown(i, e)} onChange={handleChangePageName} style={{width: '80%'}} label="" /></span><span className={pageItemRename==v.id?"hide":""}>{v.title}</span><div className="right-panel"><span className={pageItemRename==v.id?"hide":""}><i onClick={()=>lockPage(v)} className={(v.private==0)?"bi bi-unlock-fill":"bi bi-lock-fill"}></i><i onClick={()=>handleEditPage(v)} className="bi bi-pencil-fill"></i><i onClick={()=>handleRemovePage(v)} className="bi bi-trash3-fill"></i></span><span><Button onClick={()=>cancelEdit()} className={pageItemRename==v.id?"":"hide"} style={{fontSize:"11px", marginTop: '7px'}} variant="danger">отмена</Button></span></div></ListGroup.Item> 
                                 )) 
                             :
                                 (
