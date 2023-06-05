@@ -54,28 +54,7 @@ var  pdd_questions: TicketPdd[] = [],
      timer = 0,
      page = 0;
 
-function getQuestions(options: any, callback: Function){
-    pdd_questions = [];
-    request({method: 'post', data: {action: "getQuestions", data: {...options}}}).then(response => {
-        const {data} = response;
-        if(data!=null){
-            var questions = data;
-            for(var i=0, variants;i<questions.length;i++){
-                variants =  questions[i].variants;
-                pdd_questions[i] = {
-                    title: questions[i].title,
-                    image: "./img/"+questions[i].image,
-                    success: questions[i].correct,
-                    variants: variants,
-                    isSuccess: -1
-                };
-            }
-            if(callback)
-                callback();
-        }
-        
-    });
-}
+
 
 let settings = {};
 const BtnQuestion = (props: any)  => {
@@ -186,6 +165,7 @@ let numPageItems = 10,
     errors_array:ErrorType[] = [],
     requiredWidth = 0,
     variantBackgroundColor = "transparent",
+    qNum = 0,
     currentQuestionIndex = 0;
 
 const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
@@ -201,7 +181,7 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
           [currentQuestion, setCurrentQuestion] = useState<TicketPdd>(),
           [start, setStart] = useState(false),
           [opened, setOpened] = useState<Number[]>([]),
-          [qNum, setqNum] = useState<number>(0),
+          //[qNum, setqNum] = useState<number>(0),
           [ticketBg, setTicketBg] = useState("transparent"),
           [tickets, setTickets] = useState([]),
           [qpages, setqPages] = useState([]),
@@ -245,9 +225,9 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
         setTicketBg(`rgba(${rgb[0]},${rgb[1]},${rgb[2]},${rgb[3]})`);
     }, [context])
 
-    useEffect(()=>{
-        setqPages([...new Array(qNum).slice(0)]);
-    }, [qNum]);
+    //useEffect(()=>{
+    //    setqPages([...new Array(qNum).slice(0)]);
+    //}, [qNum]);
 
     useEffect(()=>{
         if(selectedTicket!=0 && (props.options.settings==false)){
@@ -258,7 +238,6 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
 
     useEffect(()=>{
         if(currentQuestion){
-            console.log("set keydown event");
             $(document).on('keydown', function(event: any){
                 let e = event.originalEvent;
                 if(e.which==13 && !Options.settings && (currentQuestionIndex==(question_answered-1))){
@@ -298,10 +277,36 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
         });
     }
 
+    function getQuestions(options: any, callback: Function){
+        pdd_questions = [];
+        request({method: 'post', data: {action: "getQuestions", data: {...options}}}).then(response => {
+            const {data} = response;
+            if(data!=null){
+                var questions = data;
+                for(var i=0, variants;i<questions.length;i++){
+                    variants =  questions[i].variants;
+                    pdd_questions[i] = {
+                        title: questions[i].title,
+                        image: "./img/"+questions[i].image,
+                        success: questions[i].correct,
+                        variants: variants,
+                        isSuccess: -1
+                    };
+                }
+                qNum = Math.min(Options.num, pdd_questions.length);
+                //setqNum(Math.min(Options.num, pdd_questions.length));
+                setqPages([...new Array(qNum).slice(0)]);
+                if(callback)
+                    callback();
+            }
+            
+        });
+    }
+
     function setQuestion(){
         if(pdd_questions.length>0 && pdd_questions.length-1>=currentQuestionIndex){
             setCurrentQuestion(pdd_questions[currentQuestionIndex]);
-            setqNum(Math.min(Options.num, pdd_questions.length));
+            //setqNum(Math.min(Options.num, pdd_questions.length));
             //setCurrentQuestion(pdd_questions[question_answered]);
         }
     }
@@ -368,9 +373,10 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
             currentQuestionIndex = currentQuestionIndex + 1;
             setQuestion();
             //goToPage(question_answered);
-            // свдинуть окно списка вопросов на 10 вправо, если достигли предела отображения
-            if(question_answered%10==0 && question_answered!=0)
+            // сдвинуть окно списка вопросов на 10 вправо, если достигли предела отображения
+            if(question_answered%10==0 && question_answered!=0){
                 toNextPage();
+            }
         }
         else if(question_answered>=props.options.num || question_answered>=pdd_questions.length){
             setEndTest(true);
@@ -416,7 +422,8 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
         selected = [];
         clearInterval(Timer);
         Timer = 0;
-        setqNum(0);
+        page = 0;
+        qNum = 0;
         results.current = [];
         errors = 0;
         timer = 0;
@@ -463,6 +470,13 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
             </div>
          );
 }
+
+    const getElapsedTime = (__time:number) => {
+        let elapsedTime = __time;
+        if(props.options.settings)
+            elapsedTime = (20*60 - elapsedTime);
+        return getTimeString(elapsedTime);
+    }
 
     return (
         <div className="container">
@@ -633,7 +647,7 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
                                             </p>
                                             {(endTest===true) && (
                                                 <p>
-                                                    Затрачено времени на <span style={{fontWeight: 'bold'}}>{(TicketName!="")?TicketName:"экзамен"}: {getTimeString(timer)}</span>
+                                                    Затрачено времени на <span style={{fontWeight: 'bold'}}>{(TicketName!="")?TicketName:"экзамен"}: {getElapsedTime(timer)}</span>
                                                 </p>
                                             )}
                                         </div>
