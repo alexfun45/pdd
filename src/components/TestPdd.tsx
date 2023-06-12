@@ -26,6 +26,7 @@ type InputSettings = {
 }
 
 type TicketPdd = {
+    id: number;
     title: string;
     image: string;
     success: string;
@@ -42,6 +43,20 @@ type testOptionsType = {
     dblclick: boolean;
     selectedTicket: string;
 }
+
+type statisticType = {
+    user_id: number;
+    elapsed_time: number;
+    correct: number;
+}
+
+interface statisticArray {
+    [key: number]: statisticType;
+};
+
+//type statisticArray = {
+//    questionId: number;
+//} | {};
 
 var  pdd_questions: TicketPdd[] = [],
      Timer:any = null,
@@ -166,7 +181,10 @@ let numPageItems = 10,
     requiredWidth = 0,
     variantBackgroundColor = "transparent",
     qNum = 0,
-    currentQuestionIndex = 0;
+    currentQuestionIndex = 0,
+    Statistic:statisticArray = {},
+    queTimer: any = null,
+    elapsed_time:number = 0;
 
 const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
 
@@ -286,6 +304,7 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
                 for(var i=0, variants;i<questions.length;i++){
                     variants =  questions[i].variants;
                     pdd_questions[i] = {
+                        id: questions[i].id,
                         title: questions[i].title,
                         image: "./img/"+questions[i].image,
                         success: questions[i].correct,
@@ -305,9 +324,10 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
 
     function setQuestion(){
         if(pdd_questions.length>0 && pdd_questions.length-1>=currentQuestionIndex){
+            queTimer = setInterval(()=>{
+                elapsed_time+=100;
+            }, 100);
             setCurrentQuestion(pdd_questions[currentQuestionIndex]);
-            //setqNum(Math.min(Options.num, pdd_questions.length));
-            //setCurrentQuestion(pdd_questions[question_answered]);
         }
     }
 
@@ -351,10 +371,14 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
             errors++;
             errors_array.push({ticket: currentQuestionIndex.toString(), title: pdd_questions[currentQuestionIndex].title, comment: currentQuestion.variants[selectedVar].comment});
             results.current[currentQuestionIndex] = 1;
+            Statistic[pdd_questions[currentQuestionIndex].id] = {user_id: context.user.id, elapsed_time: elapsed_time, correct: 1};
        }
        else{
             results.current[currentQuestionIndex] = 0;
+            Statistic[pdd_questions[currentQuestionIndex].id] = {user_id: context.user.id, elapsed_time: elapsed_time, correct: 0};
         }
+        elapsed_time = 0;
+        clearInterval(queTimer);
         question_answered++;
         if(Options.settings && currentQuestionIndex==question_answered-1)
             next();
@@ -379,6 +403,10 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
             }
         }
         else if(question_answered>=props.options.num || question_answered>=pdd_questions.length){
+
+            if(context.logged)
+                request({method: 'post', data: {action: "saveStatistic", data: {"stats": JSON.stringify(Statistic)}}});
+            
             setEndTest(true);
             testPause();
         }   
@@ -431,11 +459,6 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
         setStart(false);
         setEndTest(false);
     }
-
-   
-    //useEffect(()=>{
-    //    setQuestion();
-    //}, [currentQuestionIndex]);
 
     const toStartPage = () => {
         setLeftShift(0);

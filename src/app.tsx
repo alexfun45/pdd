@@ -10,6 +10,7 @@ import Footer from './components/Footer'
 import request from './utils/request'
 
 let defaultUser = {
+      id: 0,
       login: "",
       name: "",
       email: "",
@@ -39,6 +40,7 @@ const AppContext = createContext({
 });
 
 type userType = {
+  id: number;
   login: string;
   name: string;
   email: string;
