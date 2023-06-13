@@ -2120,3 +2120,13 @@ div.suggestPopupContent div table tbody tr td.item-selected{
     line-height: 1.2;
     font-size: 2vh !important;
   }
+
+  .chart-wrapper{
+    width: 100%;
+    height: 600px;
+    text-align: center;
+  }
+
+  .recharts-wrapper{
+    display: inline-block;
+  }

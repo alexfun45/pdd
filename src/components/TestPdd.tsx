@@ -45,6 +45,7 @@ type testOptionsType = {
 }
 
 type statisticType = {
+    ticket_id: number;
     user_id: number;
     elapsed_time: number;
     correct: number;
@@ -371,11 +372,11 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
             errors++;
             errors_array.push({ticket: currentQuestionIndex.toString(), title: pdd_questions[currentQuestionIndex].title, comment: currentQuestion.variants[selectedVar].comment});
             results.current[currentQuestionIndex] = 1;
-            Statistic[pdd_questions[currentQuestionIndex].id] = {user_id: context.user.id, elapsed_time: elapsed_time, correct: 1};
+            Statistic[pdd_questions[currentQuestionIndex].id] = {ticket_id: selectedTicket, user_id: context.user.id, elapsed_time: elapsed_time, correct: 1};
        }
        else{
             results.current[currentQuestionIndex] = 0;
-            Statistic[pdd_questions[currentQuestionIndex].id] = {user_id: context.user.id, elapsed_time: elapsed_time, correct: 0};
+            Statistic[pdd_questions[currentQuestionIndex].id] = {ticket_id: selectedTicket, user_id: context.user.id, elapsed_time: elapsed_time, correct: 0};
         }
         elapsed_time = 0;
         clearInterval(queTimer);
@@ -404,7 +405,7 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
         }
         else if(question_answered>=props.options.num || question_answered>=pdd_questions.length){
 
-            if(context.logged)
+            if(context.logged && props.options.settings===false)
                 request({method: 'post', data: {action: "saveStatistic", data: {"stats": JSON.stringify(Statistic)}}});
             
             setEndTest(true);
