@@ -53,6 +53,7 @@
             }
             $pageContent = $_POST['content'];
             file_put_contents(PAGES."footer.html", $pageContent);
+            echo PAGES."footer.html";
         }   
 
         protected function editPage(){
@@ -845,8 +846,12 @@
         $image_name = ($uploadResult['success']) ? $uploadResult['filename'] : "";
         $uploadResult2 = $this->uploadFile($_FILES, 'file_tickets');
         $uploadResult3 = $this->uploadFile($_FILES, 'file_titleimg');
+        $uploadResultTicketMobile = $this->uploadFile($_FILES, 'file_tickets_mobile');
+        $uploadResultTitleMobile =  $this->uploadFile($_FILES, 'file_titleimg_mobile');
         $image_name_tickets = ($uploadResult2['success']) ? $uploadResult2['filename'] : "";
         $image_title_exam = ($uploadResult3['success']) ? $uploadResult3['filename'] : "";
+        $image_name_tickets_mobile = ($uploadResultTicketMobile['success']) ? $uploadResultTicketMobile['filename'] : "";
+        $image_title_exam_mobile = ($uploadResultTitleMobile['success']) ? $uploadResultTitleMobile['filename'] : "";
         $showLogo = $_POST['showLogo'];
         $bgcolor = $_POST['bgcolor'];
         $bgcolor_tickets = $_POST['bgcolor_tickets'];
@@ -859,10 +864,14 @@
             $db->exec("UPDATE settings SET value='$image_name' WHERE config_name='background-image'");
         if($image_name_tickets)
             $db->exec("UPDATE settings SET value='$image_name_tickets' WHERE config_name='background-image-tickets'");
+        if($image_name_tickets_mobile)
+            $db->exec("UPDATE settings SET value='$image_name_tickets_mobile' WHERE config_name='background-image-tickets-mobile'");
         if($bgcolor_tickets)
             $db->exec("UPDATE settings SET value='$bgcolor_tickets' WHERE config_name='background-color-tickets'");
         if($image_title_exam)
             $db->exec("UPDATE settings SET value='$image_title_exam' WHERE config_name='image_title_exam'");
+        if($image_title_exam_mobile)
+            $db->exec("UPDATE settings SET value='$image_title_exam_mobile' WHERE config_name='image_title_exam_mobile'");
         if($showLogo=="0" || $showLogo=="1"){
             $db->exec("UPDATE settings SET value='$showLogo' WHERE config_name='showLogo'");
         }
@@ -887,6 +896,73 @@
         $db->exec("UPDATE settings SET value='' WHERE config_name='background-image-tickets'");
         $db->close();
     }
+
+    protected function removeBgImageMobile(){
+        $db = new SQLite3(DB."db.sqlite");
+        $db->exec("UPDATE settings SET value='' WHERE config_name='background-image-tickets-mobile'");
+        $db->close();
+    }
+
+    protected function removeImageTitleExam(){
+        $db = new SQLite3(DB."db.sqlite");
+        $db->exec("UPDATE settings SET value='' WHERE config_name='image_title_exam'");
+        $db->close();
+    }
+
+    protected function removeImageTitleExamMobile(){
+        $db = new SQLite3(DB."db.sqlite");
+        $db->exec("UPDATE settings SET value='' WHERE config_name='image_title_exam_mobile'");
+        $db->close();
+    }
+
+    protected function saveStatistic(){
+        ini_set('display_errors', TRUE);
+        $db = new SQLite3(DB."db.sqlite");
+        $stats = json_decode($this->data->stats);
+        foreach($stats as $q_id=>$stat){
+            $elapsedTime = $stat->elapsed_time/1000;
+            $time = time();
+            $db->exec("INSERT INTO statistic(timecreated, ticket_id, q_id, user_id, elapsed_time, correct, test_session) VALUES('$time', {$stat->ticket_id}, $q_id, {$stat->user_id}, {$elapsedTime}, {$stat->correct}, {$stat->testSession})");
+        }
+        $db->close();
+    }
+
+    protected function getStatistic(){
+        $db = new SQLite3(DB."db.sqlite");
+        $ticketId = $this->data->ticketId;
+        $correct = array();
+        $incorrect = array();
+        $start_date = $this->data->start_date;
+        $end_date = $this->data->end_date;
+        $result = $db->query("SELECT q_id, COUNT(*) as 'человек прошло', AVG(elapsed_time) as 'среднее время' FROM statistic WHERE ticket_id=$ticketId AND correct=1 AND (DATETIME(timecreated, 'unixepoch')>=datetime({$start_date}, 'unixepoch') AND DATETIME(timecreated, 'unixepoch')<=datetime({$end_date}, 'unixepoch')) GROUP BY q_id");
+        $i = 0;
+        while($res = $result->fetchArray(SQLITE3_ASSOC)){
+            $correct_data[$i] = $res;
+            $correct_data[$i]["name"] = "Билет "+($i+1);
+            $i++;
+        }
+        $i = 0;
+        $result = $db->query("SELECT q_id, COUNT(*) as 'человек прошло', AVG(elapsed_time) as 'среднее время' FROM statistic WHERE ticket_id=$ticketId AND correct=0 AND (DATETIME(timecreated, 'unixepoch')>=datetime({$start_date}, 'unixepoch') AND DATETIME(timecreated, 'unixepoch')<=datetime({$end_date}, 'unixepoch')) GROUP BY q_id");
+        while($res = $result->fetchArray(SQLITE3_ASSOC)){
+            $incorrect_data[$i] = $res;
+            $incorrect_data[$i]["name"] = "Билет "+($i+1);
+            $i++;
+        }
+        $stat_data = array();
+        for($j=0;$j<20;$j++){
+            $stat_data[$j]['name'] = $j.'-'.($j+1);
+            $stat_data[$j]['человек'] = 0;
+        }
+        $i = 0;
+        $result = $db->query("SELECT user_id, test_session, SUM(elapsed_time) AS summary FROM statistic WHERE ticket_id=$ticketId GROUP BY test_session");
+        while($res = $result->fetchArray(SQLITE3_ASSOC)){
+            $range = floor($res['summary']/60);
+            $stat_data[$range]['человек']+=1;
+        }
+        $db->close();
+        return array("correct"=>$correct_data, "incorrect"=>$incorrect_data, 'stat'=>$stat_data);
+    }
+
     }
     $app = new Application();
     $app->run();

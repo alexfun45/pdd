@@ -49,6 +49,10 @@ type userType = {
   settings: object;
 };
 
+function getRandomUserId(){
+  return (new Date()).getTime();
+}
+
 
 export default function App(){
   
@@ -90,10 +94,23 @@ export default function App(){
       else{
         request({method: 'post', data:{action: 'getUserRole'}}).then( response => {
           const {data} = response;
-          setRole(data.role);
-          setLogin(data.logged);
-          setUser(data);
-          window.localStorage.setItem("user", JSON.stringify(data));
+          if(data!=false){
+            setRole(data.role);
+            setLogin(data.logged);
+            setUser(data);
+            window.localStorage.setItem("user", JSON.stringify(data));
+            }
+          else{
+            setUser({
+              id: getRandomUserId(),
+              login: "unlogged",
+              name: "",
+              email: "",
+              role: -1,
+              isMobile: false,
+              settings: {}
+            });
+          }
           })
       }
       window.addEventListener('resize', handleWindowSizeChange);
