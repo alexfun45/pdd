@@ -928,24 +928,39 @@
     }
 
     protected function getStatistic(){
+        //ini_set('display_errors', TRUE);
         $db = new SQLite3(DB."db.sqlite");
         $ticketId = $this->data->ticketId;
         $correct = array();
         $incorrect = array();
         $start_date = $this->data->start_date;
         $end_date = $this->data->end_date;
-        $result = $db->query("SELECT q_id, COUNT(*) as 'человек прошло', AVG(elapsed_time) as 'среднее время' FROM statistic WHERE ticket_id=$ticketId AND correct=1 AND (DATETIME(timecreated, 'unixepoch')>=datetime({$start_date}, 'unixepoch') AND DATETIME(timecreated, 'unixepoch')<=datetime({$end_date}, 'unixepoch')) GROUP BY q_id");
+        //$sql1 = "SELECT t1.indx, t1.tickets_id, t2.* FROM ticket_2_question as t1 INNER JOIN questions as t2 ON t1.q_id=t2.id WHERE t1.tickets_id=$ticketId ORDER BY t1.indx";
+        $sql= "SELECT t2.q_id, t1.indx, COUNT(*) as 'человек прошло', AVG(t2.elapsed_time) as 'среднее время' FROM ticket_2_question as t1 INNER JOIN statistic as t2 ON t1.q_id=t2.q_id WHERE t2.ticket_id={$ticketId} AND t2.correct=1 AND (DATETIME(t2.timecreated, 'unixepoch')>=datetime({$start_date}, 'unixepoch') AND DATETIME(t2.timecreated, 'unixepoch')<=datetime({$end_date}, 'unixepoch')) GROUP BY t2.q_id ORDER BY t1.indx";
+        //$result = $db->query("SELECT q_id, COUNT(*) as 'человек прошло', AVG(elapsed_time) as 'среднее время' FROM statistic WHERE ticket_id=$ticketId AND correct=1 AND (DATETIME(timecreated, 'unixepoch')>=datetime({$start_date}, 'unixepoch') AND DATETIME(timecreated, 'unixepoch')<=datetime({$end_date}, 'unixepoch')) GROUP BY q_id");
+        $result = $db->query("SELECT t2.q_id, t1.indx, COUNT(*) as 'человек прошло', AVG(t2.elapsed_time) as 'среднее время' FROM ticket_2_question as t1 INNER JOIN statistic as t2 ON t1.q_id=t2.q_id WHERE t2.ticket_id={$ticketId} AND t2.correct=1 AND (DATETIME(t2.timecreated, 'unixepoch')>=datetime({$start_date}, 'unixepoch') AND DATETIME(t2.timecreated, 'unixepoch')<=datetime({$end_date}, 'unixepoch')) GROUP BY t2.q_id ORDER BY t1.indx");
         $i = 0;
+        $correctIndx = 0;
+        $incorrectIndx = 0;
         while($res = $result->fetchArray(SQLITE3_ASSOC)){
+           
             $correct_data[$i] = $res;
-            $correct_data[$i]["name"] = "Билет "+($i+1);
+            if($i==0)
+                $correct_data[$i]["name"] = "Билет 1";
+            else
+                $correct_data[$i]["name"] = "Билет ".($correct_data[$i]['indx']-$correct_data[0]['indx'] + 1);
+            //$correctIndx++;
+           
             $i++;
         }
         $i = 0;
-        $result = $db->query("SELECT q_id, COUNT(*) as 'человек прошло', AVG(elapsed_time) as 'среднее время' FROM statistic WHERE ticket_id=$ticketId AND correct=0 AND (DATETIME(timecreated, 'unixepoch')>=datetime({$start_date}, 'unixepoch') AND DATETIME(timecreated, 'unixepoch')<=datetime({$end_date}, 'unixepoch')) GROUP BY q_id");
+        $result = $db->query("SELECT t2.q_id, t1.indx, COUNT(*) as 'человек прошло', AVG(t2.elapsed_time) as 'среднее время' FROM ticket_2_question as t1 INNER JOIN statistic as t2 ON t1.q_id=t2.q_id WHERE t2.ticket_id={$ticketId} AND t2.correct=0 AND (DATETIME(t2.timecreated, 'unixepoch')>=datetime({$start_date}, 'unixepoch') AND DATETIME(t2.timecreated, 'unixepoch')<=datetime({$end_date}, 'unixepoch')) GROUP BY t2.q_id ORDER BY t1.indx");
         while($res = $result->fetchArray(SQLITE3_ASSOC)){
             $incorrect_data[$i] = $res;
-            $incorrect_data[$i]["name"] = "Билет "+($i+1);
+            if($i==0)
+                $incorrect_data[$i]["name"] = "Билет 1";
+            else
+                $incorrect_data[$i]["name"] = "Билет ".($incorrect_data[$i]['indx']-$incorrect_data[0]['indx'] + 1);
             $i++;
         }
         $stat_data = array();

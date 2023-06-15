@@ -2130,3 +2130,13 @@ div.suggestPopupContent div table tbody tr td.item-selected{
   .recharts-wrapper{
     display: inline-block;
   }
+
+  .custom-tooltip{
+    background-color: #FFF;
+    padding: 6px 10px;
+  }
+
+  .custom-tooltip .label{
+    color: #82ca9d;
+    font-size: 16px;
+  }

@@ -53,7 +53,7 @@ export default () => {
         if (active && payload && payload.length) {
           return (
             <div className="custom-tooltip">
-              <p className="label">{`минут ${label} : ${payload[0].value}`}</p>
+              <p className="label">{`минут ${label} : ${payload[0].value} человек`}</p>
             </div>
           );
         }      
@@ -96,7 +96,7 @@ export default () => {
                       >
                       <CartesianGrid strokeDasharray="3 3" />
                       <XAxis dataKey="name" >
-                        <Label value="Билеты" offset={-10} position="insideRight" />
+                        <Label value="Вопросы" offset={0} position="insideBottomRight" />
                       </XAxis>
                       <YAxis label={{ value: 'среднее время(сек.)', angle: -90, position: 'insideLeft' }} />
                       <Tooltip/>
@@ -121,7 +121,7 @@ export default () => {
                         >
                         <CartesianGrid strokeDasharray="3 3" />
                         <XAxis dataKey="name" >
-                            <Label value="Билеты" offset={-10} position="insideRight" />
+                            <Label value="Вопросы" offset={0} position="insideBottomRight" />
                         </XAxis>
                         <YAxis label={{ value: 'среднее время(сек.)', angle: -90, position: 'insideLeft' }} />
                         <Tooltip/>
@@ -145,7 +145,9 @@ export default () => {
                             }}
                         >
                         <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="name" />
+                        <XAxis  dataKey="name" >
+                            <Label value="Минут" offset={0} position="insideBottomRight" />
+                        </XAxis>
                         <YAxis label={{ value: 'человек', angle: -90, position: 'insideLeft' }} />
                         <Tooltip content={<CustomTooltip />}/>
                         <Legend />
