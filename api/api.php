@@ -934,11 +934,12 @@
         $avg_stat = array();
         $start_date = $this->data->start_date;
         $end_date = $this->data->end_date;
-        $result = $db->query("SELECT MIN(t1.indx) as base FROM ticket_2_question as t1 INNER JOIN statistic as t2 ON t1.q_id=t2.q_id WHERE t1.tickets_id={$ticketId} AND t2.ticket_id={$ticketId}");
-        $row = $result->fetchArray(SQLITE3_ASSOC);
-        $baseIndx = $row['base'];
+        //$result = $db->query("SELECT MIN(t1.indx) as base FROM ticket_2_question as t1 INNER JOIN statistic as t2 ON t1.q_id=t2.q_id WHERE t1.tickets_id={$ticketId} AND t2.ticket_id={$ticketId}");
+        //$row = $result->fetchArray(SQLITE3_ASSOC);
+        //$baseIndx = $row['base'];
         //$result = $db->query("SELECT t2.q_id as 'q_id','1' as correct, t1.indx as 'indx', COUNT(*) as 'человек прошло', AVG(t2.elapsed_time) as 'среднее время' FROM ticket_2_question as t1 INNER JOIN statistic as t2 ON t1.q_id=t2.q_id WHERE t2.ticket_id={$ticketId} AND t2.correct=0 AND (DATETIME(t2.timecreated, 'unixepoch')>=datetime({$start_date}, 'unixepoch') AND DATETIME(t2.timecreated, 'unixepoch')<=datetime({$end_date}, 'unixepoch')) GROUP BY t2.q_id ORDER BY indx");
-        $result = $db->query("SELECT t2.q_id as 'q_id', '1' as correct, t1.indx as 'indx', COUNT(*) as 'человек прошло', AVG(t2.elapsed_time) as 'среднее время' FROM ticket_2_question as t1 INNER JOIN statistic as t2 ON t1.q_id=t2.q_id WHERE t2.ticket_id={$ticketId} AND t2.correct=0 AND (DATETIME(t2.timecreated, 'unixepoch')>=datetime({$start_date}, 'unixepoch') AND DATETIME(t2.timecreated, 'unixepoch')<=datetime({$end_date}, 'unixepoch')) GROUP BY t2.q_id UNION ALL SELECT t2.q_id as 'q_id', '0' as correct, t1.indx as 'indx', COUNT(*) as 'человек прошло', AVG(t2.elapsed_time) as 'среднее время' FROM ticket_2_question as t1 INNER JOIN statistic as t2 ON t1.q_id=t2.q_id WHERE t2.ticket_id={$ticketId} AND t2.correct=1 AND (DATETIME(t2.timecreated, 'unixepoch')>=datetime({$start_date}, 'unixepoch') AND DATETIME(t2.timecreated, 'unixepoch')<=datetime({$end_date}, 'unixepoch')) GROUP BY t2.q_id ORDER BY t1.indx");
+        $sql = "SELECT t2.q_id as 'q_id', '1' as _correct, t1.indx as 'indx', COUNT(*) as 'человек прошло', AVG(t2.elapsed_time) as 'среднее время' FROM ticket_2_question as t1 INNER JOIN statistic as t2 ON t1.q_id=t2.q_id WHERE t2.ticket_id=8 AND t2.correct=0 AND (DATETIME(t2.timecreated, 'unixepoch')>=datetime(1686690000, 'unixepoch') AND DATETIME(t2.timecreated, 'unixepoch')<=datetime(1686949199, 'unixepoch')) GROUP BY t2.q_id";
+        $result = $db->query("SELECT t2.q_id as 'q_id', '1' as _correct, t1.indx as 'indx', COUNT(*) as 'человек прошло', AVG(t2.elapsed_time) as 'среднее время' FROM ticket_2_question as t1 INNER JOIN statistic as t2 ON t1.q_id=t2.q_id WHERE t2.ticket_id={$ticketId} AND t2.correct=0 AND (DATETIME(t2.timecreated, 'unixepoch')>=datetime({$start_date}, 'unixepoch') AND DATETIME(t2.timecreated, 'unixepoch')<=datetime({$end_date}, 'unixepoch')) GROUP BY t2.q_id UNION ALL SELECT t2.q_id as 'q_id', '0' as correct, t1.indx as 'indx', COUNT(*) as 'человек прошло', AVG(t2.elapsed_time) as 'среднее время' FROM ticket_2_question as t1 INNER JOIN statistic as t2 ON t1.q_id=t2.q_id WHERE t2.ticket_id={$ticketId} AND t2.correct=1 AND (DATETIME(t2.timecreated, 'unixepoch')>=datetime({$start_date}, 'unixepoch') AND DATETIME(t2.timecreated, 'unixepoch')<=datetime({$end_date}, 'unixepoch')) GROUP BY t2.q_id ORDER BY t1.indx");
         $i = 0;
         $correctIndx = 0;
         $incorrectIndx = 0;
@@ -946,9 +947,9 @@
         while($res = $result->fetchArray(SQLITE3_ASSOC)){
             $indx = $res['q_id'];
             
-            if(empty($correct_data[$indx]))
-                $avg_stat[$indx] = array('correct_avg'=>0, 'correct_num'=>0, 'incorrect_avg'=>0, 'incorrect_num'=>0);
-            if($res['correct']=='1'){
+            //if(empty($correct_data[$indx]))
+                //$avg_stat[$indx] = array('correct_avg'=>0, 'correct_num'=>0, 'incorrect_avg'=>0, 'incorrect_num'=>0);
+            if($res['_correct']=='1'){
                 $avg_stat[$indx]['correct_avg']  = round($res['среднее время'], 2);
                 $avg_stat[$indx]['q_id'] = $res['q_id'];
                 $avg_stat[$indx]['correct_num'] = $res['человек прошло'];
@@ -958,6 +959,7 @@
                 $avg_stat[$indx]['incorrect_num'] = $res['человек прошло'];
                 $avg_stat[$indx]['q_id'] = $res['q_id'];
             }
+            //$avg_stat[$i] = $res;
             $i++;
         }
         $i = 0;
@@ -981,6 +983,12 @@
         }
         $db->close();
         return array("correct"=>$avg_stat, 'stat'=>$stat_data, 'baseIndex'=>$baseIndx);
+    }
+
+    protected function resetStat(){
+        $db = new SQLite3(DB."db.sqlite");
+        $db->exec("DELETE FROM statistic");
+        $db->close();
     }
 
     }
