@@ -58,7 +58,17 @@ export default () => {
           );
         }      
         return null;
-      };     
+      }; 
+      
+    const renderLegendText = (value: string, entry: any) => {
+        const { color } = entry;
+        switch(value){
+            case "correct_avg": 
+                return <span style={{ color }}>правильный ответ</span>;
+            case "incorrect_avg":
+                return <span style={{ color }}>неправильный ответ</span>;
+        }
+      };
 
     return (
         <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -100,36 +110,12 @@ export default () => {
                       </XAxis>
                       <YAxis label={{ value: 'среднее время(сек.)', angle: -90, position: 'insideLeft' }} />
                       <Tooltip/>
-                      <Legend />
-                      <Bar dataKey="среднее время" stackId="a" fill="#8884d8" />
-                      <Bar dataKey="человек прошло" stackId="a" fill="#82ca9d" />
+                      <Legend formatter={renderLegendText}/>
+                      <Bar dataKey="correct_avg" stackId="a" fill="#82ca9d" />
+                      <Bar dataKey="incorrect_avg" stackId="b" fill="#ffc658" />
+                      
                     </BarChart>
                 </div>
-                <div id="chartWrapper" className={(correctChartData.length>0)?"chart-wrapper":"hide"}>
-                    <h3>Статистика неупешно пройденных вопросов</h3>
-                    <BarChart
-                        maxBarSize={50}
-                        width={document.body.clientWidth*0.8}
-                        height={400}
-                        data={incorrectChartData}
-                        margin={{
-                                top: 5,
-                                right: 30,
-                                left: 20,
-                                bottom: 5,
-                            }}
-                        >
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="name" >
-                            <Label value="Вопросы" offset={0} position="insideBottomRight" />
-                        </XAxis>
-                        <YAxis label={{ value: 'среднее время(сек.)', angle: -90, position: 'insideLeft' }} />
-                        <Tooltip/>
-                        <Legend />
-                        <Bar dataKey="среднее время" stackId="a" fill="#8884d8" />
-                        <Bar dataKey="человек прошло" stackId="a" fill="#82ca9d" />
-                    </BarChart>
-                </div>  
                 <div id="chartWrapper" className={(correctChartData.length>0)?"chart-wrapper":"hide"}>
                     <h3>Статистика количества человек/времени прохождения</h3>
                     <BarChart
