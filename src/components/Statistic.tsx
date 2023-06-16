@@ -5,7 +5,7 @@ import dayjs, { Dayjs } from 'dayjs';
 import InputLabel from '@mui/material/InputLabel';
 import FormControl from '@mui/material/FormControl';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
-import { BarChart, Bar, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Label } from 'recharts';
+import { BarChart, Bar, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Label, LabelList } from 'recharts';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DateRange } from '@mui/x-date-pickers-pro';
@@ -59,6 +59,21 @@ export default () => {
         }      
         return null;
       }; 
+
+    const CustomTooltipAvg = ({ active, payload, label }:any) => {
+        if (active && payload && payload.length) {
+          return (
+            <div className="custom-tooltip">
+              <p style={{color: '#000'}} className="label">{`Вопрос ${label}`}</p>
+              {/*<p className="label">{`Среднее время ответа правильных ответов: ${payload[0].payload.correct_avg} сек`}</p>
+              <p className="label">{`Среднее время ответа неправильных ответов: ${payload[0].payload.incorrect_avg} сек`}</p>*/}
+              <p style={{color: '#82ca9d'}} className="label">{`Количество правильно ответивших: ${payload[0].payload.correct_num}`}</p>
+              <p style={{color: '#ffc658'}} className="label">{`Количество неправильно ответивших: ${payload[0].payload.incorrect_num}`}</p>
+            </div>
+          );
+        }      
+        return null;
+      }; 
       
     const renderLegendText = (value: string, entry: any) => {
         const { color } = entry;
@@ -69,6 +84,18 @@ export default () => {
                 return <span style={{ color }}>неправильный ответ</span>;
         }
       };
+
+    const renderCustomizedLabel = (props: any) => {
+        const { x, y, width, height, value } = props;
+        const barWidth = 10;
+        return (
+            <g>
+                <text x={x + width / 2} y={y - barWidth} fill="#fff" textAnchor="middle" dominantBaseline="middle">
+                    {(value>0)?value:""}
+                </text>
+            </g>
+        )
+    }
 
     return (
         <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -104,15 +131,19 @@ export default () => {
                             bottom: 5,
                           }}
                       >
-                      <CartesianGrid strokeDasharray="3 3" />
+                      <CartesianGrid strokeDasharray="1 2" />
                       <XAxis dataKey="name" >
                         <Label value="Вопросы" offset={0} position="insideBottomRight" />
                       </XAxis>
                       <YAxis label={{ value: 'среднее время(сек.)', angle: -90, position: 'insideLeft' }} />
-                      <Tooltip/>
+                      <Tooltip content={<CustomTooltipAvg />}/>
                       <Legend formatter={renderLegendText}/>
-                      <Bar dataKey="correct_avg" stackId="a" fill="#82ca9d" />
-                      <Bar dataKey="incorrect_avg" stackId="b" fill="#ffc658" />
+                      <Bar dataKey="correct_avg" stackId="a" fill="#82ca9d" >
+                        <LabelList dataKey="correct_avg" content={renderCustomizedLabel} />
+                      </Bar>
+                      <Bar dataKey="incorrect_avg" stackId="b" fill="#ffc658" >
+                        <LabelList dataKey="incorrect_avg" content={renderCustomizedLabel} />
+                      </Bar>
                       
                     </BarChart>
                 </div>
