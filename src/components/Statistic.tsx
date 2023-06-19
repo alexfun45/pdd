@@ -50,6 +50,7 @@ export default () => {
 
     const ResetStat = () => {
         request({method: "post", data: {action: "resetStat"}});
+        setShowResetModal(false);
     }
 
     const handleCloseReset = () => {
@@ -113,8 +114,6 @@ export default () => {
             </g>
         )
     }
-
-
 
     return (
         <LocalizationProvider dateAdapter={AdapterDayjs}>

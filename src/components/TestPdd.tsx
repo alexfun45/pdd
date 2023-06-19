@@ -323,9 +323,6 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
 
     function setQuestion(){
         if(pdd_questions.length>0 && pdd_questions.length-1>=currentQuestionIndex){
-            queTimer = setInterval(()=>{
-                elapsed_time+=100;
-            }, 100);
             setCurrentQuestion(pdd_questions[currentQuestionIndex]);
         }
     }
@@ -336,6 +333,9 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
         testSession = (new Date()).getTime() + Math.floor(1000*Math.random());
         if(props.options.settings===false){
 		    getQuestions({...Options, selectedTicket:selectedTicket, settings: false}, setQuestion);
+            queTimer = setInterval(()=>{
+                elapsed_time+=1000;
+            }, 1000);
         }
         else
             getQuestions(Options, setQuestion);
@@ -347,12 +347,16 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
     }
 
     function testPause(){
+        clearInterval(queTimer);
         setStart(false);
     }
 
     function continueTest(){
         if(endTest==true) return;
         setStart(true);
+        queTimer = setInterval(()=>{
+            elapsed_time+=1000;
+        }, 1000);
     }
 
     function getRandomUserId(){
@@ -361,15 +365,9 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
 
     function selectAnswer(selectedVar: any){
         if(Options.settings && currentQuestionIndex<question_answered) return;
-        //let _opened = [...opened];
-        //_opened.push(selectedVar);
         setSelectedVar(selectedVar);
         selectedAnswer = selectedVar
-        // save selected answer
-        //selected[currentQuestionIndex] = [..._opened];
         selected[currentQuestionIndex] = selectedVar;
-        // current opened answers
-        //setOpened(_opened);
        if(results.current[currentQuestionIndex]==1 || results.current[currentQuestionIndex]==0) return;
        if(selectedVar != parseInt(pdd_questions[currentQuestionIndex].success)){
             errors++;
@@ -382,7 +380,6 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
             Statistic[pdd_questions[currentQuestionIndex].id] = {ticket_id: selectedTicket, user_id: (context.user.id)?(context.user.id).toString():getRandomUserId(), elapsed_time: elapsed_time, correct: 0, testSession: testSession};
         }
         elapsed_time = 0;
-        clearInterval(queTimer);
         question_answered++;
         if(Options.settings && currentQuestionIndex==question_answered-1)
             next();
@@ -408,9 +405,10 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
         }
         else if(question_answered>=props.options.num || question_answered>=pdd_questions.length){
 
-            if(props.options.settings===false)
+            if(props.options.settings===false){
                 request({method: 'post', data: {action: "saveStatistic", data: {"stats": JSON.stringify(Statistic)}}});
-            
+                clearInterval(queTimer);
+            }
             setEndTest(true);
             testPause();
         }   
@@ -445,6 +443,7 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
         }
         else
             setTicket(0);
+        for (var member in Statistic) delete Statistic[member];
         errors_array = [];
         setOpened([]);
         question_answered = 0;
