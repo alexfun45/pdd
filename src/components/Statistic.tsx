@@ -130,8 +130,8 @@ export default () => {
                     {
                         tickets.map((v, i)=>{
                             if(i!=0 && (i+1)%10==0)
-                                return (<><Button key={"btn_"+i} onClick={(e)=>handleChangeTicket(v)} className={(selectedTicketId==v.id)?"activeItem selectItem":"selectItem"} variant="secondary">{v.name}</Button><br /></>) 
-                            return (<Button key={"btn_"+i} onClick={(e)=>handleChangeTicket(v)} className={(selectedTicketId==v.id)?"activeItem selectItem":"selectItem"} variant="secondary">{v.name}</Button>)
+                                return (<><Button key={"btn_"+i} onClick={(e)=>handleChangeTicket(v)} className={((selectedTicket||{id:-1}).id===v.id)?"activeItem selectItem":"selectItem"} variant="secondary">{(i+1)}</Button><br /></>) 
+                            return (<Button key={"btn_"+i} onClick={(e)=>handleChangeTicket(v)} className={((selectedTicket||{id:-1}).id===v.id)?"activeItem selectItem":"selectItem"} variant="secondary">{(i+1)}</Button>)
                         })
                     }
                 </ButtonGroup>
