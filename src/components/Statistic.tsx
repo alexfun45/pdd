@@ -10,14 +10,16 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DateRange } from '@mui/x-date-pickers-pro';
 import { DateRangePicker } from '@mui/x-date-pickers-pro/DateRangePicker';
-import {Modal, Button} from 'react-bootstrap';
+import {Modal, Button, ButtonGroup} from 'react-bootstrap';
 import request from '../utils/request'
+import { Typography } from '@mui/material';
 
 
 export default () => {
     const end = dayjs(), start = end.subtract(2, 'day');
     const [tickets, setTickets] = useState([]),
           [selectedTicketId, setTicketId] = useState(0),
+          [selectedTicket, setSelectedTicket] = useState(null),
           [correctChartData, setCorrectChart] = useState([]),
           [showResetModal, setShowResetModal] = useState(false),
           [incorrectChartData, setInCorrectChart] = useState([]),
@@ -28,16 +30,16 @@ export default () => {
           ]);;
 
     useEffect(()=>{
-        request({method: 'post', data: {action: "getTickets"}}).then(response => {
+        request({method: 'post', data: {action: "getTickets", data: {withStat: true}}}).then(response => {
             const {data} = response;
             setTickets(data);
         });
     }, []);
 
     useEffect(()=>{
-        if(selectedTicketId==0) return;
+        if(selectedTicket==null) return;
         if(currentDateRange[0]==null || currentDateRange[1]==null) return;
-        request({method: "post", data: {action: "getStatistic", data: {ticketId: selectedTicketId, start_date: currentDateRange[0].unix(), end_date: currentDateRange[1].endOf('day').unix()}}}).then((response)=>{
+        request({method: "post", data: {action: "getStatistic", data: {ticketId: selectedTicket.id, start_date: currentDateRange[0].unix(), end_date: currentDateRange[1].endOf('day').unix()}}}).then((response)=>{
             const {data} = response;
             if(data.correct!=null)
                 setCorrectChart(data.correct);
@@ -46,7 +48,7 @@ export default () => {
             if(data.stat!=null)
                 setManTime(data.stat);
         });
-    }, [selectedTicketId, currentDateRange]);
+    }, [selectedTicket, currentDateRange]);
 
     const ResetStat = () => {
         request({method: "post", data: {action: "resetStat"}});
@@ -57,8 +59,13 @@ export default () => {
         setShowResetModal(false);
     }
   
-    const handleChangeTicket = (event: SelectChangeEvent) => {
+    const handleChangeTicketSelect = (event: SelectChangeEvent) => {
         setTicketId((event.target)?parseInt(event.target.value):0);
+    }
+
+    const handleChangeTicket = (ticket: any) => {
+        //setTicketId(ticket.id);
+        setSelectedTicket(ticket);
     }
 
     const handleDialogReset = () => {
@@ -118,8 +125,19 @@ export default () => {
     return (
         <LocalizationProvider dateAdapter={AdapterDayjs}>
         <Box sx={{ minWidth: 320 }}>
-            <h3>Статистика</h3>
-            <FormControl sx={{minWidth: 200}}>
+            <div style={{textAlign: "center"}}>
+                <ButtonGroup key={(selectedTicket!=null)?selectedTicket.id:0} style={{textAlign: "left"}} aria-label="Basic example">
+                    {
+                        tickets.map((v, i)=>{
+                            if(i!=0 && (i+1)%10==0)
+                                return (<><Button key={"btn_"+i} onClick={(e)=>handleChangeTicket(v)} className={(selectedTicketId==v.id)?"activeItem selectItem":"selectItem"} variant="secondary">{v.name}</Button><br /></>) 
+                            return (<Button key={"btn_"+i} onClick={(e)=>handleChangeTicket(v)} className={(selectedTicketId==v.id)?"activeItem selectItem":"selectItem"} variant="secondary">{v.name}</Button>)
+                        })
+                    }
+                </ButtonGroup>
+            </div>
+            
+            {/*<FormControl sx={{minWidth: 200}}>
                 <Select onChange={handleChangeTicket} label="Выберите билет">
                     <option>Выберите билет</option>
                     {
@@ -128,14 +146,16 @@ export default () => {
                             ))
                         }
                 </Select>
-            </FormControl><br />
-            <div style={{display:'inline-block', marginTop: '20px'}}>
+            </FormControl>*/}
+            <br />
+            <div className="dateRangeWrapper">
                 <DateRangePicker
                     value={currentDateRange}
-                    onChange={(newValue) => setDateRange(newValue)}
+                        onChange={(newValue) => setDateRange(newValue)}
                 />
+                <Button onClick={handleDialogReset} variant="danger">Сброс статистики</Button>
             </div>
-            <div style={{marginTop: '15px', textAlign: 'center', marginBottom: '15px'}}><Button onClick={handleDialogReset} variant="danger">Сброс статистики</Button></div>
+            <div><Typography sx={{margin: "10px 0px"}} variant="h3">{(selectedTicket!=null)?selectedTicket.name:""}</Typography></div>
             <div id="chartWrapper" className={(correctChartData.length>0)?"chart-wrapper":"hide"}>
                   <h3>Статистика успешно пройденных вопросов</h3>
                   <BarChart
