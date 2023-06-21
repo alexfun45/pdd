@@ -153,7 +153,7 @@ export default () => {
                     value={currentDateRange}
                         onChange={(newValue) => setDateRange(newValue)}
                 />
-                <Button onClick={handleDialogReset} variant="danger">Сброс статистики</Button>
+                <Button style={{position: 'absolute', top: '8px'}} onClick={handleDialogReset} variant="danger">Сброс статистики</Button>
             </div>
             <div><Typography sx={{margin: "10px 0px"}} variant="h3">{(selectedTicket!=null)?selectedTicket.name:""}</Typography></div>
             <div id="chartWrapper" className={(correctChartData.length>0)?"chart-wrapper":"hide"}>
