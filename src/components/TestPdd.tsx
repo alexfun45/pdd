@@ -19,6 +19,11 @@ type ErrorType = {
     title: string;
 }
 
+type QuestionType = {
+    q_id: number;
+    success: number;
+}
+
 type InputSettings = {
     surname: string;
     name: string;
@@ -37,6 +42,7 @@ type TicketPdd = {
 type testOptionsType = {
     num: number;
     max_error: number;
+    recommended: boolean;
     random: boolean;
     max: number;
     settings: boolean;
@@ -61,7 +67,6 @@ var  pdd_questions: TicketPdd[] = [],
      nextTicket = 1,
      selectedAnswer: number,
      selected: any = [],
-     //results:any = [],
      errors = 0,
      question_answered = 0,
      timer = 0,
@@ -74,7 +79,7 @@ const BtnQuestion = (props: any)  => {
 
     function getBtnpageClass(i: number){
         let classname = "btn btn-page btn-default";
-        if(props.currentQuestionIndex==i && props.results[i]!=1 && props.results[i]!=0)
+        if(props.currentQuestionIndex==i && props.results[i]!=0 && props.results[i]!=1)
             classname += " current-button";
         else if(props.currentQuestionIndex==i)
             classname += " current-finished-button";
@@ -183,7 +188,8 @@ let numPageItems = 10,
     Statistic:statisticArray = {},
     queTimer: any = null,
     elapsed_time:number = 0,
-    testSession = 0;
+    testSession = 0,
+    Results:QuestionType[] = [];
 
 const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
 
@@ -225,13 +231,17 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
             numPageItems = +((availableWidth / itemWidth).toFixed(0));
             requiredWidth = availableWidth;
         }
-        if(!props.options.settings){
-            getTickets((ticketId: number)=>{
-                //console.log("ticketId", ticketId);
-                //setTicket(ticketId);
-            });    
+        if(!props.options.settings && !props.options.recommended){
+            getTickets();    
         }
-    }, [props.options.settings]);
+    }, [props.options.settings, props.options.recommended]);
+
+    useEffect(()=>{
+        if(props.options.recommended && context.user){
+            resetTest();
+            startTest();
+        }
+    }, [props.options.recommended, context.user.id]);
 
     useEffect(()=>{
         variantBackgroundColor = context.settings['background-color'];
@@ -241,10 +251,6 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
         rgb[2] = (parseInt(rgb[2])+10).toString();
         setTicketBg(`rgba(${rgb[0]},${rgb[1]},${rgb[2]},${rgb[3]})`);
     }, [context])
-
-    //useEffect(()=>{
-    //    setqPages([...new Array(qNum).slice(0)]);
-    //}, [qNum]);
 
     useEffect(()=>{
         if(selectedTicket!=0 && (props.options.settings==false)){
@@ -279,7 +285,7 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
     };
     let obj = this;
     // getting tickets with questions
-    function getTickets(callback: Function){
+    function getTickets(){
         request({method: 'post', data: {action: "getTickets"}}).then(response => {
             const {data} = response;
             let opts = {...props.options};
@@ -287,10 +293,9 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
             setOptions(opts);
             setTickets(data);
             setTicketName(data[0].name);
+            if(selectedTicket!=0)
+                setTicket(0); 
             setTicket(data[0].id);
-            //if(callback){
-                //callback.call(obj, data[0].id)
-            //}
         });
     }
 
@@ -332,7 +337,10 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
         setEndTest(false);
         testSession = (new Date()).getTime() + Math.floor(1000*Math.random());
         if(props.options.settings===false){
-		    getQuestions({...Options, selectedTicket:selectedTicket, settings: false}, setQuestion);
+            if(props.options.recommended)
+                getQuestions({...Options, recommended: props.options.recommended, user_id:context.user.id, settings: false}, setQuestion);
+            else
+		        getQuestions({...Options, selectedTicket:selectedTicket, recommended: props.options.recommended, user_id:context.user.id, settings: false}, setQuestion);
             queTimer = setInterval(()=>{
                 elapsed_time+=1000;
             }, 1000);
@@ -374,8 +382,12 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
             errors_array.push({ticket: currentQuestionIndex.toString(), title: pdd_questions[currentQuestionIndex].title, comment: currentQuestion.variants[selectedVar].comment});
             results.current[currentQuestionIndex] = 1;
             Statistic[pdd_questions[currentQuestionIndex].id] = {ticket_id: selectedTicket, user_id: (context.user.id)?(context.user.id).toString():getRandomUserId(), elapsed_time: elapsed_time, correct: 1, testSession: testSession};
-       }
+            if(props.options.settings===false)
+                Results.push({q_id: pdd_questions[currentQuestionIndex].id, success: 0});
+        }
        else{
+            if(props.options.settings===false)
+                Results.push({q_id: pdd_questions[currentQuestionIndex].id, success: 1});
             results.current[currentQuestionIndex] = 0;
             Statistic[pdd_questions[currentQuestionIndex].id] = {ticket_id: selectedTicket, user_id: (context.user.id)?(context.user.id).toString():getRandomUserId(), elapsed_time: elapsed_time, correct: 0, testSession: testSession};
         }
@@ -404,9 +416,8 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
             }
         }
         else if(question_answered>=props.options.num || question_answered>=pdd_questions.length){
-
             if(props.options.settings===false){
-                request({method: 'post', data: {action: "saveStatistic", data: {"stats": JSON.stringify(Statistic)}}});
+                request({method: 'post', data: {action: "saveStatistic", data: {"stats": JSON.stringify(Statistic), "user_id":(context.user.id)?context.user.id:0, "results": JSON.stringify(Results)}}});
                 clearInterval(queTimer);
             }
             setEndTest(true);
@@ -506,7 +517,7 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
 
     return (
         <div className="container">
-            <div style={{marginTop: 0}} className={(props.options.settings===false)?"row testrow":"hide"}>
+            <div style={{marginTop: 0}} className={(props.options.settings===false && !props.options.recommended)?"row testrow":"hide"}>
                 <div className="exam-title">
                     <label>{context.settings.exam_title}</label>
                     <FormControl key={selectedTicket} className="form-ticket" sx={{m: 1, minWidth: 120, marginTop: '5px', verticalAlign: 'middle', '& > .MuiPaper-root':{top: '60px', maxHeight: 'calc(100% - 62px)'}}}>
@@ -621,7 +632,7 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
                 </div>
             )
             }
-            <div style={{marginTop: 0}} className="row testrow">
+            <div style={{marginTop: 0}} className={(pdd_questions.length>0)?"row testrow":"hide"}>
                 <div className="slide-wrapper" style={{width: (requiredWidth+"px")}}>
                     <i onClick={toPrevPage} className={start?"bi bi-caret-left arrow-btn arrow-left-btn":"hide"}></i>
                     <div className="button-slider">
@@ -697,7 +708,10 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
                     <div className="block-ticket">
                         <div className="col-md-12">
                             <div id="questPanel">
-                                <img id="questImage" className={(start)?"img-responsive":"hide"} width="100%" style={{maxWidth: "100%"}}
+                                {(props.options.recommended && pdd_questions.length==0) && (
+                                    <h3>Для вас пока нет рекомендуемых вопросов</h3>
+                                )}
+                                <img id="questImage" className={(start && pdd_questions.length>0)?"img-responsive":"hide"} width="100%" style={{maxWidth: "100%"}}
                                         src={(currentQuestion!==undefined)?currentQuestion.image:""}
                                         onError={(e)=>{if (e.currentTarget.src != './img/no_picture.png') e.currentTarget.src = './img/default_bilet_images.png';}}
                                         />

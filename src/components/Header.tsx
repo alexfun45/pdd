@@ -95,10 +95,7 @@ function TopMenu({showLogo}:{showLogo: string}) {
     }
   }
 
-  const topLevelMenu = [{title: "ПДД 2023", submenu:[{title: "Общие положения", href: "pdd1"}, {title: "Общие обязанности водителей", href:"pdd2"}]}, 
-    {title: "Знаки и разметка", submenu: [{title: "Предупреждающие знаки", href: "znak1"}, {title:"Знаки приоритета", href: "znak2"}]},
-    {title: "Изменения", submenu:[{title: "1 января 2022", href:""}]}, {title: "Экзамен", href: "pdd-online"}];
-  
+ 
   return (
     <div className={"top-level-menu "+((location.pathname=='/auth' || location.pathname=='/confirm')?'hide':'')}>
       <div className={(showLogo=="0")?"hide":"homeIcon"} onClick={handleHomeLink}><a href="./"></a><input onClick={triggerUpload} id="homeIcon" onChange={changeHomeIcon} type="file" /><img src={homeIcon}></img></div>

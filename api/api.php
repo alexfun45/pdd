@@ -92,7 +92,12 @@
         
     protected function getTickets(){
         $db = new SQLite3(DB."db.sqlite");
-        $sql = "SELECT * FROM tickets";
+        //$recommended = $this->data->recommended;
+        $withStat = (isset($this->data->withStat))?true:false;
+        //if(!$recommended)
+            $sql = "SELECT * FROM tickets";
+        //else
+            //$sql = "SELECT t1.*, COUNT(t2.*) as num FROM tickets as t1 LEFT JOIN statistic ON t1.id=t2.ticket_id";
         $res = $db->query($sql);
         $tickets = array();
         while ($v = $res->fetchArray(SQLITE3_ASSOC)){
@@ -124,7 +129,7 @@
         $ticket = ($this->data->settings)?null:$this->data->selectedTicket;
         $num = $this->data->num;
         //return $this->getTicketQuestions($ticket);
-        $questions = array_splice($this->getTicketQuestions($ticket), 0, $num);
+        $questions = array_splice($this->getTicketQuestions($ticket, $this->data->recommended), 0, $num);
         if($this->data->random=="on" || $this->data->random)
                 shuffle($questions);
         return $questions;
@@ -146,13 +151,18 @@
         return $tickets;
     }
 
-    function getTicketQuestions($ticketId=null){
+    function getTicketQuestions($ticketId=null, $recommended = false){
         $db = new SQLite3(DB."db.sqlite");
         $ticketId = ($ticketId===null)?$this->data->ticketId:$ticketId;
         if($ticketId!=0)
             $sql = "SELECT t1.indx, t1.tickets_id, t2.* FROM ticket_2_question as t1 INNER JOIN questions as t2 ON t1.q_id=t2.id WHERE t1.tickets_id=$ticketId ORDER BY t1.indx";
+        else if($recommended==true){
+            $userId = $this->data->user_id;
+            if(isset($userId))
+                $sql = "SELECT t2.* FROM recommended_questions as t1 INNER JOIN questions as t2 ON t1.q_id=t2.id WHERE t1.user_id={$userId}";
+        }
         else
-            $sql = "SELECT * FROM questions";
+            $sql = "SELECT * FROM questions"; 
         $res = $db->query($sql);
         $questions = array();
         $i = 0;
@@ -923,6 +933,16 @@
             $elapsedTime = $stat->elapsed_time/1000;
             $time = time();
             $db->exec("INSERT INTO statistic(timecreated, ticket_id, q_id, user_id, elapsed_time, correct, test_session) VALUES('$time', {$stat->ticket_id}, $q_id, {$stat->user_id}, {$elapsedTime}, {$stat->correct}, {$stat->testSession})");
+        }
+        $userId = $this->data->user_id;
+        if($userId!=0){
+            $results = json_decode($this->data->results);
+            for($i=0;$i<count($results);$q_id=$results[$i]->q_id, $i++){
+                if($results[$i]->success==1)
+                    $db->exec("DELETE FROM recommended_questions WHERE user_id={$userId} AND q_id={$q_id}");
+                else
+                    $db->exec("INSERT OR IGNORE INTO recommended_questions(user_id, q_id) VALUES({$userId}, {$q_id})");
+            }
         }
         $db->close();
     }

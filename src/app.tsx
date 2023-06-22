@@ -63,11 +63,16 @@ export default function App(){
         [settings, setSettings] = useState({showLogo: '1', start_page: {name: ""}, exam_title: "", 'background-color':'', 'background-image':'', 'background-color-tickets': '', 'background-image-tickets':'', 'image_title_exam':'', 'background-image-tickets-mobile':'', 'image_title_exam_mobile': ''}),
         [displayWidth, setDisplayWidth] = useState(window.innerWidth);
   
-  const getRoutes = (allRoutes: Array<{route:string, key: string, component: object, auth?: boolean}>) =>
+  const getRoutes = (allRoutes: Array<{route:string, key: string, component: object, auth?: string}>) =>
         allRoutes.map((route) => {
           if (route.route) {
               let userRole = (window.localStorage.getItem('user')!=null) ? JSON.parse(window.localStorage.getItem('user')).role:0;
-              return (route.auth && userRole!=1)?<Route path={route.route} element={<Navigate to="/auth" replace />} />:<Route path={route.route} element={route.component} key={route.key} />;
+              if((route.auth=="admin" && userRole!=1) || (route.auth=="user" && (userRole!=1 && userRole!=3))){
+                return <Route path={route.route} element={<Navigate to="/auth" replace />} />;
+              }
+              else
+                return <Route path={route.route} element={route.component} key={route.key} />;
+              //return (route.auth && userRole!=1)?<Route path={route.route} element={<Navigate to="/auth" replace />} />:<Route path={route.route} element={route.component} key={route.key} />;
           }
     
           return null;
