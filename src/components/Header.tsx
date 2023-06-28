@@ -94,8 +94,6 @@ function TopMenu({showLogo}:{showLogo: string}) {
       document.location.href = "./";
     }
   }
-
- 
   return (
     <div className={"top-level-menu "+((location.pathname=='/auth' || location.pathname=='/confirm')?'hide':'')}>
       <div className={(showLogo=="0")?"hide":"homeIcon"} onClick={handleHomeLink}><a href="./"></a><input onClick={triggerUpload} id="homeIcon" onChange={changeHomeIcon} type="file" /><img src={homeIcon}></img></div>

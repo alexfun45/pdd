@@ -104,6 +104,8 @@
             array_push($tickets, $v);
         }
         $db->close();
+        if($this->data->shuffle==1)
+            shuffle($tickets);
         return $tickets;
     }
 
@@ -866,6 +868,7 @@
         $image_name_tickets_mobile = ($uploadResultTicketMobile['success']) ? $uploadResultTicketMobile['filename'] : "";
         $image_title_exam_mobile = ($uploadResultTitleMobile['success']) ? $uploadResultTitleMobile['filename'] : "";
         $showLogo = $_POST['showLogo'];
+        $shuffle_tickets = $_POST['shuffle_tickets'];
         $bgcolor = $_POST['bgcolor'];
         $bgcolor_tickets = $_POST['bgcolor_tickets'];
         $examTitle = $_POST['exam_title'];
@@ -888,6 +891,9 @@
         if($showLogo=="0" || $showLogo=="1"){
             $db->exec("UPDATE settings SET value='$showLogo' WHERE config_name='showLogo'");
         }
+        if($shuffle_tickets=="0" || $shuffle_tickets=="1")
+            $db->exec("UPDATE settings SET value='$shuffle_tickets' WHERE config_name='shuffle_tickets'");
+        
         if($start_page){
             $db->exec("UPDATE settings SET value='$start_page' WHERE config_name='start_page'");
         }

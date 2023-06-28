@@ -21,7 +21,8 @@ export default ({allPages = []} : any) => {
             'image_title_exam_mobile': '',
             'showLogo': '1',
             'start_page': {id: 1, name: 'OOO', title: 'Общие правила'},
-            'exam_title': ''
+            'exam_title': '',
+            'shuffle_tickets': '0'
         }),
         [loading, setLoading] = useState(false),
         [start_page, setStartPage] = useState(null),
@@ -233,6 +234,12 @@ export default ({allPages = []} : any) => {
           setSettings({...settings, 'showLogo':checked});
         }
 
+        const setShuffleTickets = (e: any) => {
+          let checked = (e.target.checked)?'1':'0';
+          formData.append('shuffle_tickets', checked);
+          setSettings({...settings, 'shuffle_tickets':checked});
+        }
+
         const handleChangeStartPage = (e:any, value: any) => {
           if(value){
             setStartPage(value);
@@ -331,6 +338,10 @@ export default ({allPages = []} : any) => {
             <tr>
               <td>Заголовок выбора билета</td>
               <td><TextField style={{width: '100%', backgroundColor: '#FFF'}} onChange={handleChangeTitle} value={titleExam} /></td>
+            </tr>
+            <tr>
+              <td>Перемешивать билеты</td>
+              <td><input onChange={setShuffleTickets} type="checkbox" checked={(settings['shuffle_tickets']=='1')} /></td>
             </tr>
           </table>
             <div><Button variant="success" onClick={saveSettings}>

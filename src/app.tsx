@@ -33,7 +33,9 @@ const AppContext = createContext({
     'background-image-tickets': '',
     'image_title_exam': '',
     'background-image-tickets-mobile': '',
-    'image_title_exam_mobile': ''
+    'image_title_exam_mobile': '',
+    'shuffle_tickets': '0',
+    'load': false
   },
   pageTitle: "",
   setPageTitle: null
@@ -63,7 +65,7 @@ export default function App(){
         [pageTitle, setPageTitle] = useState(""),
         [user, setUser] = useState<userType>(defaultUser),
         [role, setRole] = useState(3),
-        [settings, setSettings] = useState({showLogo: '1', start_page: {name: ""}, exam_title: "", 'background-color':'', 'background-image':'', 'background-color-tickets': '', 'background-image-tickets':'', 'image_title_exam':'', 'background-image-tickets-mobile':'', 'image_title_exam_mobile': ''}),
+        [settings, setSettings] = useState({showLogo: '1', start_page: {name: ""}, exam_title: "", 'background-color':'', 'background-image':'', 'background-color-tickets': '', 'background-image-tickets':'', 'image_title_exam':'', 'background-image-tickets-mobile':'', 'image_title_exam_mobile': '', 'shuffle_tickets': '0', 'load': false}),
         [displayWidth, setDisplayWidth] = useState(window.innerWidth);
   
   const getRoutes = (allRoutes: Array<{route:string, key: string, component: object, auth?: string}>) =>
@@ -86,7 +88,7 @@ export default function App(){
       document.body.style.backgroundImage = window.localStorage.getItem('backgroundImage');
     request({method: "post", data: {action: "getSettings"}}).then(response=>{
       const {data} = response;
-      setSettings(data);
+      setSettings({...data, 'load': true});
       if(data['background-color']){
         if(window.localStorage.getItem('bgcolor')!=data['background-color']){
           window.localStorage.setItem('bgcolor', data['background-color']);

@@ -231,10 +231,10 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
             numPageItems = +((availableWidth / itemWidth).toFixed(0));
             requiredWidth = availableWidth;
         }
-        if(!props.options.settings && !props.options.recommended){
-            getTickets();    
+        if(!props.options.settings && !props.options.recommended && context.settings.load==true){
+            getTickets(); 
         }
-    }, [props.options.settings, props.options.recommended]);
+    }, [props.options.settings, props.options.recommended, context.settings]);
 
     useEffect(()=>{
         if(props.options.recommended && context.user){
@@ -286,7 +286,7 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
     let obj = this;
     // getting tickets with questions
     function getTickets(){
-        request({method: 'post', data: {action: "getTickets"}}).then(response => {
+        request({method: 'post', data: {action: "getTickets", data: {shuffle: context.settings.shuffle_tickets}}}).then(response => {
             const {data} = response;
             let opts = {...props.options};
             opts['selectedTicket'] = data[0].id;
