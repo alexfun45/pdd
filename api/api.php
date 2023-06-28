@@ -846,7 +846,10 @@
         $res = $db->query("SELECT value FROM settings where config_name='home_icon'");
         $result = $res->fetchArray(SQLITE3_ASSOC);
         $db->close();
-        return './img/'.$result['value'];
+        if(!empty($result['value']))
+            return './img/'.$result['value'];
+        else
+            return "./img/default_home.png";
     }
 
 

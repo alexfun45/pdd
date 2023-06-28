@@ -27,7 +27,7 @@ function TopMenu({showLogo}:{showLogo: string}) {
   const context = React.useContext(AppContext);
   const //[isLogin, setLogin] = useState(false),
         //[role, setRole] = useState<number>(0),
-        [homeIcon, setHomeIcon] = useState("./img/default_home.png"),
+        [homeIcon, setHomeIcon] = useState(""),
         [TopMenu, setTopMenu] = useState<any>({});
   const location = useLocation();
   let navigate = useNavigate();
