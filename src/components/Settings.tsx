@@ -132,6 +132,8 @@ export default ({allPages = []} : any) => {
             formData.delete('bgcolor');
             formData.append('bgcolor', bgcolor);
             document.body.style.backgroundColor = bgcolor;
+            console.log("background-color", bgcolor);
+            
           };
 
         const handleChange2 = (color: any) => {

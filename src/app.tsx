@@ -53,9 +53,12 @@ function getRandomUserId(){
   return (new Date()).getTime();
 }
 
+window.onload = function theme(){
+  document.body.style.backgroundColor = window.localStorage.getItem('bgcolor');
+}
 
 export default function App(){
-  
+ 
   const [isLogin, setLogin] = useState(false),
         [pageTitle, setPageTitle] = useState(""),
         [user, setUser] = useState<userType>(defaultUser),
@@ -79,15 +82,23 @@ export default function App(){
         });
 
   useEffect(()=>{
-
+    if(window.localStorage.getItem('backgroundImage')!=null)
+      document.body.style.backgroundImage = window.localStorage.getItem('backgroundImage');
     request({method: "post", data: {action: "getSettings"}}).then(response=>{
       const {data} = response;
       setSettings(data);
-      if(data['background-color'])
-        document.body.style.backgroundColor = data['background-color'];
+      if(data['background-color']){
+        if(window.localStorage.getItem('bgcolor')!=data['background-color']){
+          window.localStorage.setItem('bgcolor', data['background-color']);
+          document.body.style.backgroundColor = data['background-color'];
+        }
+      }
       if(data['background-image']){
         let src = "./img/" + data['background-image'];
-        document.body.style.backgroundImage = `url(${src})`;
+        if(window.localStorage.getItem('backgroundImage')!=`url(${src})`){
+          window.localStorage.setItem('backgroundImage', `url(${src})`);
+          document.body.style.backgroundImage = `url(${src})`;
+        }
         }
       });
       if(window.localStorage.getItem('user')!=null && window.localStorage.getItem('user')!="false"){
@@ -131,9 +142,8 @@ export default function App(){
     const isMobile = width <= 1000;
 
     return (  
-      
-      // the rest is the same...
       <AppContext.Provider value={{user: user, logged: isLogin, userRole: role, isMobile: isMobile, settings: settings, pageTitle, setPageTitle}}>
+          
           <HashRouter>
             { (isMobile) ?  
                 <MobileHeader />
@@ -149,6 +159,7 @@ export default function App(){
             </div>
             <Footer />
           </HashRouter>
+          
         </AppContext.Provider>
     )
 }

@@ -8,7 +8,6 @@ body {
     font-size: 2vh;
     line-height: 1.42857143;
     color: #333;
-    background-color: #fff;
     font-weight: 300;
     height: 100%;
     width: 100%;
@@ -281,16 +280,16 @@ p{
 }
 
 .top-level-menu  .homeIcon{
-    height: 64px;
-    position: relative;
+    height: 60px;
+    position: absolute;
     display: inline-block;
-    float: left;
-    margin-left: 50px;
-    margin-top: 30px;
+    left: 7px;
+    top: 7px;
+    z-index: 100000;
 }
 
 .top-level-menu  .homeIcon > img{
-    max-width: 96px;
+    max-width: 78px;
 }
 
 .homeIcon > a{
