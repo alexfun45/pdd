@@ -12,6 +12,7 @@ import { DateRange } from '@mui/x-date-pickers-pro';
 import { DateRangePicker } from '@mui/x-date-pickers-pro/DateRangePicker';
 import {Modal, Button, ButtonGroup} from 'react-bootstrap';
 import request from '../utils/request'
+import Table from 'react-bootstrap/Table'
 import { Typography } from '@mui/material';
 
 
@@ -23,6 +24,7 @@ export default () => {
           [correctChartData, setCorrectChart] = useState([]),
           [showResetModal, setShowResetModal] = useState(false),
           [incorrectChartData, setInCorrectChart] = useState([]),
+          [summaryStat, setSummaryStat] = useState([]),
           [manTime, setManTime] = useState([]),
           [currentDateRange, setDateRange] = React.useState<DateRange<Dayjs>>([
             start,
@@ -47,6 +49,7 @@ export default () => {
                 setInCorrectChart(data.incorrect);
             if(data.stat!=null)
                 setManTime(data.stat);
+            
         });
     }, [selectedTicket, currentDateRange]);
 
@@ -64,12 +67,19 @@ export default () => {
     }
 
     const handleChangeTicket = (ticket: any) => {
-        //setTicketId(ticket.id);
         setSelectedTicket(ticket);
     }
 
     const handleDialogReset = () => {
         setShowResetModal(true);   
+    }
+
+    const handleOpenSummary = () => {
+        request({method: "post", data: {action: "getSummaryStat", data: {start_date: currentDateRange[0].unix(), end_date: currentDateRange[1].endOf('day').unix()}}}).then((response)=>{
+            const {data} = response;
+            if(data.summaryStat!=null)
+                setSummaryStat(Object.values(data.summaryStat));
+        });
     }
 
     const CustomTooltip = ({ active, payload, label }:any) => {
@@ -153,7 +163,10 @@ export default () => {
                     value={currentDateRange}
                         onChange={(newValue) => setDateRange(newValue)}
                 />
-                <Button style={{position: 'absolute', top: '8px'}} onClick={handleDialogReset} variant="danger">Сброс статистики</Button>
+                <Box style={{position: 'absolute', top: '8px', display: 'inline-block'}}>
+                    <Button onClick={handleOpenSummary} variant="success">Суммарная статистика</Button>
+                    <Button onClick={handleDialogReset} variant="danger">Сброс статистики</Button>
+                </Box>
             </div>
             <div><Typography sx={{margin: "10px 0px"}} variant="h3">{(selectedTicket!=null)?selectedTicket.name:""}</Typography></div>
             <div id="chartWrapper" className={(correctChartData.length>0)?"chart-wrapper":"hide"}>
@@ -210,6 +223,28 @@ export default () => {
                         <Bar dataKey="человек" stackId="a" fill="#82ca9d" />
                     </BarChart>
                 </div>  
+                <div>
+                    <Table style={{width: '800px'}} className="users-table" responsive>
+                        <thead>
+                            <tr>
+                                <th>Билет</th>
+                                <th>сдал</th>
+                                <th>не сдал</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {
+                                summaryStat.map((v, i)=>(
+                                    <tr>
+                                        <td>{v.name}</td>
+                                        <td>{v.success}</td>
+                                        <td>{v.fail}</td>
+                                    </tr>
+                                ))
+                            }
+                        </tbody>
+                    </Table>
+                </div>
         </Box>
         <Modal show={showResetModal} onHide={handleCloseReset}>
                 <Modal.Header closeButton>
