@@ -13,6 +13,8 @@ type userType = {
     role: number;
     state: number;
     password: string;
+    reg_date: number;
+    last_auth: number;
 };
 
 const roleNames = ["администратор", "менеджер сайта", "пользователь"];
@@ -23,7 +25,9 @@ const defaultEmptyUser = {
     email: "",
     state: 0,
     role: 3,
-    password: ""
+    password: "",
+    reg_date: 0,
+    last_auth: 0
 }
 let selUser = defaultEmptyUser,
     userId = 0;
@@ -110,6 +114,8 @@ export default () => {
                         <th>Логин</th>
                         <th>email</th>
                         <th>Роль</th>
+                        <th>Дата регистрации</th>
+                        <th>Дата последней авторизации</th>
                         <th></th>
                     </tr>
                 </thead>
@@ -122,6 +128,8 @@ export default () => {
                                     <td>{v.login}</td>
                                     <td>{v.email}</td>
                                     <td className="role-cell">{roleNames[v.role-1]}</td>
+                                    <td>{v.reg_date}</td>
+                                    <td>{v.last_auth}</td>
                                     <td><span className='btn-panel'><i onClick={(e)=>handleEditUser(v)} className="bi bi-pencil-fill"></i><i onClick={()=>{ selUser = v; if(v.id!=1) setShowDeleteModal(true)}} className="bi bi-trash3-fill"></i><i onClick={()=>changePassword(v.id)} title="изменить пароль" className="bi bi-key-fill"></i></span></td>
                                 </tr>
                              </>  

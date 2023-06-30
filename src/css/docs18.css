@@ -4,7 +4,7 @@ html{
     overflow: hidden;
 }
 body {
-    font-family: Lato,Helvetica,Arial,sans-serif;
+    font-family: "Montserrat-alternates";
     font-size: 2vh;
     line-height: 1.42857143;
     color: #333;
@@ -15,6 +15,10 @@ body {
     overflow: hidden;
     background-repeat: no-repeat;
     background-size: cover;
+}
+
+*{
+    font-family: "Montserrat-alternates" !important;
 }
 
 table{
@@ -1301,7 +1305,6 @@ div.suggestPopupContent div table tbody tr td.item-selected{
 .select-css { 
     display: block; 
     font-size: 16px; 
-    font-family: sans-serif; 
     font-weight: 700; 
     color: #444; 
     line-height: 1.3; 

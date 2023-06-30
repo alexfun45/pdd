@@ -26,7 +26,7 @@ type userType = {
     password: string;
 };
 
-export default ({showUserDialog, setUserDialog, selectedUser, users, setUsers}: {showUserDialog: string,setUserDialog: React.Dispatch<React.SetStateAction<string>>, selectedUser: any, users: userType[], setUsers:React.Dispatch<React.SetStateAction<userType[]>>}) => {
+export default ({showUserDialog, setUserDialog, selectedUser, users, setUsers}: {showUserDialog: string,setUserDialog: React.Dispatch<React.SetStateAction<string>>, selectedUser: any, users: any, setUsers: any}) => {
 
     const [show, setShow] = useState(showUserDialog),
           [editedUser, setEditedUser] = useState(selectedUser);
@@ -73,7 +73,7 @@ export default ({showUserDialog, setUserDialog, selectedUser, users, setUsers}: 
     const handleClose = () => setUserDialog('hide');
 
     const isUserExists = (v: string) => {
-        let isExists = users.find((user)=>{
+        let isExists = users.find((user: any)=>{
             return (user.login==v && ((show=="edit") && selectedUser.login!=user.login));
         })
         return !(isExists!==undefined);

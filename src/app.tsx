@@ -1,6 +1,7 @@
 import React, {useState, useEffect} from "react";
 import { HashRouter, useLocation } from "react-router-dom" 
 import { createContext} from "react";
+import "@fontsource/montserrat-alternates"
 import "@/css/docs18.css"
 import { Routes, Route, Navigate, useNavigation } from "react-router-dom";
 import routes from './routers'
@@ -47,6 +48,8 @@ type userType = {
   name: string;
   email: string;
   role: number;
+  reg_date: number;
+  last_auth: number;
   isMobile: boolean;
   settings: object;
 };
@@ -63,7 +66,7 @@ export default function App(){
  
   const [isLogin, setLogin] = useState(false),
         [pageTitle, setPageTitle] = useState(""),
-        [user, setUser] = useState<userType>(defaultUser),
+        [user, setUser] = useState<any>(defaultUser),
         [role, setRole] = useState(3),
         [settings, setSettings] = useState({showLogo: '1', start_page: {name: ""}, exam_title: "", 'background-color':'', 'background-image':'', 'background-color-tickets': '', 'background-image-tickets':'', 'image_title_exam':'', 'background-image-tickets-mobile':'', 'image_title_exam_mobile': '', 'shuffle_tickets': '0', 'load': false}),
         [displayWidth, setDisplayWidth] = useState(window.innerWidth);
@@ -125,6 +128,8 @@ export default function App(){
               name: "",
               email: "",
               role: -1,
+              reg_date:0,
+              last_auth:0,
               isMobile: false,
               settings: {}
             });

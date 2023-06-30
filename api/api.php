@@ -464,11 +464,12 @@
         $email = $this->data->email;
         $role = $this->data->role;
         $confirmed = ($token=='') ? 1:0;
+        $reg_date = time();
         $role = (array_key_exists("role", $_POST)) ? $_POST['role'] : 3;
         if(isset($login) && isset($this->data->password) && isset($role)){
             $db = new SQLite3(DB."db.sqlite");
             $password = md5($this->data->password);
-            $sql = "INSERT INTO users(login, name, password, email, role, token, confirmed) VALUES('$login', '$name', '$password', '$email', '$role', '$token', '$confirmed')";
+            $sql = "INSERT INTO users(login, name, password, email, role, token, confirmed, reg_date) VALUES('$login', '$name', '$password', '$email', '$role', '$token', '$confirmed', {$reg_date})";
             $db->exec($sql);
             $userId = $db->lastInsertRowID();
             $db->close();
@@ -521,12 +522,14 @@
 
     function getUsers(){
         $db = new SQLite3(DB."db.sqlite");
-        $sql = "SELECT id, name, login, email, role, action_time FROM users";
+        $sql = "SELECT id, name, login, email, role, action_time, reg_date, last_auth FROM users";
         $res = $db->query($sql);
         $currentTime = time();
         while($user = $res->fetchArray(SQLITE3_ASSOC)){
             $online = ($user['action_time']==0) ? -1 : (($currentTime-$user['action_time']>60*5)?0:1);
             $user['state'] = $online;
+            $user['reg_date'] = ($user['reg_date']==0)?"":date("d-m-Y H:i", $user['reg_date']);
+            $user['last_auth'] = ($user['last_auth']==0)?"":date("d-m-Y H:i", $user['last_auth']);
             $users[] = $user;
         }
         $db->close();
@@ -547,6 +550,8 @@
                 $user = $result->fetchArray(SQLITE3_ASSOC);
                 setcookie("login", $_POST['login'], time() + 30*24*3600);
                 setcookie("userid", $user['id'], time() + 30*24*3600);
+                $auth_date = time();
+                $db->exec("UPDATE users SET last_auth={$auth_date} WHERE id={$user['id']}");
                 setcookie("password", $password, time() + 30*24*3600);
                 $_SESSION['logged'] = 1;
                 $_SESSION['role'] = $user['role'];

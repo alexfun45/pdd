@@ -35,7 +35,10 @@ export default (props) => {
   const imageUpload = (img, insertImage, welEditable) => {
     var reader = new FileReader();
     reader.onloadend = function() {
-      ReactSummernote.insertImage(reader.result);
+      ReactSummernote.insertImage(reader.result, $image=>{
+        console.log("img", $image);
+        //$image.wrap("<a href='"+$image+"'></a>");
+      });
     }
     reader.readAsDataURL(img[0]);
     props.formData.append("opt", "test");
@@ -49,6 +52,7 @@ export default (props) => {
           lang: 'ru-RU',
           height: '500px',
           dialogsInBody: true,
+          plugins:["hello"],
           toolbar: [
             ['style', ['style']],
             ['font', ['fontsize', 'bold', 'underline', 'clear']],
