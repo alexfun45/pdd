@@ -7,7 +7,8 @@ import 'react-summernote/lang/summernote-ru-RU'; // you can import any other loc
 import 'bootstrap/js/dist/modal';
 import 'bootstrap/js/dist/dropdown';
 import 'bootstrap/js/dist/tooltip';
-import 'react-summernote/src/summernote-image-attributes'
+//import 'react-summernote/src/summernote-image-attributes'
+import '../lib/summernote-image-attributes'
 //import 'bootstrap-icons/font/bootstrap-icons.css'
 //import 'bootstrap/dist/css/bootstrap.css';
 
