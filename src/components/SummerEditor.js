@@ -7,6 +7,7 @@ import 'react-summernote/lang/summernote-ru-RU'; // you can import any other loc
 import 'bootstrap/js/dist/modal';
 import 'bootstrap/js/dist/dropdown';
 import 'bootstrap/js/dist/tooltip';
+import 'react-summernote/src/summernote-image-attributes'
 //import 'bootstrap-icons/font/bootstrap-icons.css'
 //import 'bootstrap/dist/css/bootstrap.css';
 
@@ -36,7 +37,7 @@ export default (props) => {
     var reader = new FileReader();
     reader.onloadend = function() {
       ReactSummernote.insertImage(reader.result, $image=>{
-        console.log("img", $image);
+       
         //$image.wrap("<a href='"+$image+"'></a>");
       });
     }
@@ -53,6 +54,19 @@ export default (props) => {
           height: '500px',
           dialogsInBody: true,
           plugins:["hello"],
+          popover: {
+            image: [
+                ['custom', ['imageAttributes']],
+                ['imagesize', ['imageSize100', 'imageSize50', 'imageSize25']],
+                ['float', ['floatLeft', 'floatRight', 'floatNone']],
+                ['remove', ['removeMedia']]
+            ],
+        },
+        imageAttributes:{
+          icon:'<i class="note-icon-pencil"/>',
+          removeEmpty:false, // true = remove attributes | false = leave empty if present
+          disableUpload: false // true = don't display Upload Options | Display Upload Options
+      },
           toolbar: [
             ['style', ['style']],
             ['font', ['fontsize', 'bold', 'underline', 'clear']],

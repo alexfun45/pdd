@@ -1,7 +1,7 @@
 import React, {useState, useEffect} from "react";
 import { HashRouter, useLocation } from "react-router-dom" 
 import { createContext} from "react";
-import "@fontsource/montserrat-alternates"
+//import "@fontsource/montserrat-alternates"
 import "@/css/docs18.css"
 import { Routes, Route, Navigate, useNavigation } from "react-router-dom";
 import routes from './routers'
