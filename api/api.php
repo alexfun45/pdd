@@ -1048,7 +1048,7 @@
         $db = new SQLite3(DB."db.sqlite");
         $start_date = $this->data->start_date;
         $end_date = $this->data->end_date;
-        $result = $db->query("SELECT t1.name AS name, COUNT(*) AS num, SUM(t2.correct) AS summ FROM tickets AS t1 LEFT JOIN statistic AS t2 ON t1.id=ticket_id WHERE (DATETIME(t2.timecreated, 'unixepoch')>=datetime({$start_date}, 'unixepoch') AND DATETIME(t2.timecreated, 'unixepoch')<=datetime({$end_date}, 'unixepoch')) GROUP BY t1.id, t2.test_session HAVING summ!=0");
+        $result = $db->query("SELECT t1.name AS name, COUNT(*) AS num, SUM(t2.correct) AS summ FROM tickets AS t1 LEFT JOIN statistic AS t2 ON t1.id=ticket_id WHERE (DATETIME(t2.timecreated, 'unixepoch')>=datetime({$start_date}, 'unixepoch') AND DATETIME(t2.timecreated, 'unixepoch')<=datetime({$end_date}, 'unixepoch')) GROUP BY t1.id, t2.test_session");
         $tickets = array();
         while($res = $result->fetchArray(SQLITE3_ASSOC)){
             if(empty($tickets[$res['name']])){
