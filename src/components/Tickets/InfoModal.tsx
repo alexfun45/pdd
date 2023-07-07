@@ -24,12 +24,12 @@ export default ({showDialog, setOpen, fQuestions}:{showDialog: boolean, setOpen:
                         <Modal.Title>Неправильные ответы</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
-                        <div>список неправильных ответов:
+                        <div>Номера вопросов с неправильными ответами:
                         {(questions!=undefined) && (
                             <span>
                                 {
                                     questions.map((v: any)=>(
-                                        <span style={{color: '#1f82d8', marginLeft: '5px'}}>{v}</span>
+                                        <span className="qItem">{v}</span>
                                     ))
                                     
                                 }

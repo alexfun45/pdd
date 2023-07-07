@@ -1270,7 +1270,7 @@ div.suggestPopupContent div table tbody tr td.item-selected{
 .users-table td{
     font-size: 16px;
     font-weight: 400;
-    padding: 12px 17px !important;
+    padding: 12px 17px;
     border: none;
 }
 
@@ -2186,4 +2186,24 @@ div.suggestPopupContent div table tbody tr td.item-selected{
     color:#1f82d8;
     cursor: pointer;
     text-decoration: underline;
+  }
+  .grad-table th{
+    text-align: center;
+  }
+  .grad-table th, td{
+    padding: 6px 8px !important;
+  }
+
+  .grad-table tr td{
+    text-align: center;
+  }
+
+  .qItem{
+    margin-left: 5px;
+    color: #FFF;
+    width: auto;
+    height: auto;
+    display: inline-block;
+    background-color: rgb(31, 130, 216);
+    padding: 2px 6px;
   }

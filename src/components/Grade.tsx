@@ -4,7 +4,7 @@ import Table from 'react-bootstrap/Table'
 import InfoModal from './Tickets/InfoModal'
 
 const tickets:number[] = [];
-for(let i=1;i<=20;i++){
+for(let i=1;i<=40;i++){
     tickets[i-1] = i;
 }
 
@@ -33,8 +33,8 @@ export default () => {
     return (
         <div>
             <InfoModal showDialog={open} setOpen={setOpen} fQuestions={fQuestions}/>
-            <Table style={{width: '1000px'}} className="users-table" responsive>
-                <thead><tr><th rowSpan={2}>логин/id</th><th style={{textAlign: 'center'}} colSpan={21}>Билеты</th>
+            <Table style={{width: 'auto'}} className="users-table grad-table" responsive>
+                <thead><tr><th style={{fontSize: "12px"}} rowSpan={2}>логин/id</th><th style={{textAlign: 'center'}} colSpan={41}>Билеты</th>
                 </tr>
                 <tr>
                     <th style={{fontSize: "12px"}}>дата</th>
@@ -47,8 +47,8 @@ export default () => {
                 {
                     Object.entries(gradeData).map((userData:any, indx)=>(
                         <tr>
-                            <td>{userData[0]}</td>
-                            <td>{
+                            <td style={{fontSize: '12px'}}>{userData[0]}</td>
+                            <td style={{fontSize: '12px'}}>{
                                 Object.entries(userData[1]).map((d: any, i: number)=>{
                                     if(i>0) return;
                                     return d[1].time;
