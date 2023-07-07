@@ -21,10 +21,10 @@ export default ({showDialog, setOpen, fQuestions}:{showDialog: boolean, setOpen:
         <>
             <Modal show={show} onHide={handleClose}>
                     <Modal.Header closeButton>
-                        <Modal.Title>Неправильные ответы</Modal.Title>
+                        <Modal.Title>Номера вопросов с неправильными ответами</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
-                        <div>Номера вопросов с неправильными ответами:
+                        <div>
                         {(questions!=undefined) && (
                             <span>
                                 {
