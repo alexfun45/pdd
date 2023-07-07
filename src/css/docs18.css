@@ -2181,3 +2181,9 @@ div.suggestPopupContent div table tbody tr td.item-selected{
   .note-form-group{
     height: auto;
   }
+
+  .btnItem{
+    color:#1f82d8;
+    cursor: pointer;
+    text-decoration: underline;
+  }

@@ -7,6 +7,7 @@ import PageEditor from './PageEditor'
 import UsersManager from './Users'
 import Statistic from './Statistic'
 import Settings from './Settings'
+import Grade from './Grade'
 import request from '../utils/request'
 import {AppContext} from '../app'
 
@@ -70,6 +71,11 @@ export default () => {
                     {(context.userRole==1) && (
                         <Tab eventKey="statistic" title="Статистика">
                             <Statistic />
+                        </Tab>
+                    )}
+                    {(context.userRole==1) && (
+                        <Tab eventKey="grade" title="Успеваемость">
+                            <Grade />
                         </Tab>
                     )}
                     <Tab eventKey="pagemanager" title="Менеджер страниц">

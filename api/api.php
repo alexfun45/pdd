@@ -961,8 +961,35 @@
         $db->close();
     }
 
-    protected function getStatistic(){
+    protected function getGrade(){
+        $db = new SQLite3(DB."db.sqlite");
+        $result = $db->query("SELECT t1.user_id AS user_id, t1.q_id AS q_id, t2.login AS login, t1.test_session as test_session, t3.name AS ticketname, t1.timecreated AS timefinished, SUM(t1.correct) AS num FROM statistic AS t1 INNER JOIN tickets AS t3 ON t1.ticket_id=t3.id LEFT JOIN users AS t2 ON t1.user_id=t2.id GROUP BY t1.user_id, t1.ticket_id, t1.test_session ORDER BY t1.user_id, t1.ticket_id, t1.timecreated");
+        $grades = array();
+        while($res = $result->fetchArray(SQLITE3_ASSOC)){
+            $user_id = $res['user_id'];
+            $ticket_name = $res['ticketname'];
+            $login = (!empty($res['login']))?$res['login']:$user_id;
+            $time = date("d-m-Y H:i", $res['timefinished']); 
+            $grades[$login][$ticket_name] = array("time"=>$time, 'failed'=>$res['num'], 'user_id'=>$user_id, 'session'=>$res['test_session']);
+        }
+        $db->close();
+        return $grades;
+    }
+
+    protected function getFailedQuestions(){
         //ini_set('display_errors', TRUE);
+        $db = new SQLite3(DB."db.sqlite");
+        $user_id = $this->data->q_id;
+        $test_session = $this->data->testSession;
+        $result = $db->query("SELECT t2.indx FROM statistic AS t1 INNER JOIN ticket_2_question AS t2 ON t1.ticket_id=t2.tickets_id AND t1.q_id=t2.q_id WHERE t1.test_session={$test_session} AND t1.correct=1");
+        while($res = $result->fetchArray(SQLITE3_ASSOC)){
+            $q[] = $res['indx'];
+        }
+        $db->close();
+        return $q;
+    }
+
+    protected function getStatistic(){
         $db = new SQLite3(DB."db.sqlite");
         $ticketId = $this->data->ticketId;
         $avg_stat = array();
