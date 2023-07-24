@@ -29,12 +29,12 @@ export default ({Logout, isLogin, role, isMobile}: {Logout: React.MouseEventHand
             <div id="admin_panel">
                 {((role==1 || role==2) && !isMobile) && (
                     <a className="adminpanel-btn btn btn-primary btn-auth" id="admin-btn" href="#/admin">
-                        <i className="bi bi-gear"></i>
+                        Личный кабинет
                     </a>
                 )}
                 {(role==3) && (
                    <a className="adminpanel-btn btn btn-primary btn-auth" id="admin-btn" href="#/profile">
-                        <i className="bi bi-person-square"></i>Профиль
+                        <i className="bi bi-person-square"></i>Личный кабинет
                     </a> 
                 )}
                 <div onClick={Logout} className="adminpanel-btn exit-icon btn btn-primary btn-auth" id="logout">

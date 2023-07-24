@@ -75,7 +75,7 @@ export default function App(){
         allRoutes.map((route) => {
           if (route.route) {
               let userRole = (window.localStorage.getItem('user')!=null) ? JSON.parse(window.localStorage.getItem('user')).role:0;
-              if((route.auth=="admin" && userRole!=1) || (route.auth=="user" && (userRole!=1 && userRole!=3))){
+              if((route.auth=="admin" && (userRole!=1 && userRole!=2)) || (route.auth=="user" && (userRole!=1 && userRole!=3))){
                 return <Route path={route.route} element={<Navigate to="/auth" replace />} />;
               }
               else
