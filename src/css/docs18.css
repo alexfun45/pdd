@@ -1738,7 +1738,7 @@ div.suggestPopupContent div table tbody tr td.item-selected{
         box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
         min-width: 300px;
         min-height: 350px;
-        max-width: 600px;
+        max-width: 900px;
         border-radius: 10px;
     }
 
@@ -1761,6 +1761,7 @@ div.suggestPopupContent div table tbody tr td.item-selected{
         justify-content: center;
         width: auto;
         padding-top: 20px;
+        margin-left: 100px;
     }
 
     .profileBody > div{
@@ -2206,4 +2207,15 @@ div.suggestPopupContent div table tbody tr td.item-selected{
     display: inline-block;
     background-color: rgb(31, 130, 216);
     padding: 2px 6px;
+  }
+
+  .v-title{
+    font-size: 12px;
+    background-color: rgb(189, 187, 187) !important;
+  }
+
+  .btn-link{
+    color:#1f82d8;
+    cursor: pointer;
+    text-decoration: underline;
   }

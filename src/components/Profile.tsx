@@ -1,10 +1,52 @@
 import React, {useState, useEffect} from 'react'
-import Form from 'react-bootstrap/Form';
+import PropTypes from 'prop-types';
+import SwipeableViews from 'react-swipeable-views';
+import { useTheme } from '@mui/material/styles';
+import AppBar from '@mui/material/AppBar';
+import Tabs from '@mui/material/Tabs';
+import Tab from '@mui/material/Tab';
+import Typography from '@mui/material/Typography';
+import Box from '@mui/material/Box';
+import EditorProfile from './EditorProfile';
+import UserGradeTable from './Grade/userGradeTable';
+import InfoModal from './Tickets/InfoModal'
 import request from "../utils/request";
-import Button from "react-bootstrap/Button"
-import {AppContext} from '../app'
 
-type userType = {
+interface TabPanelProps {
+    children?: React.ReactNode;
+    dir?: string;
+    index: number;
+    value: number;
+  }
+
+function TabPanel(props: TabPanelProps) {
+    const { children, value, index, ...other } = props;
+  
+    return (
+      <div
+        role="tabpanel"
+        hidden={value !== index}
+        id={`full-width-tabpanel-${index}`}
+        aria-labelledby={`full-width-tab-${index}`}
+        {...other}
+      >
+        {value === index && (
+          <Box sx={{ p: 3 }}>
+            <Typography>{children}</Typography>
+          </Box>
+        )}
+      </div>
+    );
+  }
+  
+  function a11yProps(index: number) {
+    return {
+      id: `full-width-tab-${index}`,
+      'aria-controls': `full-width-tabpanel-${index}`,
+    };
+  }
+
+ type userType = {
     id: number;
     login: string;
     name: string;
@@ -23,119 +65,73 @@ let defaultUser = {
   }
 
 export default () => {
-
-    //const context = React.useContext(AppContext);
-    const [user, setUser] = useState<userType>(defaultUser),
-          [editModes, setEditModes] = useState({login: false, name: false, email: false}),
-          [passwordError, setPassError] = useState(false),
-          [newPassword, setNewPassword] = useState(""),
-          [errorMsg, setErrorMsg] = useState("");
+    const theme = useTheme();
+    const [value, setValue] = React.useState(0),
+          [gradeData, setGradeData] = useState(),
+          [open, setOpen] = useState(false),
+          [fQuestions, setfQuestions] = useState([]),
+          [user, setUser] = useState<userType>(defaultUser);
 
     useEffect(()=>{
-        request({method: "post", data:{action: "getProfile"}}).then(response=>{
+            request({method: "post", data:{action: "getProfile"}}).then(response=>{
+                const {data} = response;
+                setUser(data);
+            });
+        }, []);
+    
+    useEffect(()=>{
+        request({method: 'post', data: {action: "getGrade", data: {user_id: user.id}}}).then(response => {
             const {data} = response;
-            setUser(data);
+            setGradeData(data);
         });
-    }, []);
+    }, [user])
 
-    const handleChange = (value: string, key: string) => {
-        if(value.length<100)
-            setUser({...user, [key]: value});
-    }
+    const handleChange = (event: React.SyntheticEvent, newValue: number) => {
+        setValue(newValue);
+    };
 
-    const enterValue = (event: any, key: string) => {
-        if(event.keyCode==13){
-            //setEditModes({...editModes, [key]: false});
-            saveUser(key);
-        }
-    }
+    const handleChangeIndex = (index: number) => {
+        setValue(index);
+    };
 
-    const checkPassword = (event: any) => {
-        let v = event.target.value;
-        if(v.length<8){
-            setPassError(true);
-            setErrorMsg("Пароль должен содержать не меньше 8 символов");
-            return;
-        }
-        if( !((/[0-9]/.test(v)) && (/[A-Z]/.test(v))) ){
-            setPassError(true);
-               setErrorMsg("Пароль должен содержать буквы и цифры и символы в верхнем и нижнем регистре");
-            return;
-        }
-        setPassError(false);
-        setErrorMsg("");
-        setNewPassword(v);
-    }
-
-    const saveUser = (key: string) => {
-        setEditModes({...editModes, [key]: false});
-        request({method: "post", data: {action: "editUser", data: {...user}}});
-    }
-
-    const changePassword = () => {
-        if(!passwordError){
-            request({method: "post", data: {action: "changePassword", data: {userId: user.id, password: newPassword}}});  
-        }
+    const handleClickItem = (user_id: number, session: string) => {
+        request({method: 'post', data: {action: "getFailedQuestions", data: { user_id: user_id, testSession: session}}}).then(response => {
+            const {data} = response;
+            setfQuestions(data);
+        });
+        setOpen(true);
     }
 
     return (
         <div className="profileWrapper">
-            <div className="profileHeader">Профиль</div>
-            {(user.confirmed=='0') &&
-                <div className="confirm-msg">Вы не подтвердили свой аккаунт. Проверьте почту и перейдите по ссылке для подтверждения регистрации, иначе вам будет недоступно редактирование профиля.</div>
-            }
-            <div className="profileBody">
-                <div><label>Логин</label>
-                    <span>
-                        {( (editModes.login) && (parseInt(user.confirmed)==1)) ?
-                            (<Form.Control
-                                type="text"
-                                id="loginText"
-                                value={user.login}
-                                onChange={(e)=>handleChange(e.target.value, 'login')}
-                                onKeyDown={(e)=>enterValue(e, 'login')}
-                                onBlur={()=>saveUser('login')}
-                            />) :
-                            (<span>{user.login}<i onClick={()=>{console.log("confirmed", user.confirmed); setEditModes({...editModes, ['login']: true})}} className="bi bi-pencil-square mini-btn"></i></span>)
-                        }
-                    </span>
-                </div>
-                <div><label>Имя</label><span>
-                    {(editModes.name && user.confirmed=='1') ?
-                                (<Form.Control
-                                    type="text"
-                                    id="nameText"
-                                    value={user.name}
-                                    onChange={(e)=>handleChange(e.target.value, 'name')}
-                                    onKeyDown={(e)=>enterValue(e, 'name')}
-                                    onBlur={()=>saveUser('name')}
-                                />) :
-                                (<span>{user.name}<i onClick={()=>setEditModes({...editModes, ['name']: true})} className="bi bi-pencil-square mini-btn"></i></span>)
-                            }
-                            </span></div>
-                    <div><label>email</label><span>
-                        {(editModes.email && user.confirmed=='1') ?
-                                    (<Form.Control
-                                        type="text"
-                                        id="emailText"
-                                        value={user.email}
-                                        onChange={(e)=>handleChange(e.target.value, 'email')}
-                                        onKeyDown={(e)=>enterValue(e, 'email')}
-                                        onBlur={()=>saveUser('email')}
-                                    />) :
-                                    (<span>{user.email}<i onClick={()=>setEditModes({...editModes, ['email']: true})} className="bi bi-pencil-square mini-btn"></i></span>)
-                                }</span></div>
-                        <div className="password-field">
-                                <div>
-                                    <Form.Control
-                                        type="password"
-                                        id="passwordText"
-                                        onChange={(e)=>checkPassword(e)}
-                                    />
-                                    <div className="error-msg">{errorMsg}</div>
-                                </div>
-                                        <Button onClick={changePassword}>изменить пароль</Button></div>
-            </div>
+            <InfoModal showDialog={open} setOpen={setOpen} fQuestions={fQuestions}/>
+            <Box sx={{ bgcolor: 'background.paper', width: '100%' }}>
+            <AppBar position="static">
+                <Tabs
+                value={value}
+                onChange={handleChange}
+                indicatorColor="secondary"
+                textColor="inherit"
+                variant="fullWidth"
+                aria-label="full width tabs example"
+                >
+                <Tab label="Редактор профиля" {...a11yProps(0)} />
+                <Tab label="Успеваемость" {...a11yProps(1)} />
+                </Tabs>
+            </AppBar>
+            <SwipeableViews
+                axis={theme.direction === 'rtl' ? 'x-reverse' : 'x'}
+                index={value}
+                onChangeIndex={handleChangeIndex}
+            >
+                <TabPanel value={value} index={0} dir={theme.direction}>
+                    <EditorProfile user={user} setUser={setUser} />
+                </TabPanel>
+                <TabPanel value={value} index={1} dir={theme.direction}>
+                    <UserGradeTable setUser={Function()} gradeData={gradeData} handleClickItem={handleClickItem}/>
+                </TabPanel>
+            </SwipeableViews>
+            </Box>
         </div>
     )
 }

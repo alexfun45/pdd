@@ -7,7 +7,7 @@ import PageEditor from './PageEditor'
 import UsersManager from './Users'
 import Statistic from './Statistic'
 import Settings from './Settings'
-import Grade from './Grade'
+import Grade from './Grade/Grade'
 import request from '../utils/request'
 import {AppContext} from '../app'
 
