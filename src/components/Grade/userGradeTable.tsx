@@ -27,7 +27,8 @@ export default ({setUser, gradeData, handleClickItem}: {setUser: Function, grade
     }
 
     return (
-        <Table style={{width: 'auto'}} className="users-table grad-table" responsive>
+        <div style={{height: '300px'}}>
+            <Table style={{width: 'auto'}} className="users-table grad-table" responsive>
                 <thead>
                     <tr>
                         <th style={{fontSize: "12px"}} rowSpan={1}></th><th style={{textAlign: 'center'}} colSpan={41}><span onClick={resetUserSelected} className='btn-link' style={{float: 'left', color: '#FFF'}}>&#60; назад</span>Билеты</th>
@@ -62,6 +63,7 @@ export default ({setUser, gradeData, handleClickItem}: {setUser: Function, grade
                             ))
                         }
                     </tr>
-        </Table>
+            </Table>
+        </div>
     )
 }

@@ -9,18 +9,24 @@ type userType = {
     login: string;
     name: string;
     email: string;
+    confirmed: number;
     role: number;
-    confirmed: string;
+    reg_date: number;
+    last_auth: number;
+    isMobile: boolean;
+    settings: object;
   };
 
 let defaultUser = {
-    id: 0,
-    login: "",
-    name: "",
-    email: "",
-    role: 3,
-    confirmed: "1"
-  }
+  id: 0,
+  login: "",
+  name: "",
+  email: "",
+  confirmed: 0,
+  role: 3,
+  isMobile: false,
+  settings: {}
+  };
 
 export default ({user, setUser}:{user: userType, setUser: Function}) => {
 
@@ -72,13 +78,13 @@ export default ({user, setUser}:{user: userType, setUser: Function}) => {
     return (
         <div>
             
-            {(user.confirmed=='0') &&
+            {(user.confirmed==0) &&
                 <div className="confirm-msg">Вы не подтвердили свой аккаунт. Проверьте почту и перейдите по ссылке для подтверждения регистрации, иначе вам будет недоступно редактирование профиля.</div>
             }
             <div className="profileBody">
                 <div><label>Логин</label>
                     <span>
-                        {( (editModes.login) && (parseInt(user.confirmed)==1)) ?
+                        {( (editModes.login) && (user.confirmed==1)) ?
                             (<Form.Control
                                 type="text"
                                 id="loginText"
@@ -92,7 +98,7 @@ export default ({user, setUser}:{user: userType, setUser: Function}) => {
                     </span>
                 </div>
                 <div><label>Имя</label><span>
-                    {(editModes.name && user.confirmed=='1') ?
+                    {(editModes.name && user.confirmed==1) ?
                                 (<Form.Control
                                     type="text"
                                     id="nameText"
@@ -105,7 +111,7 @@ export default ({user, setUser}:{user: userType, setUser: Function}) => {
                             }
                             </span></div>
                     <div><label>email</label><span>
-                        {(editModes.email && user.confirmed=='1') ?
+                        {(editModes.email && user.confirmed==1) ?
                                     (<Form.Control
                                         type="text"
                                         id="emailText"

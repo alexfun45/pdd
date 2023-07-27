@@ -15,9 +15,12 @@ let defaultUser = {
       login: "",
       name: "",
       email: "",
+      confirmed: 0,
       role: 3,
       isMobile: false,
-      settings: {}
+      settings: {},
+      reg_date: 0,
+      last_auth: 0
     }
 
 const AppContext = createContext({
@@ -47,6 +50,7 @@ type userType = {
   login: string;
   name: string;
   email: string;
+  confirmed: number;
   role: number;
   reg_date: number;
   last_auth: number;
@@ -66,7 +70,7 @@ export default function App(){
  
   const [isLogin, setLogin] = useState(false),
         [pageTitle, setPageTitle] = useState(""),
-        [user, setUser] = useState<any>(defaultUser),
+        [user, setUser] = useState<userType>(defaultUser),
         [role, setRole] = useState(3),
         [settings, setSettings] = useState({showLogo: '1', start_page: {name: ""}, exam_title: "", 'background-color':'', 'background-image':'', 'background-color-tickets': '', 'background-image-tickets':'', 'image_title_exam':'', 'background-image-tickets-mobile':'', 'image_title_exam_mobile': '', 'shuffle_tickets': '0', 'load': false}),
         [displayWidth, setDisplayWidth] = useState(window.innerWidth);
@@ -108,6 +112,7 @@ export default function App(){
       });
       if(window.localStorage.getItem('user')!=null && window.localStorage.getItem('user')!="false"){
         let userData = JSON.parse(window.localStorage.getItem('user'));
+        console.log("userData", userData);
         setRole(userData.role);
         setLogin(userData.logged);
         setUser(userData);
@@ -127,6 +132,7 @@ export default function App(){
               login: "unlogged",
               name: "",
               email: "",
+              confirmed: 0,
               role: -1,
               reg_date:0,
               last_auth:0,

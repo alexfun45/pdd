@@ -425,10 +425,10 @@
     }
 
     protected function getUserRole($data){
-       if(isset($_SESSION['logged'])) return array("logged"=>true, "id"=>$_SESSION['userId'], "role"=>$_SESSION['role'], "login"=>$_SESSION["login"], "name"=>$_SESSION["name"], "email"=>$_SESSION["email"]);
+        if(isset($_SESSION['logged'])) return array("logged"=>true, "id"=>$_SESSION['userId'], "role"=>$_SESSION['role'], "login"=>$_SESSION["login"], "name"=>$_SESSION["name"], "email"=>$_SESSION["email"]);
         if(isset($_COOKIE["login"]) && isset($_COOKIE["password"])){
             $db = new SQLite3(DB."db.sqlite");
-            $sql = "SELECT id, login, name, email, role FROM users WHERE login=:login AND password=:password";
+            $sql = "SELECT id, login, name, email, role, confirmed FROM users WHERE login=:login AND password=:password";
             $stmt = $db->prepare($sql);
             $login = $_COOKIE["login"];
             $stmt->bindParam(':login', $login);
@@ -449,12 +449,14 @@
     }
 
     protected function getProfile(){
+        //ini_set('display_errors', TRUE);
         $db = new SQLite3(DB."db.sqlite");
         $id = $_SESSION['userId'];
         $sql = "SELECT id, login, name, email, role, confirmed FROM users WHERE id=$id";
         $res = $db->query($sql);
         $result = $res->fetchArray(SQLITE3_ASSOC);
         $db->close();
+        echo 'user_id='.$_SESSION['userId'];
         return $result;
     }
 
@@ -540,7 +542,7 @@
         if(isset($this->data->login) && isset($this->data->password) && strlen($this->data->login)<128 && strlen($this->data->password)<128){
             $db = new SQLite3(DB."db.sqlite");
             $password = md5($this->data->password);
-            $sql = "SELECT id, login, role FROM users WHERE login=:login AND password=:password";
+            $sql = "SELECT id, login, role, name, email, confirmed FROM users WHERE login=:login AND password=:password";
             $stmt = $db->prepare($sql);
             $stmt->bindParam(':login', $this->data->login);
             $stmt->bindParam(':password', $password);
@@ -555,7 +557,10 @@
                 setcookie("password", $password, time() + 30*24*3600);
                 $_SESSION['logged'] = 1;
                 $_SESSION['role'] = $user['role'];
+                $_SESSION['login'] = $user['login'];
                 $_SESSION['userId'] = $user['id'];
+                $_SESSION['name'] = $user['name'];
+                $_SESSION['email'] = $user['email'];
                 $stmt->close();
                 //return $password;
                 return ($user!==false);

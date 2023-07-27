@@ -10,6 +10,7 @@ import Box from '@mui/material/Box';
 import EditorProfile from './EditorProfile';
 import UserGradeTable from './Grade/userGradeTable';
 import InfoModal from './Tickets/InfoModal'
+import {AppContext} from '../app'
 import request from "../utils/request";
 
 interface TabPanelProps {
@@ -46,23 +47,31 @@ function TabPanel(props: TabPanelProps) {
     };
   }
 
- type userType = {
+type userType = {
     id: number;
     login: string;
     name: string;
     email: string;
+    confirmed: number;
     role: number;
-    confirmed: string;
+    isMobile: boolean;
+    reg_date: number;
+    last_auth: number;
+    settings: object;
   };
 
 let defaultUser = {
-    id: 0,
-    login: "",
-    name: "",
-    email: "",
-    role: 3,
-    confirmed: "1"
-  }
+  id: 0,
+  login: "",
+  name: "",
+  email: "",
+  confirmed: 0,
+  reg_date: 0,
+  last_auth: 0,
+  role: 3,
+  isMobile: false,
+  settings: {}
+  };
 
 export default () => {
     const theme = useTheme();
@@ -72,12 +81,18 @@ export default () => {
           [fQuestions, setfQuestions] = useState([]),
           [user, setUser] = useState<userType>(defaultUser);
 
+    const context = React.useContext(AppContext);
+
     useEffect(()=>{
+      setUser(context.user);
+      console.log("user", context.user);
+    }, [context.user]);
+    /*useEffect(()=>{
             request({method: "post", data:{action: "getProfile"}}).then(response=>{
                 const {data} = response;
                 setUser(data);
             });
-        }, []);
+        }, []);*/
     
     useEffect(()=>{
         request({method: 'post', data: {action: "getGrade", data: {user_id: user.id}}}).then(response => {
