@@ -85,19 +85,14 @@ export default () => {
 
     useEffect(()=>{
       setUser(context.user);
-      console.log("user", context.user);
     }, [context.user]);
-    /*useEffect(()=>{
-            request({method: "post", data:{action: "getProfile"}}).then(response=>{
-                const {data} = response;
-                setUser(data);
-            });
-        }, []);*/
+    
     
     useEffect(()=>{
+      if(user.id==0) return;
         request({method: 'post', data: {action: "getGrade", data: {user_id: user.id}}}).then(response => {
             const {data} = response;
-            setGradeData(data);
+            setGradeData(data[user.login]);
         });
     }, [user])
 

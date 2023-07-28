@@ -28,6 +28,8 @@ let defaultUser = {
   settings: {}
   };
 
+let editUser = {};
+
 export default ({user, setUser}:{user: userType, setUser: Function}) => {
 
     const [editModes, setEditModes] = useState({login: false, name: false, email: false}),
@@ -36,8 +38,10 @@ export default ({user, setUser}:{user: userType, setUser: Function}) => {
           [errorMsg, setErrorMsg] = useState("");
 
     const handleChange = (value: string, key: string) => {
-        if(value.length<100)
+        if(value.length<100){
             setUser({...user, [key]: value});
+            editUser = {...user, [key]: value};
+        }
     }
 
     const enterValue = (event: any, key: string) => {
@@ -67,6 +71,7 @@ export default ({user, setUser}:{user: userType, setUser: Function}) => {
     const saveUser = (key: string) => {
         setEditModes({...editModes, [key]: false});
         request({method: "post", data: {action: "editUser", data: {...user}}});
+        
     }
 
     const changePassword = () => {

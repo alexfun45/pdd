@@ -9,6 +9,9 @@ import Header from "./components/Header"
 import MobileHeader from './components/MobileHeader'
 import Footer from './components/Footer'
 import request from './utils/request'
+import * as actions from "./store/userActions";
+import { useDispatch } from "react-redux";
+import store from './store/store'
 
 let defaultUser = {
       id: 0,
@@ -89,11 +92,16 @@ export default function App(){
     
           return null;
         });
+  
+  const saveUser = (newUserProfile: userType) => {
+    setUser(newUserProfile);
+    window.localStorage.setItem("user", JSON.stringify(newUserProfile));
+  }
 
   useEffect(()=>{
     if(window.localStorage.getItem('backgroundImage')!=null)
       document.body.style.backgroundImage = window.localStorage.getItem('backgroundImage');
-    request({method: "post", data: {action: "getSettings"}}).then(response=>{
+      request({method: "post", data: {action: "getSettings"}}).then(response=>{
       const {data} = response;
       setSettings({...data, 'load': true});
       if(data['background-color']){
@@ -110,9 +118,8 @@ export default function App(){
         }
         }
       });
-      if(window.localStorage.getItem('user')!=null && window.localStorage.getItem('user')!="false"){
+      /*if(window.localStorage.getItem('user')!=null && window.localStorage.getItem('user')!="false"){
         let userData = JSON.parse(window.localStorage.getItem('user'));
-        console.log("userData", userData);
         setRole(userData.role);
         setLogin(userData.logged);
         setUser(userData);
@@ -141,8 +148,11 @@ export default function App(){
             });
           }
           })
-      }
+      }*/
       window.addEventListener('resize', handleWindowSizeChange);
+      //const dispatch = useDispatch();
+      //dispatch(actions.fetchUser());
+      store.dispatch(actions.fetchUser());
     }, []);
 
    
