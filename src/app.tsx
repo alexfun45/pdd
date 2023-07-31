@@ -150,8 +150,6 @@ export default function App(){
           })
       }*/
       window.addEventListener('resize', handleWindowSizeChange);
-      //const dispatch = useDispatch();
-      //dispatch(actions.fetchUser());
       store.dispatch(actions.fetchUser());
     }, []);
 

@@ -1,11 +1,27 @@
 import {
     FETCH_USER_BEGIN,
     FETCH_USER_SUCCESS,
-    FETCH_USER_FAILURE
+    FETCH_USER_FAILURE,
+    LOGOUT_USER
   } from './actionTypes';
 
+  function getRandomUserId(){
+    return (new Date()).getTime();
+  }
+
   const initialState = {
-    user: {},
+    user: {
+        id: getRandomUserId(),
+        login: "unlogged",
+        name: "",
+        email: "",
+        confirmed: 0,
+        role: -1,
+        reg_date:0,
+        last_auth:0,
+        isMobile: false,
+        settings: {}
+      },
     loading: false,
     error: null
   };
@@ -27,7 +43,7 @@ import {
         return {
           ...state,
           loading: false,
-          items: action.payload.users
+          user: action.payload
         };
   
       case FETCH_USER_FAILURE:
@@ -38,12 +54,11 @@ import {
         // This is all up to you and your app though:
         // maybe you want to keep the items around!
         // Do whatever seems right for your use case.
-        return {
-          ...state,
-          loading: false,
-          error: action.payload.error,
-          items: []
-        };
+        console.log("failure");
+        return initialState;
+      
+      case LOGOUT_USER:
+        return initialState;
   
       default:
         // ALWAYS have a default case in a reducer

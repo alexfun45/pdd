@@ -63,10 +63,8 @@ function TopMenu({showLogo}:{showLogo: string}) {
       }
     }, [window.location.href])
   
-  const Logout = (e: React.MouseEvent) => {
+  const Logout = () => {
     request({method: 'post', data:{ action: 'Logout'}});
-    //setLogin(false);
-    //navigate("/");
     window.localStorage.clear();
     document.location.href = "./";
   }
