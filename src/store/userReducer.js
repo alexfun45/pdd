@@ -1,4 +1,7 @@
 import {
+    LOGIN_USER_BEGIN,
+    LOGIN_USER_SUCCESS,
+    LOGIN_USER_FAILURE,
     FETCH_USER_BEGIN,
     FETCH_USER_SUCCESS,
     FETCH_USER_FAILURE,
@@ -22,6 +25,7 @@ import {
         isMobile: false,
         settings: {}
       },
+    isAuthenticated: false,
     loading: false,
     error: null
   };
@@ -40,10 +44,13 @@ import {
       case FETCH_USER_SUCCESS:
         // All done: set loading "false".
         // Also, replace the items with the ones from the server
+        
         return {
           ...state,
           loading: false,
-          user: action.payload
+          user: action.payload,
+          isAuthenticated: true,
+          error: null
         };
   
       case FETCH_USER_FAILURE:
@@ -54,11 +61,26 @@ import {
         // This is all up to you and your app though:
         // maybe you want to keep the items around!
         // Do whatever seems right for your use case.
-        console.log("failure");
         return initialState;
-      
+      case LOGIN_USER_BEGIN:
+        return {
+          ...state,
+          loading: true,
+          error: null
+        }
+      case LOGIN_USER_SUCCESS:
+        return {
+          ...state,
+          loading: false,
+          user: action.payload,
+          isAuthenticated: true,
+          error: null
+        }
       case LOGOUT_USER:
-        return initialState;
+      case LOGIN_USER_FAILURE:
+        return {
+          ...initialState,
+        }
   
       default:
         // ALWAYS have a default case in a reducer

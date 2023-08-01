@@ -10,7 +10,7 @@ import MobileHeader from './components/MobileHeader'
 import Footer from './components/Footer'
 import request from './utils/request'
 import * as actions from "./store/userActions";
-import { useDispatch } from "react-redux";
+import AdminRoute from './PrivateRoutes'
 import store from './store/store'
 
 let defaultUser = {
@@ -77,11 +77,11 @@ export default function App(){
         [role, setRole] = useState(3),
         [settings, setSettings] = useState({showLogo: '1', start_page: {name: ""}, exam_title: "", 'background-color':'', 'background-image':'', 'background-color-tickets': '', 'background-image-tickets':'', 'image_title_exam':'', 'background-image-tickets-mobile':'', 'image_title_exam_mobile': '', 'shuffle_tickets': '0', 'load': false}),
         [displayWidth, setDisplayWidth] = useState(window.innerWidth);
-  
+
   const getRoutes = (allRoutes: Array<{route:string, key: string, component: object, auth?: string}>) =>
         allRoutes.map((route) => {
           if (route.route) {
-              let userRole = (window.localStorage.getItem('user')!=null) ? JSON.parse(window.localStorage.getItem('user')).role:0;
+              let userRole = (window.localStorage.getItem('user')!==undefined) ? JSON.parse(window.localStorage.getItem('user')).role:0;
               if((route.auth=="admin" && (userRole!=1 && userRole!=2)) || (route.auth=="user" && (userRole!=1 && userRole!=3))){
                 return <Route path={route.route} element={<Navigate to="/auth" replace />} />;
               }
@@ -153,8 +153,6 @@ export default function App(){
       store.dispatch(actions.fetchUser());
     }, []);
 
-   
-
     const handleWindowSizeChange = () => {
       setDisplayWidth(window.innerWidth);
     }
@@ -174,8 +172,15 @@ export default function App(){
             <div id="maincontainer" className={(isMobile)?"containerWrapper mobileWrapper":"containerWrapper"}>
               <Routes>
                   {
-                    getRoutes(routes)  
-                  }
+                   routes.map((route) => {
+                    if (route.route) {
+                      if(route.auth=="admin")
+                        return <Route path={route.route} key={route.key} element={<AdminRoute component={route.component}></AdminRoute>} />
+                      else 
+                        return <Route path={route.route} element={route.component} key={route.key} />
+                    } 
+                  })
+                }
               </Routes>
             </div>
             <Footer />

@@ -20,7 +20,7 @@ const routes = [
     },
     {
         route: "admin",
-        component: <AdminPanel />,
+        component: AdminPanel,
         key: "admin",
         auth: "admin"
     },

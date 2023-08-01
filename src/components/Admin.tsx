@@ -1,12 +1,9 @@
 import React, {useEffect, useState} from 'react'
 import { Button } from "react-bootstrap"
-import { useSelector } from 'react-redux'
-//import mapStateToProps from '../store/mapStateProps.js'
 import * as actions from "../store/userActions";
 import { useDispatch } from "react-redux";
 import { connect } from 'react-redux';
 import {AppContext} from '../app'
-import $ from 'jquery'
 
 const mapStateToProps = (state:any) => {
     return {
@@ -14,17 +11,14 @@ const mapStateToProps = (state:any) => {
     }
   }
 
-
-//const AdminComponent = ({Logout, isLogin, role, isMobile}: {Logout: React.MouseEventHandler, isLogin: boolean, role: number, isMobile: boolean}) => {
-  const AdminComponent = (props: any) => {
+const AdminComponent = (props: any) => {
 
         const context = React.useContext(AppContext);
         const dispatch = useDispatch();
         let user = props.data.user;
-        console.log("props", props);
         return (
             <div className="admin-panel-wrapper">
-                {(!user.logged) ? (
+                {(!props.data.isAuthenticated) ? (
                 <div id="login-block">
                     <form id="login-form" method="POST">
                         {(context.isMobile) ? 

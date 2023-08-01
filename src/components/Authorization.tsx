@@ -8,7 +8,10 @@ import Form from 'react-bootstrap/Form';
 import { useParams, useNavigate } from "react-router-dom";
 import LoginMobile from './LoginMobile'
 import request from '../utils/request'
+import * as actions from "../store/userActions";
+import { useDispatch } from "react-redux";
 import {AppContext} from '../app'
+import store from '../store/store'
 
 type InputSingInTypes = {
     login: string; 
@@ -45,7 +48,10 @@ export default () => {
     const {register, handleSubmit, setError, watch, setValue, formState: { errors } } = useForm<InputSingInTypes>({mode: 'onBlur'});
     const {register: register2, handleSubmit:handleSubmit2, watch:watch2, formState: { errors: errors2 } } = useForm<InputSignUpTypes>({mode: 'onBlur'});
     const {register: register3, handleSubmit: handleSubmit3, formState: {errors: errors3}} = useForm<emailRecoveryType>({mode: 'onBlur'});
-    const onSubmit = (data: {login:string, password:string}) => { 
+    const onSubmit = (data: {login:string, password:string}) => {
+        store.dispatch(actions.Login(data));
+    }
+    /*const onSubmit = (data: {login:string, password:string}) => { 
         request({method: "post", data: {action: "login", data: {login: data.login, password: data.password}}}).then((response)=>{
             const {data} = response;
             if(data==true){
@@ -59,7 +65,7 @@ export default () => {
                 });
             }
         });
-     } 
+     }*/
     const onSubmit2 = (data: {login2:string, name2: string, password2:string, email2: string}) => {
         request({method: "post", data: {action: "signup", data: {
                     login: data.login2, password: data.password2, name: data.name2, email: data.email2}}}).then((response)=>{
