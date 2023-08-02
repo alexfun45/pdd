@@ -12,6 +12,13 @@ import UserGradeTable from './Grade/userGradeTable';
 import InfoModal from './Tickets/InfoModal'
 import {AppContext} from '../app'
 import request from "../utils/request";
+import { connect } from 'react-redux';
+
+const mapStateToProps = (state:any) => {
+  return {
+    user: state.user
+  }
+}
 
 interface TabPanelProps {
     children?: React.ReactNode;
@@ -19,6 +26,8 @@ interface TabPanelProps {
     index: number;
     value: number;
   }
+
+
 
 function TabPanel(props: TabPanelProps) {
     const { children, value, index, ...other } = props;
@@ -73,7 +82,7 @@ let defaultUser = {
   settings: {}
   };
 
-export default () => {
+const Profile = (props: any) => {
     const theme = useTheme();
     const [value, setValue] = React.useState(0),
           [gradeData, setGradeData] = useState(),
@@ -84,8 +93,8 @@ export default () => {
     const context = React.useContext(AppContext);
 
     useEffect(()=>{
-      setUser(context.user);
-    }, [context.user]);
+      setUser(props.user);
+    }, [props.user]);
     
     
     useEffect(()=>{
@@ -145,3 +154,5 @@ export default () => {
         </div>
     )
 }
+
+export default connect(mapStateToProps)(Profile);

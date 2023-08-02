@@ -26,8 +26,36 @@ export default ({setUser, gradeData, handleClickItem}: {setUser: Function, grade
         setUser("");
     }
 
+    const regNumber = /[^\d]*?(\d+)/;
+
+    const getFailedForTicket = (userData:any, ticketIndx: number) => {
+        let data:any =  Object.entries(userData),
+                        failed = 0,
+                        session = 0,
+                        user_id = 0,
+                        isExist = false;
+                                    
+        for(let j=0, ticketNumber;j<data.length;j++){
+            if(data[j]==undefined) continue;
+            ticketNumber = data[j][0].match(regNumber);
+            if(ticketNumber!=null){
+                if(parseInt(ticketNumber[1])==(ticketIndx+1)){
+                    isExist = true;
+                    failed = data[j][1].failed;
+                    session = data[j][1].session;
+                    user_id = data[j][1].user_id;
+                    }
+                }  
+            }
+        if(isExist)
+            return <td><span onClick={()=>handleClickItem(user_id, session.toString())} className='btnItem'>{failed}</span></td>
+        else
+            return <td></td>
+    }
+
     return (
         <div style={{height: '300px'}}>
+            { (gradeData) && (
             <Table style={{width: 'auto'}} className="users-table grad-table" responsive>
                 <thead>
                     <tr>
@@ -58,12 +86,16 @@ export default ({setUser, gradeData, handleClickItem}: {setUser: Function, grade
                     <tr>
                         <td></td>
                         {
-                            Object.entries(gradeData).map((v: any, i)=>(
+                            tickets.map((v, i)=>{
+                                return getFailedForTicket(gradeData, i) 
+                            })
+                            /*Object.entries(gradeData).map((v: any, i)=>(
                                 <td key={v.session}><span onClick={()=>handleClickItem(v[1].user_id, v[1].session)} className='btnItem'>{v[1].failed}</span></td>
-                            ))
+                            ))*/
                         }
                     </tr>
             </Table>
+            )}
         </div>
     )
 }

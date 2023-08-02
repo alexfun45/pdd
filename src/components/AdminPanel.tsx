@@ -8,6 +8,7 @@ import UsersManager from './Users'
 import Statistic from './Statistic'
 import Settings from './Settings'
 import Grade from './Grade/Grade'
+import { connect } from 'react-redux';
 import request from '../utils/request'
 import {AppContext} from '../app'
 
@@ -23,14 +24,19 @@ function TabTitle({tab_type, setpageTabtype, setKey, editPageName, setEditPageNa
     )
 }
 
-export default () => {
+const mapStateToProps = (state:any) => {
+    return {
+      auth: state.user
+    }
+  }
+
+const AdminPanel = (props: any) => {
     const context = React.useContext(AppContext);
     const [key, setKey] = useState('tickets'),
           [menuItems, setMenuItems] = useState<any>([]),
           [allPages, setAllPages] = useState<any>([]),
           [pageTabtype, setpageTabtype] = useState(0),
           [editPageName, setEditPageName] = useState("");
-
      // getting all menu items and all pages
      useEffect(()=>{
         request({method: "post", data: {action: "getMenuItems"}}).then((response)=>{
@@ -58,22 +64,22 @@ export default () => {
                     <Tab eventKey="tickets" title="Билеты">
                         <TicketManager />
                     </Tab>
-                    {(context.userRole==1) && (
+                    {(props.auth.role==1) && (
                         <Tab eventKey="settings" title="Настройки">
                             <Settings allPages={allPages} />
                         </Tab>
                     )}
-                    {(context.userRole==1) && (
+                    {(props.auth.role==1) && (
                         <Tab eventKey="users" title="Пользователи">
                             <UsersManager />
                         </Tab>
                     )}
-                    {(context.userRole==1) && (
+                    {(props.auth.role==1) && (
                         <Tab eventKey="statistic" title="Статистика">
                             <Statistic />
                         </Tab>
                     )}
-                    {(context.userRole==1) && (
+                    {(props.auth.role==1) && (
                         <Tab eventKey="grade" title="Успеваемость">
                             <Grade />
                         </Tab>
@@ -91,3 +97,5 @@ export default () => {
         </div>
     )
 }
+
+export default connect(mapStateToProps)(AdminPanel)

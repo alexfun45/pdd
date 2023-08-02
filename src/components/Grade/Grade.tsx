@@ -55,7 +55,32 @@ export default () => {
         setUser(login);
     }
 
-    
+    const regNumber = /[^\d]*?(\d+)/;
+
+    const getFailedForTicket = (userData:statsInterface, ticketIndx: number) => {
+        let data:any =  Object.entries(userData),
+                        failed = 0,
+                        session = 0,
+                        user_id = 0,
+                        isExist = false;
+                                    
+        for(let j=0, ticketNumber;j<data.length;j++){
+            if(data[j]==undefined) continue;
+            ticketNumber = data[j][0].match(regNumber);
+            if(ticketNumber!=null){
+                if(parseInt(ticketNumber[1])==(ticketIndx+1)){
+                    isExist = true;
+                    failed = data[j][1].failed;
+                    session = data[j][1].session;
+                    user_id = data[j][1].user_id;
+                    }
+                }  
+            }
+        if(isExist)
+            return <TableCell><span onClick={()=>handleClickItem(user_id, session.toString())} className='btnItem'>{failed}</span></TableCell>
+        else
+            return <TableCell></TableCell>
+    }
 
     return (
         <div>
@@ -89,9 +114,12 @@ export default () => {
                                     }
                                 </TableCell>
                                 {
-                                Object.entries(userData[1]).map((ticketData: any)=>(
+                                tickets.map((v, i)=>{
+                                    return getFailedForTicket(userData[1], i) 
+                                })
+                                /*Object.entries(userData[1]).map((ticketData: any)=>(
                                     <TableCell><span onClick={()=>handleClickItem(userData[1].user_id, ticketData[1].session)} className='btnItem'>{ticketData[1].failed}</span></TableCell>
-                                ))
+                                ))*/
                                 }
                             </TableRow>
                         ))

@@ -425,7 +425,8 @@
     }
 
     protected function getUserRole($data){
-        if(isset($_SESSION['logged'])) return array("logged"=>true, "id"=>$_SESSION['userId'], "role"=>$_SESSION['role'], "login"=>$_SESSION["login"], "name"=>$_SESSION["name"], "email"=>$_SESSION["email"]);
+        if(isset($_SESSION['logged']))
+            return array("logged"=>true, "id"=>$_SESSION['userId'], "confirmed"=>$_SESSION['confirmed'], "role"=>$_SESSION['role'], "login"=>$_SESSION["login"], "name"=>$_SESSION["name"], "email"=>$_SESSION["email"]);
         if(isset($_COOKIE["login"]) && isset($_COOKIE["password"])){
             $db = new SQLite3(DB."db.sqlite");
             $sql = "SELECT id, login, name, email, role, confirmed FROM users WHERE login=:login AND password=:password";
@@ -440,9 +441,10 @@
             $_SESSION['login'] = $row['login'];
             $_SESSION['name'] = $row['name'];
             $_SESSION['email'] = $row['email'];
+            $_SESSION['confirmed'] = $row['confirmed'];
             $_SESSION['id'] = $row['id'];
             $stmt->close();
-            return array("logged"=>($row['login']!=null), "id"=>$row["id"], "role"=>$row["role"], "login"=>$row["login"], "name"=>$row["name"], "email"=>$row["email"]);
+            return array("logged"=>($row['login']!=null), "id"=>$row["id"], "role"=>$row["role"], "login"=>$row["login"], "name"=>$row["name"], "email"=>$row["email"], "confirmed"=>$row['confirmed']);
         }
         else
             return false;
@@ -480,15 +482,17 @@
     }
 
     function editUser(){
+        //ini_set('display_errors', TRUE);
         $login = $this->data->login;
         $name = $this->data->name;
         $email = $this->data->email;
         $id = $this->data->id;
         $role = $this->data->role;
         $db = new SQLite3(DB."db.sqlite");
-        $db->exec("UPDATE users SET login='$login', name='$name', role=$role, email='$email' WHERE id=$id");
+        $db->exec("UPDATE users SET login='$login', name='$name', role=$role, email='$email' WHERE id={$id}");
+        $sql = "UPDATE users SET login='$login', name='$name', role=$role, email='$email' WHERE id={$id}";
         $db->close();
-        return true;
+        return $sql;
     }
 
     function removeUser(){
@@ -557,13 +561,15 @@
                 setcookie("password", $password, time() + 30*24*3600);
                 $_SESSION['logged'] = 1;
                 $_SESSION['role'] = $user['role'];
+                $_SESSION['confirmed'] = $user['confirmed'];
                 $_SESSION['login'] = $user['login'];
                 $_SESSION['userId'] = $user['id'];
                 $_SESSION['name'] = $user['name'];
                 $_SESSION['email'] = $user['email'];
                 $stmt->close();
                 //return $password;
-                return ($user!==false);
+                //return ($user!==false);
+                return $user;
             }
             else
                 return false;

@@ -25,7 +25,7 @@ import {
         isMobile: false,
         settings: {}
       },
-    isAuthenticated: false,
+    isAuthenticated: null,
     loading: false,
     error: null
   };

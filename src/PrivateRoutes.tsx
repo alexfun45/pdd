@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useState, useEffect} from "react";
 import { Route, Navigate, Outlet } from "react-router-dom";
 import { connect } from "react-redux";
 
@@ -19,8 +19,16 @@ import { connect } from "react-redux";
 };*/
 
 const AdminRoute = (props: any) => {
+
     const {component: Component, isAuthenticated, role} = props;
-    if(!isAuthenticated){
+    const [isAuth, setAuth] = useState(isAuthenticated);
+
+    useEffect(()=>{
+      setAuth(isAuth);
+    }, [isAuthenticated])
+
+    if(isAuthenticated===null) return null;
+    if(!isAuthenticated || (role!=1 && role!=2)){
       return <Navigate to="/auth" replace />
     }
     else

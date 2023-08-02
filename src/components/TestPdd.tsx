@@ -7,6 +7,13 @@ import Select, { SelectChangeEvent } from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import {AppContext} from '../app'
 import request from "../utils/request";
+import { connect } from 'react-redux';
+
+const mapStateToProps = (state:any) => {
+    return {
+      user: state.user
+    }
+  }
 
 type answersType = {
     answer: string;
@@ -191,7 +198,7 @@ let numPageItems = 10,
     testSession = 0,
     Results:QuestionType[] = [];
 
-const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
+const TestPdd = (props: any) => {
 
     const [selectedVariant, setSelectedVar] = useState(-1),
           [startTime, setStartTime] = useState(0),
@@ -210,7 +217,6 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
           [qpages, setqPages] = useState([]),
           [leftShift, setLeftShift] = useState(0),
           [endTest, setEndTest] = useState(false);
-    
     const context = React.useContext(AppContext);
    
     useEffect(()=>{
@@ -338,9 +344,9 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
         testSession = (new Date()).getTime() + Math.floor(1000*Math.random());
         if(props.options.settings===false){
             if(props.options.recommended)
-                getQuestions({...Options, recommended: props.options.recommended, user_id:context.user.id, settings: false}, setQuestion);
+                getQuestions({...Options, recommended: props.options.recommended, user_id:props.user.id, settings: false}, setQuestion);
             else
-		        getQuestions({...Options, selectedTicket:selectedTicket, recommended: props.options.recommended, user_id:context.user.id, settings: false}, setQuestion);
+		        getQuestions({...Options, selectedTicket:selectedTicket, recommended: props.options.recommended, user_id:props.user.id, settings: false}, setQuestion);
             queTimer = setInterval(()=>{
                 elapsed_time+=1000;
             }, 1000);
@@ -381,7 +387,7 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
             errors++;
             errors_array.push({ticket: currentQuestionIndex.toString(), title: pdd_questions[currentQuestionIndex].title, comment: currentQuestion.variants[selectedVar].comment});
             results.current[currentQuestionIndex] = 1;
-            Statistic[pdd_questions[currentQuestionIndex].id] = {ticket_id: selectedTicket, user_id: (context.user.id)?(context.user.id).toString():getRandomUserId(), elapsed_time: elapsed_time, correct: 1, testSession: testSession};
+            Statistic[pdd_questions[currentQuestionIndex].id] = {ticket_id: selectedTicket, user_id: (props.user.id)?(props.user.id).toString():getRandomUserId(), elapsed_time: elapsed_time, correct: 1, testSession: testSession};
             if(props.options.settings===false)
                 Results.push({q_id: pdd_questions[currentQuestionIndex].id, success: 0});
         }
@@ -389,7 +395,7 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
             if(props.options.settings===false)
                 Results.push({q_id: pdd_questions[currentQuestionIndex].id, success: 1});
             results.current[currentQuestionIndex] = 0;
-            Statistic[pdd_questions[currentQuestionIndex].id] = {ticket_id: selectedTicket, user_id: (context.user.id)?(context.user.id).toString():getRandomUserId(), elapsed_time: elapsed_time, correct: 0, testSession: testSession};
+            Statistic[pdd_questions[currentQuestionIndex].id] = {ticket_id: selectedTicket, user_id: (props.user.id)?(props.user.id).toString():getRandomUserId(), elapsed_time: elapsed_time, correct: 0, testSession: testSession};
         }
         elapsed_time = 0;
         question_answered++;
@@ -417,7 +423,7 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
         }
         else if(question_answered>=props.options.num || question_answered>=pdd_questions.length){
             if(props.options.settings===false){
-                request({method: 'post', data: {action: "saveStatistic", data: {"stats": JSON.stringify(Statistic), "user_id":(context.user.id)?context.user.id:0, "results": JSON.stringify(Results)}}});
+                request({method: 'post', data: {action: "saveStatistic", data: {"stats": JSON.stringify(Statistic), "user_id":(props.user.id)?props.user.id:0, "results": JSON.stringify(Results)}}});
                 clearInterval(queTimer);
             }
             setEndTest(true);
@@ -734,4 +740,4 @@ const TestPdd = (props: {start: boolean, options: testOptionsType}) => {
     )
 }
 
-export default TestPdd
+export default connect(mapStateToProps)(TestPdd);

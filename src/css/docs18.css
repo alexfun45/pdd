@@ -1738,7 +1738,7 @@ div.suggestPopupContent div table tbody tr td.item-selected{
         box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
         min-width: 300px;
         min-height: 350px;
-        max-width: 900px;
+        max-width: 65%;
         border-radius: 10px;
     }
 
