@@ -3,12 +3,19 @@ import { useParams } from "react-router-dom";
 import request from '../utils/request'
 import {AppContext} from '../app'
 import { useNavigate } from "react-router-dom";
+import { connect } from 'react-redux';
 
 interface ContentProps {
     id: string
 } 
 
-function Content(){
+const mapStateToProps = (state:any) => {
+    return {
+      isAuth: state.isAuthenticated
+    }
+  }
+
+function Content(props: any){
     const context = React.useContext(AppContext);
     const {id = ''} = useParams(),
           [__content, setContent] = useState("");
@@ -22,7 +29,7 @@ function Content(){
     useEffect(()=>{
         request({method: "post", data:{action: "getPage", data: {page_id: id}}}).then( response =>{
             const {data} = response;
-            if(data.private==1 && !context.logged) navigate("/auth");
+            if(data.private==1 && !props.isAuth) navigate("/auth");
             let regexp = /(font\-)?size[=\:][\'\"]?\s?([^\'\";]*)[\'\"]?/sg,
                 content = data.content,
                 result = "";
@@ -40,7 +47,7 @@ function Content(){
             }
             setContent(result);
         });
-    }, [context.logged, id]);
+    }, [props.isAuth, id]);
 
     return (
         <div className="container">
@@ -51,4 +58,4 @@ function Content(){
     )
 }
 
-export default Content;
+export default connect(mapStateToProps)(Content);
