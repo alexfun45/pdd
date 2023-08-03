@@ -1,4 +1,5 @@
 import React, {useEffect, useState} from 'react'
+import request from '../../utils/request'
 import Table from 'react-bootstrap/Table'
 
 type userStatType = {
@@ -18,12 +19,22 @@ for(let i=1;i<=40;i++){
     tickets[i-1] = i;
 }
 
-export default ({setUser, gradeData, handleClickItem}: {setUser: Function, gradeData: userStatType, handleClickItem: Function}) => {
+export default ({user_id, setUser, handleClickItem}: {user_id: number, setUser: Function,  handleClickItem: Function}) => {
 
-    const [user, setuser] = useState("");
+    const [user, setuser] = useState(user_id),
+          [gradeData, setGradeData] = useState([]),
+          [order, setOrder] = useState("DESC");
+
+    useEffect(()=>{
+        request({method: 'post', data: {action: "getUserGrade", data: {user_id: user_id, order: order}}}).then(response => {
+            const {data} = response;
+            setGradeData(data);
+        });
+        setuser(user_id);
+    }, [user_id, order])
 
     const resetUserSelected = () => {
-        setUser("");
+        setUser(0);
     }
 
     const regNumber = /[^\d]*?(\d+)/;
@@ -50,7 +61,23 @@ export default ({setUser, gradeData, handleClickItem}: {setUser: Function, grade
         if(isExist)
             return <td><span onClick={()=>handleClickItem(user_id, session.toString())} className='btnItem'>{failed}</span></td>
         else
-            return <td></td>
+            return <td> </td>
+    }
+
+    const getFailed = (ticketData: any, ticketIndx: number) => {
+        let ticketNumber = ticketData.ticket_name.match(regNumber);
+        if(ticketNumber!=null){
+            if(parseInt(ticketNumber[1])==(ticketIndx+1)){
+                return <td key={ticketData.session+ticketIndx}><span onClick={()=>handleClickItem(user_id, ticketData.session.toString())} className='btnItem'>{ticketData.failed}</span></td>
+                }
+            else
+                return <td key={ticketData.session+ticketIndx}> </td>  
+        }
+    }
+
+    const handleOrder = () => {
+        let __order = (order=="ASC")?"DESC":"ASC";
+        setOrder(__order);
     }
 
     return (
@@ -59,7 +86,7 @@ export default ({setUser, gradeData, handleClickItem}: {setUser: Function, grade
             <Table style={{width: 'auto'}} className="users-table grad-table" responsive>
                 <thead>
                     <tr>
-                        <th style={{fontSize: "12px"}} rowSpan={1}></th><th style={{textAlign: 'center'}} colSpan={41}><span onClick={resetUserSelected} className='btn-link' style={{float: 'left', color: '#FFF'}}>&#60; назад</span>Билеты</th>
+                        <th onClick={(e)=>handleOrder()} style={{fontSize: "12px", cursor: "pointer"}} rowSpan={1}>дата <i className={(order=='ASC')?"bi bi-arrow-down":"bi bi-arrow-up"}></i></th><th style={{textAlign: 'center'}} colSpan={41}><span onClick={resetUserSelected} className='btn-link' style={{float: 'left', color: '#FFF'}}>&#60; назад</span>Билеты</th>
                     </tr>
                     <tr>
                         <th></th>
@@ -69,7 +96,20 @@ export default ({setUser, gradeData, handleClickItem}: {setUser: Function, grade
                                     ))
                                 }
                             </tr>
-                    <tr>
+                </thead>
+                    {
+                       gradeData.map((ticket: any, i)=>(
+                            <tr>
+                                <td className='v-title'>{ticket.time}</td>
+                                {
+                                 tickets.map((v, i)=>(
+                                    getFailed(ticket, i)
+                                 ))   
+                                }
+                            </tr>
+                       ))
+                    }
+                    {/*<tr>
                         <th className='v-title' style={{fontSize: '12px', verticalAlign: 'middle'}}>дата</th>
                             {
                                 Object.entries(gradeData).map((v: any, i)=>(
@@ -82,18 +122,16 @@ export default ({setUser, gradeData, handleClickItem}: {setUser: Function, grade
                                 ))
                             }
                     </tr>
-                </thead>
+                
                     <tr>
                         <td></td>
                         {
                             tickets.map((v, i)=>{
                                 return getFailedForTicket(gradeData, i) 
                             })
-                            /*Object.entries(gradeData).map((v: any, i)=>(
-                                <td key={v.session}><span onClick={()=>handleClickItem(v[1].user_id, v[1].session)} className='btnItem'>{v[1].failed}</span></td>
-                            ))*/
+                          
                         }
-                    </tr>
+                    </tr>*/}
             </Table>
             )}
         </div>

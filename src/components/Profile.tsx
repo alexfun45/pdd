@@ -147,7 +147,7 @@ const Profile = (props: any) => {
                     <EditorProfile user={user} setUser={setUser} />
                 </TabPanel>
                 <TabPanel value={value} index={1} dir={theme.direction}>
-                    <UserGradeTable setUser={Function()} gradeData={gradeData} handleClickItem={handleClickItem}/>
+                    <UserGradeTable user_id={user.id} setUser={Function()} handleClickItem={handleClickItem}/>
                 </TabPanel>
             </SwipeableViews>
             </Box>

@@ -6,6 +6,7 @@ import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
+import TableSortLabel from '@mui/material/TableSortLabel';
 import TableHead from '@mui/material/TableHead';
 import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
@@ -34,14 +35,15 @@ export default () => {
     const [open, setOpen] = useState(false),
           [fQuestions, setfQuestions] = useState([]),
           closeModal = () => setOpen(false),
-          [selectedUser, setUser] = useState("");
+          [order, setOrder] = useState("DESC"),
+          [selectedUser, setUser] = useState(0);
    
     useEffect(()=>{
-        request({method: 'post', data: {action: "getGrade"}}).then(response => {
+        request({method: 'post', data: {action: "getGrade", data: {order: order}}}).then(response => {
             const {data} = response;
             setGradeData(data);
         });
-    }, []);
+    }, [order]);
 
     const handleClickItem = (user_id: number, session: string) => {
         request({method: 'post', data: {action: "getFailedQuestions", data: { user_id: user_id, testSession: session}}}).then(response => {
@@ -51,8 +53,15 @@ export default () => {
         setOpen(true);
     }
 
-    const handleUserClick = (login: string) => {
-        setUser(login);
+    const handleUserClick = (userData: any) => {
+        let user:any = (Object.entries(userData))[0];
+        user = user[1].user_id;
+        setUser(user);
+    }
+
+    const handleOrder = () => {
+        let __order = (order=="ASC")?"DESC":"ASC";
+        setOrder(__order);
     }
 
     const regNumber = /[^\d]*?(\d+)/;
@@ -85,7 +94,7 @@ export default () => {
     return (
         <div>
             <InfoModal showDialog={open} setOpen={setOpen} fQuestions={fQuestions}/>
-            <TableContainer className={(selectedUser=="")?"":"hide"} sx={{ maxHeight: 640 }}>
+            <TableContainer className={(selectedUser==0)?"":"hide"} sx={{ maxHeight: 640 }}>
                 <Table stickyHeader aria-label="sticky table">
                     <TableHead>
                         <TableRow>
@@ -93,7 +102,7 @@ export default () => {
                             {/*<TableCell colSpan={41}>Билеты</TableCell>*/}
                         </TableRow>
                         <TableRow>
-                            <TableCell style={{fontSize: '12px'}}>дата</TableCell>
+                            <TableCell sx={{"cursor":"pointer"}} onClick={(e)=>handleOrder()} style={{fontSize: '12px'}}>дата <i className={(order=='ASC')?"bi bi-arrow-down":"bi bi-arrow-up"}></i></TableCell>
                             {
                                 tickets.map((v, i)=>(
                                     <TableCell style={{padding: '6px 8px'}}>{v}</TableCell>
@@ -105,7 +114,7 @@ export default () => {
                         {
                         Object.entries(gradeData).map((userData:any, indx)=>(
                             <TableRow>
-                                <TableCell style={{fontSize: '12px'}}><span onClick={(e)=>handleUserClick(userData[0])} className='btn-link'>{userData[0]}</span></TableCell>
+                                <TableCell style={{fontSize: '12px'}}><span onClick={(e)=>handleUserClick(userData[1])} className='btn-link'>{userData[0]}</span></TableCell>
                                 <TableCell style={{fontSize: '12px', padding: '6px 8px'}}>{
                                     Object.entries(userData[1]).map((d: any, i: number)=>{
                                         if(i>0) return;
@@ -127,9 +136,9 @@ export default () => {
                     </TableBody>
                     </Table>
                 </TableContainer>
-                <div className={(selectedUser=="")?"hide":""}>
-                    { (selectedUser!="") && (
-                        <UserGradeTable setUser={setUser} gradeData={gradeData[selectedUser]} handleClickItem={handleClickItem} />
+                <div className={(selectedUser==0)?"hide":""}>
+                    { (selectedUser!=0) && (
+                        <UserGradeTable user_id={selectedUser} setUser={setUser} handleClickItem={handleClickItem} />
                     )
                     }
                 </div>
