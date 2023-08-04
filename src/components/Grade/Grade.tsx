@@ -91,6 +91,10 @@ export default () => {
             return <TableCell></TableCell>
     }
 
+    const resetUserSelected = () => {
+        setUser(0);
+    }
+
     return (
         <div>
             <InfoModal showDialog={open} setOpen={setOpen} fQuestions={fQuestions}/>
@@ -138,7 +142,10 @@ export default () => {
                 </TableContainer>
                 <div className={(selectedUser==0)?"hide":""}>
                     { (selectedUser!=0) && (
-                        <UserGradeTable user_id={selectedUser} setUser={setUser} handleClickItem={handleClickItem} />
+                        <>
+                            <div><span onClick={resetUserSelected} className='btn-link' style={{float: 'left', color: '#FFF', padding: '3px 12px', marginBottom: '5px', borderRadius: '2px', backgroundColor: '#007fff'}}>&#60; назад</span></div>
+                            <UserGradeTable user_id={selectedUser} setUser={setUser} handleClickItem={handleClickItem} />
+                        </>
                     )
                     }
                 </div>

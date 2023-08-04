@@ -1,6 +1,14 @@
 import React, {useEffect, useState} from 'react'
 import request from '../../utils/request'
-import Table from 'react-bootstrap/Table'
+//import Table from 'react-bootstrap/Table'
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableSortLabel from '@mui/material/TableSortLabel';
+import TableHead from '@mui/material/TableHead';
+import TablePagination from '@mui/material/TablePagination';
+import TableRow from '@mui/material/TableRow';
 
 type userStatType = {
     time: string;
@@ -68,10 +76,10 @@ export default ({user_id, setUser, handleClickItem}: {user_id: number, setUser: 
         let ticketNumber = ticketData.ticket_name.match(regNumber);
         if(ticketNumber!=null){
             if(parseInt(ticketNumber[1])==(ticketIndx+1)){
-                return <td key={ticketData.session+ticketIndx}><span onClick={()=>handleClickItem(user_id, ticketData.session.toString())} className='btnItem'>{ticketData.failed}</span></td>
+                return <TableCell style={{padding: '6px 8px'}} key={ticketData.session+ticketIndx}><span onClick={()=>handleClickItem(user_id, ticketData.session.toString())} className='btnItem'>{ticketData.failed}</span></TableCell>
                 }
             else
-                return <td key={ticketData.session+ticketIndx}> </td>  
+                return <TableCell style={{padding: '6px 8px'}} key={ticketData.session+ticketIndx}> </TableCell>  
         }
     }
 
@@ -81,32 +89,35 @@ export default ({user_id, setUser, handleClickItem}: {user_id: number, setUser: 
     }
 
     return (
-        <div style={{height: '300px'}}>
+        <div>
             { (gradeData) && (
-            <Table style={{width: 'auto'}} className="users-table grad-table" responsive>
-                <thead>
-                    <tr>
-                        <th onClick={(e)=>handleOrder()} style={{fontSize: "12px", cursor: "pointer"}} rowSpan={1}>дата <i className={(order=='ASC')?"bi bi-arrow-down":"bi bi-arrow-up"}></i></th><th style={{textAlign: 'center'}} colSpan={41}><span onClick={resetUserSelected} className='btn-link' style={{float: 'left', color: '#FFF'}}>&#60; назад</span>Билеты</th>
-                    </tr>
-                    <tr>
-                        <th></th>
+           
+            <TableContainer sx={{ maxHeight: 640 }}>
+            <Table stickyHeader aria-label="sticky table">
+                <TableHead>
+                    <TableRow>
+                        <TableCell onClick={(e)=>handleOrder()} style={{fontSize: "12px", cursor: "pointer"}} rowSpan={1}>дата <i className={(order=='ASC')?"bi bi-arrow-down":"bi bi-arrow-up"}></i></TableCell><TableCell style={{textAlign: 'center'}} colSpan={41}><span onClick={resetUserSelected} className='btn-link' style={{float: 'left', color: '#FFF'}}>&#60; назад</span>Билеты</TableCell>
+                    </TableRow>
+                    <TableRow>
+                        <TableCell></TableCell>
                                 {
                                     tickets.map((v, i)=>(
-                                        <th>{v}</th>
+                                        <TableCell style={{padding: '6px 8px'}}>{v}</TableCell>
                                     ))
                                 }
-                            </tr>
-                </thead>
+                    </TableRow>
+                </TableHead>
+                <TableBody>
                     {
                        gradeData.map((ticket: any, i)=>(
-                            <tr>
-                                <td className='v-title'>{ticket.time}</td>
+                            <TableRow>
+                                <TableCell className='v-title'>{ticket.time}</TableCell>
                                 {
                                  tickets.map((v, i)=>(
                                     getFailed(ticket, i)
                                  ))   
                                 }
-                            </tr>
+                            </TableRow>
                        ))
                     }
                     {/*<tr>
@@ -132,7 +143,9 @@ export default ({user_id, setUser, handleClickItem}: {user_id: number, setUser: 
                           
                         }
                     </tr>*/}
+                    </TableBody>
             </Table>
+            </TableContainer>
             )}
         </div>
     )
