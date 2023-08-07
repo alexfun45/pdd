@@ -109,6 +109,26 @@
         return $tickets;
     }
 
+    protected function getSubjects(){
+        $db = new SQLite3(DB."db.sqlite");
+        $sql = "SELECT t1.id, t1.name, AVG(t2.estimate) as estimate FROM subjects as t1 LEFT JOIN estimatesSubjects as t2 ON t1.id=t2.subject_id GROUP BY t1.id";
+        $res = $db->query($sql);
+        $subjects = array();
+        while ($v = $res->fetchArray(SQLITE3_ASSOC)){
+            $v['estimate'] = round($v['estimate'], 2);
+            array_push($subjects, $v);
+        }
+        $db->close();
+        return $subjects;
+    }
+
+    protected function addRating(){
+        $db = new SQLite3(DB."db.sqlite");
+        $subject_id = $this->data->subjectId;
+        $rating = $this->data->rating;
+        $db->exec("INSERT INTO estimatesSubjects(subject_id, estimate) VALUES({$subject_id}, {$rating})");
+    }
+
     protected function getQuestions2($data){
         $db = new SQLite3(DB."db.sqlite");
         $current_page = $this->data->page;
@@ -131,7 +151,10 @@
         $ticket = ($this->data->settings)?null:$this->data->selectedTicket;
         $num = $this->data->num;
         //return $this->getTicketQuestions($ticket);
-        $questions = array_splice($this->getTicketQuestions($ticket, $this->data->recommended), 0, $num);
+        if(!$this->data->subject)
+            $questions = array_splice($this->getTicketQuestions($ticket, $this->data->recommended), 0, $num);
+        else
+            $questions = array_splice($this->getSubjectQuestions($this->data->selectedSubject), 0, $num);
         if($this->data->random=="on" || $this->data->random)
                 shuffle($questions);
         return $questions;
@@ -163,6 +186,31 @@
             if(isset($userId))
                 $sql = "SELECT t2.* FROM recommended_questions as t1 INNER JOIN questions as t2 ON t1.q_id=t2.id WHERE t1.user_id={$userId}";
         }
+        else
+            $sql = "SELECT * FROM questions"; 
+        $res = $db->query($sql);
+        $questions = array();
+        $i = 0;
+        while ($_q = $res->fetchArray(SQLITE3_ASSOC)){
+            $_v = array();
+            $questions[$i] = $_q;
+            $sql = "SELECT * FROM variants WHERE q_id='{$_q['id']}'";
+            $res2 = $db->query($sql);
+            while ($v = $res2->fetchArray(SQLITE3_ASSOC)){
+                $_v[] = $v;
+            }
+            $questions[$i]["variants"] = $_v;
+            $i++;
+        }
+        $db->close();
+        return $questions;
+    }
+
+    function getSubjectQuestions($subjectId=null){
+        $db = new SQLite3(DB."db.sqlite");
+        $subjectId = ($subjectId===null)?$this->data->subjectId:$subjectId;
+        if($subjectId!=0)
+            $sql = "SELECT t1.indx, t1.subject_id, t2.* FROM subject_2_question as t1 INNER JOIN questions as t2 ON t1.q_id=t2.id WHERE t1.subject_id=$subjectId ORDER BY t1.indx";
         else
             $sql = "SELECT * FROM questions"; 
         $res = $db->query($sql);
@@ -297,6 +345,14 @@
         return $db->lastInsertRowID();
     }
 
+    protected function addSubject(){
+        $db = new SQLite3(DB."db.sqlite");
+        $subject_name = $this->data->subject_name;
+        $db->exec("INSERT INTO subjects(name) VALUES('$subject_name')");
+        $db->close();
+        return $db->lastInsertRowID();
+    }
+
     protected function addQuestion(){
         $uploadResult = $this->uploadFile($_FILES);
         $image_name = ($uploadResult['success']) ? $uploadResult['filename'] : "";
@@ -358,6 +414,15 @@
         $db->close();
     }
 
+    protected function addQueToSubject(){
+        $db = new SQLite3(DB."db.sqlite");
+        $subjectId = $this->data->subjectId;
+        $questionId = $this->data->qId;
+        $next_indx = $this->data->next_indx;
+        $db->exec("INSERT INTO subject_2_question(subject_id, q_id, indx) VALUES($subjectId, $questionId, $next_indx)");
+        $db->close();
+    }
+
     protected function removeQuestionicket(){
         $db = new SQLite3(DB."db.sqlite");
         $ticketId = $this->data->ticketId;
@@ -397,6 +462,13 @@
         $ticketId = $this->data->ticket_id;
         $db->exec("DELETE FROM tickets WHERE id=$ticketId");
         $db->exec("DELETE FROM variants WHERE ticket_id='$ticketId'");
+    }
+
+    protected function removeSubject(){
+        $db = new SQLite3(DB."db.sqlite");
+        $sId = $this->data->subject_id;
+        $db->exec("DELETE FROM subjects WHERE id=$sId");
+        //$db->exec("DELETE FROM variants WHERE ticket_id='$ticketId'");
     }
 
     protected function getConfig(){
@@ -975,16 +1047,32 @@
     protected function getGrade(){
         $db = new SQLite3(DB."db.sqlite");
         $userSql = (isset($this->data->user_id)) ? " WHERE t1.user_id={$this->data->user_id}" : "";
-        $result = $db->query("SELECT t1.user_id AS user_id, t1.q_id AS q_id, t2.login AS login, t1.test_session as test_session, t3.name AS ticketname, t1.timecreated AS timefinished, SUM(t1.correct) AS num FROM statistic AS t1 INNER JOIN tickets AS t3 ON t1.ticket_id=t3.id LEFT JOIN users AS t2 ON t1.user_id=t2.id {$userSql} GROUP BY t1.user_id, t1.ticket_id, t1.test_session ORDER BY t1.user_id, t1.ticket_id, t1.timecreated");
+        $order = $this->data->order;
+        $result = $db->query("SELECT t1.user_id AS user_id, t1.q_id AS q_id, t2.login AS login, t1.test_session as test_session, t3.name AS ticketname, t1.timecreated AS timefinished, MAX(t1.timecreated) as last_time, SUM(t1.correct) AS num FROM statistic AS t1 INNER JOIN tickets AS t3 ON t1.ticket_id=t3.id LEFT JOIN users AS t2 ON t1.user_id=t2.id {$userSql} GROUP BY t1.user_id, t1.ticket_id, t1.test_session ORDER BY last_time {$order}");
         $grades = array();
         while($res = $result->fetchArray(SQLITE3_ASSOC)){
             $user_id = $res['user_id'];
             $ticket_name = $res['ticketname'];
             $login = (!empty($res['login']))?$res['login']:$user_id;
-            $time = date("d-m-Y H:i", $res['timefinished']); 
+            $time = date("d-m-Y H:i", $res['last_time']);
             $grades[$login][$ticket_name] = array("time"=>$time, 'failed'=>$res['num'], 'user_id'=>$user_id, 'session'=>$res['test_session']);
         }
         $db->close();
+        return $grades;
+    }
+
+    protected function getUserGrade(){
+        $db = new SQLite3(DB."db.sqlite");
+        $user_id = $this->data->user_id;
+        $order = $this->data->order;
+        $result = $db->query("SELECT t1.user_id AS user_id, t1.q_id AS q_id, t2.login AS login, t1.test_session as test_session, t3.name AS ticketname, t1.timecreated AS timefinished, SUM(t1.correct) AS num FROM statistic AS t1 INNER JOIN tickets AS t3 ON t1.ticket_id=t3.id LEFT JOIN users AS t2 ON t1.user_id=t2.id where user_id={$user_id} GROUP BY t1.test_session ORDER BY t1.timecreated {$order}");
+        $grades = array();
+        while($res = $result->fetchArray(SQLITE3_ASSOC)){
+            $user_id = $res['user_id'];
+            $ticket_name = $res['ticketname'];
+            $time = date("d-m-Y H:i", $res['timefinished']); 
+            $grades[] = array("time"=>$time, 'ticket_name'=>$ticket_name, 'failed'=>$res['num'], 'user_id'=>$user_id, 'session'=>$res['test_session']);
+        }
         return $grades;
     }
 
@@ -993,7 +1081,8 @@
         $db = new SQLite3(DB."db.sqlite");
         $user_id = $this->data->q_id;
         $test_session = $this->data->testSession;
-        $result = $db->query("SELECT t2.indx FROM statistic AS t1 INNER JOIN ticket_2_question AS t2 ON t1.ticket_id=t2.tickets_id AND t1.q_id=t2.q_id WHERE t1.test_session={$test_session} AND t1.correct=1");
+        //$result = $db->query("SELECT t2.indx FROM statistic AS t1 INNER JOIN ticket_2_question AS t2 ON t1.ticket_id=t2.tickets_id AND t1.q_id=t2.q_id WHERE t1.test_session={$test_session} AND t1.correct=1");
+        $result = $db->query("SELECT t2.indx FROM statistic AS t1 INNER JOIN ticket_2_question AS t2 ON t1.q_id=t2.q_id WHERE t1.test_session={$test_session} AND t1.correct=1");
         while($res = $result->fetchArray(SQLITE3_ASSOC)){
             $q[] = $res['indx'];
         }

@@ -27,6 +27,7 @@ function Content(props: any){
     }, [context]);
 
     useEffect(()=>{
+        if(props.isAuth==null || id=="") return;
         request({method: "post", data:{action: "getPage", data: {page_id: id}}}).then( response =>{
             const {data} = response;
             if(data.private==1 && !props.isAuth) navigate("/auth");

@@ -36,17 +36,22 @@ const routes = [
     },
     {
         route: "pdd-online",
-        component: <TestPdd start={true} options={{num: 20, max_error:2, random: false, recommended: false, max: 1000, dblclick: false, settings: false}} />,
+        component: <TestPdd start={true} options={{num: 20, max_error:2, subjects: false, random: false, recommended: false, max: 1000, dblclick: false, settings: false}} />,
         key: "textpdd"
     },
     {
+        route: "subjects",
+        component: <TestPdd start={true} options={{num: 20, max_error:2, subjects: true, random: false, recommended: false, max: 1000, dblclick: false, settings: false}} />,
+        key: "subjects"
+    },
+    {
         route: "pdd_for_school",
-        component: <TestPdd start={false} options={{num: 20, max_error: 2, recommended: false, random: false, max: 1000, dblclick: false, settings: true}} />,
+        component: <TestPdd start={false} options={{num: 20, max_error: 2, subjects: false, recommended: false, random: false, max: 1000, dblclick: false, settings: true}} />,
         key: "pdd_for_school"
     },
     {
         route: "pdd_recommended",
-        component: <TestPdd start={false} options={{num: 20, max_error: 2, recommended: true, random: false, max: 1000, dblclick: false, settings: false}} />,
+        component: <TestPdd start={false} options={{num: 20, max_error: 2, subjects: false, recommended: true, random: false, max: 1000, dblclick: false, settings: false}} />,
         key: "pdd_recommended",
         auth: "user"
     },

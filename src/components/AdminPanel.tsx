@@ -2,6 +2,7 @@ import React, {useState, useEffect} from "react";
 import Tab from 'react-bootstrap/Tab';
 import Tabs from 'react-bootstrap/Tabs';
 import TicketManager from './TicketManager'
+import SubjectManager from './SubjectManager'
 import PageManager from './PageManager'
 import PageEditor from './PageEditor'
 import UsersManager from './Users'
@@ -63,6 +64,9 @@ const AdminPanel = (props: any) => {
                     >
                     <Tab eventKey="tickets" title="Билеты">
                         <TicketManager />
+                    </Tab>
+                    <Tab eventKey="subjects" title="Темы">
+                        <SubjectManager />
                     </Tab>
                     {(props.auth.role==1) && (
                         <Tab eventKey="settings" title="Настройки">

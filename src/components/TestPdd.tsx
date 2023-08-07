@@ -7,6 +7,7 @@ import Select, { SelectChangeEvent } from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import {AppContext} from '../app'
 import request from "../utils/request";
+import StarRatings from 'react-star-ratings';
 import { connect } from 'react-redux';
 
 const mapStateToProps = (state:any) => {
@@ -35,6 +36,11 @@ type InputSettings = {
     surname: string;
     name: string;
     name2: string;
+}
+
+type SubjectType = {
+    id: number;
+    name: string;
 }
 
 type TicketPdd = {
@@ -205,9 +211,12 @@ const TestPdd = (props: any) => {
           [iterator, setIterator] = useState(1),
           [Options, setOptions] = useState({...props.options}),
           [selectedTicket, setTicket] = useState(0),
+          [selectedSubject, setSubject] = useState(0),
           //[currentQuestionIndex, setCurrentTicket] = useState<number>(0),
           results = useRef([]),
           [TicketName, setTicketName] = useState(""),
+          [subjects, setSubjects] = useState([]),
+          [subjectName, setSubjectName] = useState(""),
           [currentQuestion, setCurrentQuestion] = useState<TicketPdd>(),
           [start, setStart] = useState(false),
           [opened, setOpened] = useState<Number[]>([]),
@@ -216,7 +225,9 @@ const TestPdd = (props: any) => {
           [tickets, setTickets] = useState([]),
           [qpages, setqPages] = useState([]),
           [leftShift, setLeftShift] = useState(0),
-          [endTest, setEndTest] = useState(false);
+          [endTest, setEndTest] = useState(false),
+          [estimate, setEstimate] = useState(null),
+          [newRating, setNewRating] = useState(0);
     const context = React.useContext(AppContext);
    
     useEffect(()=>{
@@ -239,11 +250,13 @@ const TestPdd = (props: any) => {
         }
         if(!props.options.settings && !props.options.recommended && context.settings.load==true){
             getTickets(); 
+        if(!props.options.settings && !props.options.recommended && props.options.subjects)
+            getSubjects();
         }
     }, [props.options.settings, props.options.recommended, context.settings]);
 
     useEffect(()=>{
-        if(props.options.recommended && context.user){
+        if(props.options.recommended && context.user && !props.options.subjects){
             resetTest();
             startTest();
         }
@@ -259,11 +272,18 @@ const TestPdd = (props: any) => {
     }, [context])
 
     useEffect(()=>{
-        if(selectedTicket!=0 && (props.options.settings==false)){
+        if(selectedTicket!=0 && (props.options.settings==false) && !props.options.subjects){
             resetTest();
             startTest();
         }
     }, [selectedTicket]);
+
+    useEffect(()=>{
+        if(selectedSubject!=0 && (props.options.settings==false)){
+            resetTest();
+            startTest();
+        }
+    }, [selectedSubject]);
 
     useEffect(()=>{
         if(currentQuestion){
@@ -302,6 +322,14 @@ const TestPdd = (props: any) => {
             if(selectedTicket!=0)
                 setTicket(0); 
             setTicket(data[0].id);
+        });
+    }
+
+    function getSubjects(){
+        request({method: 'post', data: {action: "getSubjects"}}).then(response => {
+            const {data} = response;
+            setSubjects(data);
+            //setSubjectName(data[0].name);
         });
     }
 
@@ -346,7 +374,7 @@ const TestPdd = (props: any) => {
             if(props.options.recommended)
                 getQuestions({...Options, recommended: props.options.recommended, user_id:props.user.id, settings: false}, setQuestion);
             else
-		        getQuestions({...Options, selectedTicket:selectedTicket, recommended: props.options.recommended, user_id:props.user.id, settings: false}, setQuestion);
+		        getQuestions({...Options, selectedTicket:selectedTicket, recommended: props.options.recommended, user_id:props.user.id, settings: false, subject: props.options.subjects}, setQuestion);
             queTimer = setInterval(()=>{
                 elapsed_time+=1000;
             }, 1000);
@@ -436,6 +464,16 @@ const TestPdd = (props: any) => {
         Options.selectedTicket = event.target.value;
     }
 
+    function handleChangeSubject(event: SelectChangeEvent){
+        let selSubjectId = event.target.value;
+        setSubject(parseInt(selSubjectId));
+        let estimate = subjects.find(item=>(selSubjectId==item.id));
+        estimate = (estimate.estimate);
+        setEstimate(estimate);
+        setSubjectName(estimate.name);
+        Options.selectedSubject = selSubjectId;
+    }
+
     function goToPage(ticketIndx: any){
         if(ticketIndx<pdd_questions.length && ticketIndx<question_answered){
             currentQuestionIndex = ticketIndx;         
@@ -521,9 +559,14 @@ const TestPdd = (props: any) => {
         return getTimeString(elapsedTime);
     }
 
+    const changeRating = (rating: any) => {
+        setNewRating(rating);
+        request({method: 'post', data: {action: "addRating", data: {subjectId: selectedSubject, rating: rating}}});
+    }
+
     return (
         <div className="container">
-            <div style={{marginTop: 0}} className={(props.options.settings===false && !props.options.recommended)?"row testrow":"hide"}>
+            <div style={{marginTop: 0}} className={(props.options.settings===false && !props.options.recommended && !props.options.subjects)?"row testrow":"hide"}>
                 <div className="exam-title">
                     <label>{context.settings.exam_title}</label>
                     <FormControl key={selectedTicket} className="form-ticket" sx={{m: 1, minWidth: 120, marginTop: '5px', verticalAlign: 'middle', '& > .MuiPaper-root':{top: '60px', maxHeight: 'calc(100% - 62px)'}}}>
@@ -545,6 +588,36 @@ const TestPdd = (props: any) => {
                         <Watch start={start} setEndTest={setEndTest} endTest={endTest} pause={testPause} _continue={continueTest} iterator={iterator} startTime={startTime} btnView="button" />  
                     )}
                 </div>
+            </div>
+            <div style={{marginTop: 0}} className={(props.options.settings===false && !props.options.recommended && props.options.subjects)?"row testrow":"hide"}>
+                <label>Выбор темы:</label>
+                <FormControl key={selectedSubject} className="form-ticket" sx={{m: 1, minWidth: 120, marginTop: '5px', verticalAlign: 'middle', '& > .MuiPaper-root':{top: '60px', maxHeight: 'calc(100% - 62px)'}}}>
+                        <Select
+                            disabled={start?true:false}
+                            labelId="demo-simple-select-helper-label"
+                            sx={{"& .MuiSelect-select": {padding: "5px 14px", top: '30px'}}}
+                            id="demo-simple-select-helper"
+                            value={selectedSubject.toString()}
+                            onChange={handleChangeSubject}>
+                                {
+                                    subjects.map((v: SubjectType, i: number)=>(
+                                        <MenuItem value={v.id}>{v.name}</MenuItem>
+                                    ))
+                                }
+                        </Select>
+                    </FormControl>
+                    <div style={{marginBottom: '4px'}}><h3>{subjectName}</h3></div>
+                    { ((estimate!=null && estimate!==undefined)) && (
+                        <div className="centered-block">оценка: 
+                            <StarRatings
+                                rating={estimate}
+                                numberOfStars={5}
+                                starRatedColor="#c7372c"
+                                starDimension="18px"
+                                starSpacing="5px"
+                            /> <span style={{marginLeft: '4px'}}>{estimate}</span>
+                        </div>
+                    )}
             </div>
             <div className={(props.options.settings==true)?"row testrow":"hide"}>
                 <div className="col-md-12">
@@ -689,9 +762,22 @@ const TestPdd = (props: any) => {
                                                 }
                                             </p>
                                             {(endTest===true) && (
+                                                <>
                                                 <p>
                                                     Затрачено времени на <span style={{fontWeight: 'bold'}}>{(TicketName!="")?TicketName:"экзамен"}: {getElapsedTime(timer)}</span>
                                                 </p>
+                                                <p>
+                                                    <span>оцените сложность: </span>
+                                                    <StarRatings
+                                                        rating={newRating}
+                                                        numberOfStars={5}
+                                                        starDimension="18px"
+                                                        starRatedColor="#c7372c"
+                                                        changeRating={changeRating}
+                                                        starSpacing="5px"
+                                                    />
+                                                </p>
+                                                </>
                                             )}
                                         </div>
                                         </div>
