@@ -431,6 +431,14 @@
         $db->close();
     }
 
+    protected function removeQuestionSubject(){
+        $db = new SQLite3(DB."db.sqlite");
+        $subjectId = $this->data->subjectId;
+        $questionId = $this->data->qId;
+        $db->exec("DELETE FROM subject_2_question WHERE subject_id=$subjectId AND q_id=$questionId");
+        $db->close();
+    }
+
     protected function editTicket(){
         $db = new SQLite3(DB."db.sqlite");
         $text = $_POST['text'];

@@ -198,7 +198,7 @@ export default () => {
         let copyQuestions = [...subjectQuestions];
         copyQuestions.splice(removedIndx, 1);
         setSubjectQue(copyQuestions);
-        request({method: "post", data: {action: "removeQuestionicket", data: {ticketId: selectedSubject, qId: qId}}});
+        request({method: "post", data: {action: "removeQuestionSubject", data: {subjectId: selectedSubject, qId: qId}}});
     }
 
     const handleRemoveSubjectQuestion = (queId: number, indx: number) => {
@@ -271,7 +271,7 @@ export default () => {
     return (
         <>
           <div className="block-wrapper">
-                
+                <DeleteDialog show={deleteDialogShow} setShow={setDeleteDialog} title="Вы действительно хотите произвести удаление?" removeMethod={removeMethod}/>
                 <div className="col-30">
                         <div className="col-title">Темы<Button onClick={() => setShowNewSubject(true)} variant="outline-success">+ Создать</Button></div>
                         <ListGroup>
