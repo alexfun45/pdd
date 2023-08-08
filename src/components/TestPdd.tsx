@@ -329,6 +329,7 @@ const TestPdd = (props: any) => {
         request({method: 'post', data: {action: "getSubjects"}}).then(response => {
             const {data} = response;
             setSubjects(data);
+            setSubject(data[0].id);
             //setSubjectName(data[0].name);
         });
     }
@@ -595,7 +596,7 @@ const TestPdd = (props: any) => {
                         <Select
                             disabled={start?true:false}
                             labelId="demo-simple-select-helper-label"
-                            sx={{"& .MuiSelect-select": {padding: "5px 14px", top: '30px'}}}
+                            sx={{"& .MuiSelect-select": {padding: "5px 14px", top: '30px', width: '210px'}}}
                             id="demo-simple-select-helper"
                             value={selectedSubject.toString()}
                             onChange={handleChangeSubject}>
@@ -607,15 +608,15 @@ const TestPdd = (props: any) => {
                         </Select>
                     </FormControl>
                     <div style={{marginBottom: '4px'}}><h3>{subjectName}</h3></div>
-                    { ((estimate!=null && estimate!==undefined)) && (
-                        <div className="centered-block">оценка: 
+                    { ((estimate!=null && estimate!==undefined && estimate!=0)) && (
+                        <div className="centered-block"><span style={{marginRight: '3px', paddingTop: '5px'}}>оценка:</span>
                             <StarRatings
                                 rating={estimate}
                                 numberOfStars={5}
                                 starRatedColor="#c7372c"
                                 starDimension="18px"
                                 starSpacing="5px"
-                            /> <span style={{marginLeft: '4px'}}>{estimate}</span>
+                            /> <span style={{marginLeft: '4px', paddingTop: '5px'}}>{estimate}</span>
                         </div>
                     )}
             </div>
