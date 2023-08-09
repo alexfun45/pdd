@@ -222,3 +222,24 @@
   font-size: 16px;
   font-weight: 400;
 }
+
+.auth-block{
+  width: 100%;
+  text-align: center;
+  margin-top: 15px;
+}
+
+.auth-block > div{
+  display: inline-block;
+  cursor: pointer;
+  padding: 15px 20px;
+  background-color: #E8EBED;
+}
+
+.auth-block > div:hover{
+  background-color: #d6d7d8;
+}
+
+.auth-block > div > img{
+  margin-right: 20p;
+}

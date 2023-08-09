@@ -164,7 +164,8 @@ export default () => {
                                     <div className="btn"><input onClick={handleForgotBtn} id="passforgot" value="Забыли пароль?" type="submit" /></div>
                                 </div>
                                 <input name="call" value="signin" type="hidden" />
-                        </form>
+                                {/*<div className="auth-block" style={{textAlign: 'center'}}><div><img style={{maxWidth: '25px', float: 'left'}} src='./img/icons8-google-48.png' />Google</div></div>
+                            */}</form>
                         </Tab>
                         <Tab eventKey="signUp" title="Регистрация">
                             <form onSubmit={handleSubmit2(onSubmit2)} action="./admin.php" method="POST" id="signup" className="sign_up">
