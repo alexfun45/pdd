@@ -334,12 +334,13 @@ const TestPdd = (props: any) => {
         });
     }
 
-    function getQuestions(options: any, callback: Function){
+    async function getQuestions(options: any){
         pdd_questions = [];
-        request({method: 'post', data: {action: "getQuestions", data: {...options}}}).then(response => {
+        return await request({method: 'post', data: {action: "getQuestions", data: {...options}}}).then(response => {
             const {data} = response;
             if(data!=null){
                 var questions = data;
+                if(data.length==0 || data==null) return false;
                 for(var i=0, variants;i<questions.length;i++){
                     variants =  questions[i].variants;
                     pdd_questions[i] = {
@@ -354,8 +355,8 @@ const TestPdd = (props: any) => {
                 qNum = Math.min(Options.num, pdd_questions.length);
                 //setqNum(Math.min(Options.num, pdd_questions.length));
                 setqPages([...new Array(qNum).slice(0)]);
-                if(callback)
-                    callback();
+                
+                return true;
             }
             
         });
@@ -368,20 +369,28 @@ const TestPdd = (props: any) => {
     }
 
     function startTest(){
-        setStart(true);
         setEndTest(false);
         testSession = (new Date()).getTime() + Math.floor(1000*Math.random());
         if(props.options.settings===false){
-            if(props.options.recommended)
+            /*if(props.options.recommended)
                 getQuestions({...Options, recommended: props.options.recommended, user_id:props.user.id, settings: false}, setQuestion);
             else
-		        getQuestions({...Options, selectedTicket:selectedTicket, recommended: props.options.recommended, user_id:props.user.id, settings: false, subject: props.options.subjects}, setQuestion);
-            queTimer = setInterval(()=>{
-                elapsed_time+=1000;
-            }, 1000);
+		        getQuestions({...Options, selectedTicket:selectedTicket, selectedSubject: selectedSubject, recommended: props.options.recommended, user_id:props.user.id, settings: false, subject: props.options.subjects}, setQuestion);
+            */
+            getQuestions({...Options, selectedTicket:selectedTicket, selectedSubject: selectedSubject, recommended: props.options.recommended, user_id:props.user.id,subject: props.options.subjects, settings: false}).then((result)=>{
+                console.log("result", result);
+                if(result!==false){
+                    setStart(true);
+                    queTimer = setInterval(()=>{
+                        elapsed_time+=1000;
+                    }, 1000);
+                setQuestion();
+                }
+            })
+                
         }
         else
-            getQuestions(Options, setQuestion);
+            getQuestions(Options).then(()=>setQuestion());
     }
 
     function handleStartTest(){
