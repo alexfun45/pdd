@@ -293,6 +293,7 @@ export default () => {
                             <InputGroup.Text className="input-right-btn"><i onClick={createSubject} style={{cursor: "pointer", color: "green"}} className="bi bi-check"></i></InputGroup.Text>
                         </InputGroup>
                         </ListGroup>    
+                        <div className={(subjects.length!=0)?"title-num":"hide"}>количество: {subjects.length}</div>
                     </div>
 
                     <div className="col-30">
@@ -346,6 +347,7 @@ export default () => {
                             )
                         }
                         </ListGroup>
+                        <div className={(Questions.length!=0 && !isEdit)?"title-num":"hide"}>количество: {filtered.length==0?Questions.length:filtered.length}</div>
                         <QuestionForm show={isEdit} setShow={setEditMode} Question={selectedQuestion} setSelectedQue={setSelectedQue} setQuestions={setQuestions} update={updateSubjectQuestions} />
                     </div>
 

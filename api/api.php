@@ -470,12 +470,14 @@
         $ticketId = $this->data->ticket_id;
         $db->exec("DELETE FROM tickets WHERE id=$ticketId");
         $db->exec("DELETE FROM variants WHERE ticket_id='$ticketId'");
+        $db->close();
     }
 
     protected function removeSubject(){
         $db = new SQLite3(DB."db.sqlite");
         $sId = $this->data->subject_id;
         $db->exec("DELETE FROM subjects WHERE id=$sId");
+        $db->close();
         //$db->exec("DELETE FROM variants WHERE ticket_id='$ticketId'");
     }
 
@@ -1031,7 +1033,7 @@
     }
 
     protected function saveStatistic(){
-        ini_set('display_errors', TRUE);
+        //ini_set('display_errors', TRUE);
         $db = new SQLite3(DB."db.sqlite");
         $stats = json_decode($this->data->stats);
         foreach($stats as $q_id=>$stat){
@@ -1099,12 +1101,14 @@
     }
 
     protected function getStatistic(){
+        //ini_set('display_errors', TRUE);
         $db = new SQLite3(DB."db.sqlite");
         $ticketId = $this->data->ticketId;
         $avg_stat = array();
         $start_date = $this->data->start_date;
         $end_date = $this->data->end_date;
-        $result = $db->query("SELECT t2.q_id as 'q_id', '1' as _correct, t1.indx as 'indx', COUNT(DISTINCT t2.test_session) as 'человек прошло', AVG(t2.elapsed_time) as 'среднее время' FROM ticket_2_question as t1 INNER JOIN statistic as t2 ON t1.q_id=t2.q_id WHERE t2.ticket_id={$ticketId} AND t2.correct=0 AND (DATETIME(t2.timecreated, 'unixepoch')>=datetime({$start_date}, 'unixepoch') AND DATETIME(t2.timecreated, 'unixepoch')<=datetime({$end_date}, 'unixepoch')) GROUP BY t2.q_id UNION ALL SELECT t2.q_id as 'q_id', '0' as correct, t1.indx as 'indx', COUNT(DISTINCT t2.test_session) as 'человек прошло', AVG(t2.elapsed_time) as 'среднее время' FROM ticket_2_question as t1 INNER JOIN statistic as t2 ON t1.q_id=t2.q_id WHERE t2.ticket_id={$ticketId} AND t2.correct=1 AND (DATETIME(t2.timecreated, 'unixepoch')>=datetime({$start_date}, 'unixepoch') AND DATETIME(t2.timecreated, 'unixepoch')<=datetime({$end_date}, 'unixepoch')) GROUP BY t2.q_id ORDER BY t1.indx");
+        $result = $db->query("SELECT t2.q_id as 'q_id', '1' as _correct, t1.indx as 'indx', COUNT(DISTINCT t2.test_session) as 'человек прошло', AVG(t2.elapsed_time) as 'среднее время' FROM ticket_2_question as t1 INNER JOIN statistic as t2 ON t1.q_id=t2.q_id WHERE t1.tickets_id={$ticketId} AND t2.correct=0 AND (DATETIME(t2.timecreated, 'unixepoch')>=datetime({$start_date}, 'unixepoch') AND DATETIME(t2.timecreated, 'unixepoch')<=datetime({$end_date}, 'unixepoch')) GROUP BY t2.q_id UNION ALL SELECT t2.q_id as 'q_id', '0' as correct, t1.indx as 'indx', COUNT(DISTINCT t2.test_session) as 'человек прошло', AVG(t2.elapsed_time) as 'среднее время' FROM ticket_2_question as t1 INNER JOIN statistic as t2 ON t1.q_id=t2.q_id WHERE t1.tickets_id={$ticketId} AND t2.correct=1 AND (DATETIME(t2.timecreated, 'unixepoch')>=datetime({$start_date}, 'unixepoch') AND DATETIME(t2.timecreated, 'unixepoch')<=datetime({$end_date}, 'unixepoch')) GROUP BY t2.q_id ORDER BY t1.indx");
+        //$result = $db->query("SELECT * FROM (SELECT t2.q_id as 'q_id', '1' as _correct, t1.indx as 'indx', COUNT(DISTINCT t2.test_session) as 'человек прошло', AVG(t2.elapsed_time) as 'среднее время' FROM ticket_2_question as t1 INNER JOIN statistic as t2 ON t1.q_id=t2.q_id WHERE t1.tickets_id={$ticketId} AND t2.correct=0 AND (DATETIME(t2.timecreated, 'unixepoch')>=datetime({$start_date}, 'unixepoch') AND DATETIME(t2.timecreated, 'unixepoch')<=datetime({$end_date}, 'unixepoch')) GROUP BY t2.q_id UNION ALL SELECT t2.q_id as 'q_id', '0' as correct, t1.indx as 'indx', COUNT(DISTINCT t2.test_session) as 'человек прошло', AVG(t2.elapsed_time) as 'среднее время' FROM ticket_2_question as t1 INNER JOIN statistic as t2 ON t1.q_id=t2.q_id WHERE t1.tickets_id={$ticketId} AND t2.correct=1 AND (DATETIME(t2.timecreated, 'unixepoch')>=datetime({$start_date}, 'unixepoch') AND DATETIME(t2.timecreated, 'unixepoch')<=datetime({$end_date}, 'unixepoch')) GROUP BY t2.q_id) GROUP BY q_id");
         $i = 0;
         $correctIndx = 0;
         $incorrectIndx = 0;

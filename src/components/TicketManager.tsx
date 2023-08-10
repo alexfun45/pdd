@@ -381,6 +381,7 @@ export default () => {
                         <InputGroup.Text className="input-right-btn"><i onClick={createTicket} style={{cursor: "pointer", color: "green"}} className="bi bi-check"></i></InputGroup.Text>
                     </InputGroup>
                     </ListGroup>
+                    <div className={(tickets.length!=0)?"title-num":"hide"}>количество: {tickets.length}</div>
                 </div>
             
                 <div className="col-30">
@@ -416,7 +417,7 @@ export default () => {
                         sx={{ width: 300 }}
                         renderInput={(params) => <TextField {...params} label="поиск" />}
                     />
-                    <ListGroup className={isEdit?"hide":""}>
+                    <ListGroup style={{width: '100%'}} className={isEdit?"hide":""}>
                     {
                         (filtered.length==0 ? 
                             Questions.map((q:QuestionType, i: number)=>{
@@ -432,6 +433,7 @@ export default () => {
                         )
                     }
                     </ListGroup>
+                    <div className={(Questions.length!=0 && !isEdit)?"title-num":"hide"}>количество: {filtered.length==0?Questions.length:filtered.length}</div>
                     <QuestionForm show={isEdit} setShow={setEditMode} Question={selectedQuestion} setSelectedQue={setSelectedQue} setQuestions={setQuestions} update={updateTicketQuestions} />
                 </div>
             </div>
