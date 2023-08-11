@@ -253,10 +253,10 @@ const TestPdd = (props: any) => {
         if(!props.options.settings && !props.options.recommended && props.options.subjects)
             getSubjects();
         }
-    }, [props.options.settings, props.options.recommended, context.settings]);
+    }, [props.options.settings, props.options.subjects, props.options.recommended, context.settings]);
 
     useEffect(()=>{
-        if(props.options.recommended && context.user && !props.options.subjects){
+        if(props.options.recommended && context.user){
             resetTest();
             startTest();
         }
