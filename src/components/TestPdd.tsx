@@ -576,46 +576,55 @@ const TestPdd = (props: any) => {
 
     return (
         <div className="container">
-            <div style={{marginTop: 0}} className={(props.options.settings===false && !props.options.recommended && !props.options.subjects)?"row testrow":"hide"}>
-                <div className="exam-title">
-                    <label>{context.settings.exam_title}</label>
-                    <FormControl key={selectedTicket} className="form-ticket" sx={{m: 1, minWidth: 120, marginTop: '5px', verticalAlign: 'middle', '& > .MuiPaper-root':{top: '60px', maxHeight: 'calc(100% - 62px)'}}}>
-                        <Select
-                            disabled={start?true:false}
-                            labelId="demo-simple-select-helper-label"
-                            sx={{"& .MuiSelect-select": {padding: "5px 14px", top: '30px'}}}
-                            id="demo-simple-select-helper"
-                            value={selectedTicket.toString()}
-                            onChange={handleChangeTicket}>
-                                {
-                                    tickets.map((v, i)=>(
-                                        <MenuItem value={v.id}>{v.name}</MenuItem>
-                                    ))
-                                }
-                        </Select>
-                    </FormControl>
-                    { (currentQuestion!=undefined && context.isMobile) && (
-                        <Watch start={start} setEndTest={setEndTest} endTest={endTest} pause={testPause} _continue={continueTest} iterator={iterator} startTime={startTime} btnView="button" />  
-                    )}
+            {(props.options.settings===false && !props.options.recommended && !props.options.subjects) && (
+                <div style={{marginTop: 0}} className={(props.options.settings===false && !props.options.recommended && !props.options.subjects)?"row testrow":"hide"}>
+                    <div className="exam-title">
+                        <label>{context.settings.exam_title}</label>
+                        <FormControl key={selectedTicket} className="form-ticket" sx={{m: 1, minWidth: 120, marginTop: '5px', verticalAlign: 'middle', '& > .MuiPaper-root':{top: '60px', maxHeight: 'calc(100% - 62px)'}}}>
+                            <Select
+                                disabled={start?true:false}
+                                labelId="demo-simple-select-helper-label"
+                                sx={{"& .MuiSelect-select": {padding: "5px 14px", top: '30px'}}}
+                                id="demo-simple-select-helper"
+                                value={selectedTicket.toString()}
+                                onChange={handleChangeTicket}>
+                                    {
+                                        tickets.map((v, i)=>(
+                                            <MenuItem value={v.id}>{v.name}</MenuItem>
+                                        ))
+                                    }
+                            </Select>
+                        </FormControl>
+                        { (currentQuestion!=undefined && context.isMobile) && (
+                            <Watch start={start} setEndTest={setEndTest} endTest={endTest} pause={testPause} _continue={continueTest} iterator={iterator} startTime={startTime} btnView="button" />  
+                        )}
+                    </div>
                 </div>
-            </div>
+                )}
             <div style={{marginTop: 0}} className={(props.options.settings===false && !props.options.recommended && props.options.subjects)?"row testrow":"hide"}>
-                <label>Выбор темы:</label>
-                <FormControl key={selectedSubject} className="form-ticket" sx={{m: 1, minWidth: 120, marginTop: '5px', verticalAlign: 'middle', '& > .MuiPaper-root':{top: '60px', maxHeight: 'calc(100% - 62px)'}}}>
-                        <Select
-                            disabled={start?true:false}
-                            labelId="demo-simple-select-helper-label"
-                            sx={{"& .MuiSelect-select": {padding: "5px 14px", top: '30px', width: '210px'}}}
-                            id="demo-simple-select-helper"
-                            value={selectedSubject.toString()}
-                            onChange={handleChangeSubject}>
-                                {
-                                    subjects.map((v: SubjectType, i: number)=>(
-                                        <MenuItem value={v.id}>{v.name}</MenuItem>
-                                    ))
-                                }
-                        </Select>
-                    </FormControl>
+                { (props.options.settings===false && !props.options.recommended && props.options.subjects) && (
+                    <>
+                        <label>Выбор темы:</label>
+                        <FormControl key={selectedSubject} className="form-ticket" sx={{m: 1, minWidth: 120, marginTop: '5px', verticalAlign: 'middle', '& > .MuiPaper-root':{top: '60px', maxHeight: 'calc(100% - 62px)'}}}>
+                                <Select
+                                    disabled={start?true:false}
+                                    labelId="demo-simple-select-helper-label"
+                                    sx={{"& .MuiSelect-select": {padding: "5px 14px", top: '30px', width: '210px'}}}
+                                    id="demo-simple-select-helper"
+                                    value={selectedSubject.toString()}
+                                    onChange={handleChangeSubject}>
+                                        {
+                                            subjects.map((v: SubjectType, i: number)=>(
+                                                <MenuItem value={v.id}>{v.name}</MenuItem>
+                                            ))
+                                        }
+                                </Select>
+                            </FormControl>
+                            { (currentQuestion!=undefined && context.isMobile) && (
+                                <Watch start={start} setEndTest={setEndTest} endTest={endTest} pause={testPause} _continue={continueTest} iterator={iterator} startTime={startTime} btnView="button" />  
+                            )}
+                        </>
+                    )}
                     <div style={{marginBottom: '4px'}}><h3>{subjectName}</h3></div>
                     { ((estimate!=null && estimate!==undefined && estimate!=0)) && (
                         <div className="centered-block"><span style={{marginRight: '3px', paddingTop: '5px'}}>оценка:</span>
