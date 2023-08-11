@@ -48,7 +48,9 @@ var removedIndx = 0,
     removeMethod: Function,
     qId = 0,
     options:any[] = [],
-    changePostionLock = false;;
+    changePostionLock = false,
+    ItemNewName = "";
+
 export default () => {
 
     const [tickets, setTickets] = useState<TicketType[]>([]),
@@ -71,6 +73,8 @@ export default () => {
           [ticketNum, setTicketNum] = useState(0),
           [subjectNum, setSubjectNum] = useState(0),
           [filtered, setFiltered] = useState<QuestionType[] | []>([]),
+          [renameItemId, setRenameId] = useState(0),
+          [sortOrder, setSortOrder] = useState("asc"),
           defaultTicket = {text: "", id: 1, image: "", correct_id: 0, variants: [{answer: '', comment: ''}]};  
     let currentTicket = useRef(defaultTicket);
 
@@ -355,6 +359,52 @@ export default () => {
         }
     }
 
+    const handleRenameItem = (ticketId: number) => {
+        setRenameId(ticketId);
+        ItemNewName = "";
+    }
+
+    const handleChangeItemName = (e: React.ChangeEvent<HTMLInputElement>) => {
+        ItemNewName = e.target.value;
+    }
+
+    const cancelEdit = () => {
+        setRenameId(0);
+    }
+
+    const handleKeyDown = (i: number, e: React.KeyboardEvent<HTMLDivElement>) => {
+        if(e.keyCode==27)
+            cancelEdit();
+        if(e.keyCode==13){
+          if(renameItemId!=0 && ItemNewName!=""){
+            request({method: "post", data: {action: "renameTicket", data: {id: renameItemId, newName: ItemNewName}}}).then(response=>{
+                setRenameId(0);
+                let copy = [...tickets];
+                copy[i].name = ItemNewName;
+                setTickets(copy);
+                ItemNewName = "";
+            });
+          }
+        }
+    }
+
+    const getNumber = (__str: string) => {
+        return parseInt(__str.replace(/^\D+/g, ''));
+    }
+
+    const sortTicket = () => {
+        let copyTickets = [...tickets];
+        if(sortOrder=='asc'){
+            copyTickets.sort((a, b)=>getNumber(a.name)<getNumber(b.name)?1:-1);
+            setSortOrder('desc');
+        }
+        else{
+            copyTickets.sort((a, b)=>getNumber(b.name)<getNumber(a.name)?1:-1);
+            setSortOrder('asc');
+        }
+        setTickets(copyTickets);
+    }
+
     return (
         <>
             <div className="block-wrapper">
@@ -362,10 +412,11 @@ export default () => {
                 {/*<CreateTicket ticket={currentTicket.current} setShow={setShow} editMode={isEdit} show={show} removeTicket={removeTicket} getTickets={getTickets}/>*/}
                 <div className="col-30">
                     <div className="col-title">Билеты <Button onClick={() => setShowNewTicket(true)} variant="outline-success">+ Создать</Button></div>
+                    <div style={{textAlign: 'left'}}><span onClick={sortTicket} style={{fontSize: '12px', color: '#3c96e6', cursor: 'pointer'}}>сортировать<i className={(sortOrder=="asc")?"bi bi-arrow-down":"bi bi-arrow-up"}></i></span></div>
                     <ListGroup>
                         {
                             tickets.map((value:TicketType, i: number) => {
-                                    return <ListGroup.Item action id={(value?.id || '').toString()} onClick={(e)=>selectTicket(value?.id || 0)} eventKey={value?.id}>{value?.name}<div className="right-panel"><span><i onClick={()=>handleRemoveTicket(value?.id || null)} className="bi bi-trash3-fill"></i></span></div></ListGroup.Item> 
+                                    return <ListGroup.Item action id={(value?.id || '').toString()} onClick={(e)=>selectTicket(value?.id || 0)} onDoubleClick={()=>handleRenameItem(value?.id || 0)} eventKey={value?.id}><span className={renameItemId==value.id?"":"hide"}><TextField defaultValue={value?.name} onKeyDown={(e)=>handleKeyDown(i, e)} onChange={handleChangeItemName} style={{width: '70%'}} label="" /></span><span className={renameItemId==value.id?"hide":""}>{value?.name}</span><div className="right-panel"><span><i onClick={()=>handleRenameItem(value?.id || 0)} className={renameItemId!=value.id?"bi bi-pencil-fill":"hide"}></i><i onClick={()=>handleRemoveTicket(value?.id || null)} className={renameItemId!=value.id?"bi bi-trash3-fill":"hide"}></i><Button onClick={()=>cancelEdit()} className={renameItemId==value.id?"":"hide"} style={{fontSize:"11px", marginTop: '7px'}} variant="danger">отмена</Button></span></div></ListGroup.Item> 
                             })      
                         }
                     <InputGroup className={(showNewTicket)?"mb-3":"hide"}>
@@ -422,7 +473,7 @@ export default () => {
                         (filtered.length==0 ? 
                             Questions.map((q:QuestionType, i: number)=>{
                                 if(q!=null)
-                                    return <ListGroup.Item action id={(q?.id || '').toString()} onClick={(e)=>selectQuestion(q)} eventKey={q?.id}>{q?.code_id}<div className="right-panel"><span><i onClick={()=>handleEditQuestion(q)} className="bi bi-pencil-fill"></i><i onClick={()=>handleRemoveQuestion(q.id, i)} className="bi bi-trash3-fill"></i></span></div></ListGroup.Item>  
+                                    return <ListGroup.Item action id={(q?.id || '').toString()} onClick={(e)=>selectQuestion(q)}  onDoubleClick={()=>handleRenameItem(q?.id || 0)} eventKey={q?.id}>{q?.code_id}<div className="right-panel"><span><i onClick={()=>handleEditQuestion(q)} className="bi bi-pencil-fill"></i><i onClick={()=>handleRemoveQuestion(q.id, i)} className="bi bi-trash3-fill"></i></span></div></ListGroup.Item>  
                             })
                             :
                             (

@@ -1107,7 +1107,7 @@
         $avg_stat = array();
         $start_date = $this->data->start_date;
         $end_date = $this->data->end_date;
-        $result = $db->query("SELECT t2.q_id as 'q_id', '1' as _correct, t1.indx as 'indx', COUNT(DISTINCT t2.test_session) as 'человек прошло', AVG(t2.elapsed_time) as 'среднее время' FROM ticket_2_question as t1 INNER JOIN statistic as t2 ON t1.q_id=t2.q_id WHERE t1.tickets_id={$ticketId} AND t2.correct=0 AND (DATETIME(t2.timecreated, 'unixepoch')>=datetime({$start_date}, 'unixepoch') AND DATETIME(t2.timecreated, 'unixepoch')<=datetime({$end_date}, 'unixepoch')) GROUP BY t2.q_id UNION ALL SELECT t2.q_id as 'q_id', '0' as correct, t1.indx as 'indx', COUNT(DISTINCT t2.test_session) as 'человек прошло', AVG(t2.elapsed_time) as 'среднее время' FROM ticket_2_question as t1 INNER JOIN statistic as t2 ON t1.q_id=t2.q_id WHERE t1.tickets_id={$ticketId} AND t2.correct=1 AND (DATETIME(t2.timecreated, 'unixepoch')>=datetime({$start_date}, 'unixepoch') AND DATETIME(t2.timecreated, 'unixepoch')<=datetime({$end_date}, 'unixepoch')) GROUP BY t2.q_id ORDER BY t1.indx");
+        $result = $db->query("SELECT t2.q_id as 'q_id', '1' as _correct, t1.indx as 'indx', COUNT(DISTINCT t2.test_session) as 'человек прошло', AVG(t2.elapsed_time) as 'среднее время' FROM ticket_2_question as t1 INNER JOIN statistic as t2 ON t1.q_id=t2.q_id AND t2.ticket_id={$ticketId} WHERE t1.tickets_id={$ticketId} AND t2.correct=0 AND (DATETIME(t2.timecreated, 'unixepoch')>=datetime({$start_date}, 'unixepoch') AND DATETIME(t2.timecreated, 'unixepoch')<=datetime({$end_date}, 'unixepoch')) GROUP BY t2.q_id UNION ALL SELECT t2.q_id as 'q_id', '0' as correct, t1.indx as 'indx', COUNT(DISTINCT t2.test_session) as 'человек прошло', AVG(t2.elapsed_time) as 'среднее время' FROM ticket_2_question as t1 INNER JOIN statistic as t2 ON t1.q_id=t2.q_id WHERE t1.tickets_id={$ticketId} AND t2.correct=1 AND (DATETIME(t2.timecreated, 'unixepoch')>=datetime({$start_date}, 'unixepoch') AND DATETIME(t2.timecreated, 'unixepoch')<=datetime({$end_date}, 'unixepoch')) GROUP BY t2.q_id ORDER BY t1.indx");
         //$result = $db->query("SELECT * FROM (SELECT t2.q_id as 'q_id', '1' as _correct, t1.indx as 'indx', COUNT(DISTINCT t2.test_session) as 'человек прошло', AVG(t2.elapsed_time) as 'среднее время' FROM ticket_2_question as t1 INNER JOIN statistic as t2 ON t1.q_id=t2.q_id WHERE t1.tickets_id={$ticketId} AND t2.correct=0 AND (DATETIME(t2.timecreated, 'unixepoch')>=datetime({$start_date}, 'unixepoch') AND DATETIME(t2.timecreated, 'unixepoch')<=datetime({$end_date}, 'unixepoch')) GROUP BY t2.q_id UNION ALL SELECT t2.q_id as 'q_id', '0' as correct, t1.indx as 'indx', COUNT(DISTINCT t2.test_session) as 'человек прошло', AVG(t2.elapsed_time) as 'среднее время' FROM ticket_2_question as t1 INNER JOIN statistic as t2 ON t1.q_id=t2.q_id WHERE t1.tickets_id={$ticketId} AND t2.correct=1 AND (DATETIME(t2.timecreated, 'unixepoch')>=datetime({$start_date}, 'unixepoch') AND DATETIME(t2.timecreated, 'unixepoch')<=datetime({$end_date}, 'unixepoch')) GROUP BY t2.q_id) GROUP BY q_id");
         $i = 0;
         $correctIndx = 0;
@@ -1182,6 +1182,18 @@
         $db = new SQLite3(DB."db.sqlite");
         $db->exec("DELETE FROM statistic");
         $db->close();
+    }
+
+    protected function renameTicket(){
+        $ticketId = $this->data->id;
+        $newName = $this->data->newName;
+        $db = new SQLite3(DB."db.sqlite");
+        $db->exec("UPDATE tickets SET name='{$newName}' WHERE id={$ticketId}");
+        $db->close();
+    }
+
+    protected function renameSubject(){
+        $subjetcId = $this->data->id;
     }
 
     }

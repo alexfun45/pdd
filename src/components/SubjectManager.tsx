@@ -48,7 +48,8 @@ var removedIndx = 0,
     removeMethod: Function,
     qId = 0,
     options:any[] = [],
-    changePostionLock = false;
+    changePostionLock = false,
+    ItemNewName = "";
 
 export default () => {
 
@@ -65,6 +66,8 @@ export default () => {
           [search, setSearchValue] = useState<string>(""),
           [subjectNum, setSubjectNum] = useState(0),
           [filtered, setFiltered] = useState<QuestionType[] | []>([]),
+          [renameItemId, setRenameId] = useState(0),
+          [sortOrder, setSortOrder] = useState("asc"),
           defaultTicket = {text: "", id: 1, image: "", correct_id: 0, variants: [{answer: '', comment: ''}]};  
     let currentTicket = useRef(defaultTicket);
 
@@ -268,16 +271,64 @@ export default () => {
         }
     }
 
+    const handleRenameItem = (ticketId: number) => {
+        setRenameId(ticketId);
+        ItemNewName = "";
+    }
+
+    const handleChangeItemName = (e: React.ChangeEvent<HTMLInputElement>) => {
+        ItemNewName = e.target.value;
+    }
+
+    const cancelEdit = () => {
+        setRenameId(0);
+    }
+
+    const handleKeyDown = (i: number, e: React.KeyboardEvent<HTMLDivElement>) => {
+        if(e.keyCode==27)
+            cancelEdit();
+        if(e.keyCode==13){
+          if(renameItemId!=0 && ItemNewName!=""){
+            request({method: "post", data: {action: "renameSubject", data: {id: renameItemId, newName: ItemNewName}}}).then(()=>{
+                setRenameId(0);
+                let copy;
+                copy = [...subjects];
+                copy[i].name = ItemNewName;
+                setSubjects(copy);
+                ItemNewName = "";
+            });
+          }
+        }
+    }
+
+    const getNumber = (__str: string) => {
+        return parseInt(__str.replace(/^\D+/g, ''));
+    }
+
+    const sortTicket = () => {
+        let copySubjects = [...subjects];
+        if(sortOrder=='asc'){
+            copySubjects.sort((a, b)=>getNumber(a.name)<getNumber(b.name)?1:-1);
+            setSortOrder('desc');
+        }
+        else{
+            copySubjects.sort((a, b)=>getNumber(b.name)<getNumber(a.name)?1:-1);
+            setSortOrder('asc');
+        }
+        setSubjects(copySubjects);
+    }
+
     return (
         <>
           <div className="block-wrapper">
                 <DeleteDialog show={deleteDialogShow} setShow={setDeleteDialog} title="Вы действительно хотите произвести удаление?" removeMethod={removeMethod}/>
                 <div className="col-30">
                         <div className="col-title">Темы<Button onClick={() => setShowNewSubject(true)} variant="outline-success">+ Создать</Button></div>
+                        <div style={{textAlign: 'left'}}><span onClick={sortTicket} style={{fontSize: '12px', color: '#3c96e6', cursor: 'pointer'}}>сортировать<i className={(sortOrder=="asc")?"bi bi-arrow-down":"bi bi-arrow-up"}></i></span></div>
                         <ListGroup>
                             {
                                 subjects.map((value:SubjectType, i: number) => {
-                                        return <ListGroup.Item action id={(value?.id || '').toString()} onClick={(e)=>selectSubject(value?.id || 0)} eventKey={value?.id}>{value?.name}<div className="right-panel"><span><i onClick={()=>handleRemoveSubject(value?.id || null)} className="bi bi-trash3-fill"></i></span></div></ListGroup.Item> 
+                                        return <ListGroup.Item action id={(value?.id || '').toString()} onClick={(e)=>selectSubject(value?.id || 0)} onDoubleClick={()=>handleRenameItem(value?.id || 0)} eventKey={value?.id}><span className={renameItemId==value.id?"":"hide"}><TextField defaultValue={value?.name} onKeyDown={(e)=>handleKeyDown(i, e)} onChange={handleChangeItemName} style={{width: '70%'}} label="" /></span><span className={renameItemId==value.id?"hide":""}>{value?.name}</span><div className="right-panel"><span><i onClick={()=>handleRenameItem(value?.id || 0)} className={renameItemId!=value.id?"bi bi-pencil-fill":"hide"}></i><i onClick={()=>handleRemoveSubject(value?.id || null)} className={renameItemId!=value.id?"bi bi-trash3-fill":"hide"}></i><Button onClick={()=>cancelEdit()} className={renameItemId==value.id?"":"hide"} style={{fontSize:"11px", marginTop: '7px'}} variant="danger">отмена</Button></span></div></ListGroup.Item> 
                                 })      
                             }
                         <InputGroup className={(showNewSubject)?"mb-3":"hide"}>

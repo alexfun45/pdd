@@ -1,14 +1,25 @@
-import React, {useState, useEffect} from "react";
+import React, {useState, useEffect, lazy, Suspense} from "react";
 import Tab from 'react-bootstrap/Tab';
 import Tabs from 'react-bootstrap/Tabs';
-import TicketManager from './TicketManager'
+/*import TicketManager from './TicketManager'
 import SubjectManager from './SubjectManager'
 import PageManager from './PageManager'
 import PageEditor from './PageEditor'
 import UsersManager from './Users'
 import Statistic from './Statistic'
 import Settings from './Settings'
-import Grade from './Grade/Grade'
+import Grade from './Grade/Grade'*/
+
+const TicketManager = lazy(() => import('./TicketManager'));
+const SubjectManager = lazy(() => import('./SubjectManager'));
+const PageManager = lazy(() => import('./PageManager'));
+const PageEditor = lazy(() => import('./PageEditor'));
+const UsersManager = lazy(() => import('./Users'));
+const Statistic = lazy(() => import('./Statistic'));
+const Settings = lazy(() => import('./Settings'));
+const Grade = lazy(() => import('./Grade/Grade'));
+
+
 import { connect } from 'react-redux';
 import request from '../utils/request'
 import {AppContext} from '../app'
@@ -63,37 +74,74 @@ const AdminPanel = (props: any) => {
                     activeKey={key}
                     >
                     <Tab eventKey="tickets" title="Билеты">
-                        <TicketManager />
+                     { (key=="tickets") ? (
+                        <Suspense fallback={<div>Loading...</div>}>
+                            <TicketManager />
+                        </Suspense>
+                        ):null
+                     }
                     </Tab>
                     <Tab eventKey="subjects" title="Темы">
-                        <SubjectManager />
+                        { (key=="subjects") ? (
+                            <Suspense fallback={<div>Loading...</div>}>
+                                <SubjectManager />
+                            </Suspense>
+                         ):null
+                        }
                     </Tab>
                     {(props.auth.role==1) && (
                         <Tab eventKey="settings" title="Настройки">
-                            <Settings allPages={allPages} />
+                            { (key=="settings") ? (
+                                <Suspense fallback={<div>Loading...</div>}>
+                                    <Settings allPages={allPages} />
+                                </Suspense>
+                            ):null
+                            }
                         </Tab>
                     )}
                     {(props.auth.role==1) && (
                         <Tab eventKey="users" title="Пользователи">
-                            <UsersManager />
+                            { (key=="users") ? (
+                                <Suspense fallback={<div>Loading...</div>}>
+                                    <UsersManager />
+                                </Suspense>
+                            ):null
+                        }
                         </Tab>
                     )}
                     {(props.auth.role==1) && (
                         <Tab eventKey="statistic" title="Статистика">
-                            <Statistic />
+                            { (key=="statistic") ? (
+                                <Suspense fallback={<div>Loading...</div>}>
+                                    <Statistic />
+                                </Suspense>
+                            ):null
+                            }
                         </Tab>
                     )}
                     {(props.auth.role==1) && (
                         <Tab eventKey="grade" title="Успеваемость">
-                            <Grade />
+                            { (key=="grade") ? (
+                                <Suspense fallback={<div>Loading...</div>}>
+                                    <Grade />
+                                </Suspense>
+                            ):null
+                            }
                         </Tab>
                     )}
                     <Tab eventKey="pagemanager" title="Менеджер страниц">
-                        <PageManager setpageTabtype={setpageTabtype} setKey={setKey} setEditPageName={setEditPageName} __menuItems={menuItems} __allPages={allPages} />
+                        { (key=="pagemanager") ? (
+                            <Suspense fallback={<div>Loading...</div>}>
+                                <PageManager setpageTabtype={setpageTabtype} setKey={setKey} setEditPageName={setEditPageName} __menuItems={menuItems} __allPages={allPages} />
+                            </Suspense>
+                        ):null
+                        }
                     </Tab>
                     { (pageTabtype!=0) && (
                         <Tab eventKey="newpage" tabClassName={(pageTabtype!=0)?'':'hide'} title={<TabTitle tab_type={pageTabtype} editPageName={editPageName} setpageTabtype={setpageTabtype} setKey={setKey} setEditPageName={setEditPageName}/>}>
-                            <PageEditor editPageName={editPageName} setEditPageName={setEditPageName} mode={pageTabtype}/>
+                            <Suspense fallback={<div>Loading...</div>}>
+                                <PageEditor editPageName={editPageName} setEditPageName={setEditPageName} mode={pageTabtype}/>
+                            </Suspense>
                         </Tab>
                     )}
                 </Tabs>
