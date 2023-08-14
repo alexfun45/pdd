@@ -41,7 +41,7 @@ const routes = [
     },
     {
         route: "subjects",
-        component: <TestPdd start={true} options={{num: 20, max_error:2, subjects: true, random: false, recommended: false, max: 1000, dblclick: false, settings: false}} />,
+        component: <TestPdd start={true} options={{num: 400, max_error:2, subjects: true, random: false, recommended: false, max: 1000, dblclick: false, settings: false}} />,
         key: "subjects"
     },
     {

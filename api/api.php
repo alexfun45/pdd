@@ -341,16 +341,18 @@
         $db = new SQLite3(DB."db.sqlite");
         $ticket_name = $this->data->ticket_name;
         $db->exec("INSERT INTO tickets(name) VALUES('$ticket_name')");
+        $id = $db->lastInsertRowID();
         $db->close();
-        return $db->lastInsertRowID();
+        return $id;
     }
 
     protected function addSubject(){
         $db = new SQLite3(DB."db.sqlite");
         $subject_name = $this->data->subject_name;
         $db->exec("INSERT INTO subjects(name) VALUES('$subject_name')");
+        $id = $db->lastInsertRowID();
         $db->close();
-        return $db->lastInsertRowID();
+        return $id;
     }
 
     protected function addQuestion(){

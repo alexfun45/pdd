@@ -68,8 +68,9 @@ export default () => {
           [filtered, setFiltered] = useState<QuestionType[] | []>([]),
           [renameItemId, setRenameId] = useState(0),
           [sortOrder, setSortOrder] = useState("asc"),
+          textInput:React.RefObject<HTMLInputElement> = React.useRef(),
           defaultTicket = {text: "", id: 1, image: "", correct_id: 0, variants: [{answer: '', comment: ''}]};  
-    let currentTicket = useRef(defaultTicket);
+
 
     useEffect(()=>{
         if(show==false){
@@ -139,15 +140,18 @@ export default () => {
 
 
     const handleKeyDownSubject = (e: any) => {
-        if(e.keyCode==13)
+        if(e.keyCode==13){
+            ItemNewName = e.target.value;
             createSubject();
+        }
     }
 
     const createSubject = () => {
-        request({method: "post", data: {action: "addSubject", data: {subject_name: newSubjectName}}}).then(response=>{
+        ItemNewName =(ItemNewName=="")? textInput.current.value:ItemNewName;
+        request({method: "post", data: {action: "addSubject", data: {subject_name: ItemNewName}}}).then(response=>{
             const {data} = response;
-            setSubjects(prev=>([...subjects, {id: data, name: newSubjectName}]));
-            setSubjectName("");
+            setSubjects(prev=>([...subjects, {id: data, name: ItemNewName}]));
+            ItemNewName = "";
             setShowNewSubject(false);
         });
     }
@@ -318,25 +322,32 @@ export default () => {
         setSubjects(copySubjects);
     }
 
+    const handleCreateButton = () => {
+        let list = document.getElementById('listItems');
+        list.scrollTop = list.scrollHeight;
+        textInput.current.focus();
+        setShowNewSubject(true);
+    }
+
     return (
         <>
           <div className="block-wrapper">
                 <DeleteDialog show={deleteDialogShow} setShow={setDeleteDialog} title="Вы действительно хотите произвести удаление?" removeMethod={removeMethod}/>
                 <div className="col-30">
-                        <div className="col-title">Темы<Button onClick={() => setShowNewSubject(true)} variant="outline-success">+ Создать</Button></div>
+                        <div className="col-title">Темы<Button onClick={handleCreateButton} variant="outline-success">+ Создать</Button></div>
                         <div style={{textAlign: 'left'}}><span onClick={sortTicket} style={{fontSize: '12px', color: '#3c96e6', cursor: 'pointer'}}>сортировать<i className={(sortOrder=="asc")?"bi bi-arrow-down":"bi bi-arrow-up"}></i></span></div>
-                        <ListGroup>
+                        <ListGroup id="listItems">
                             {
                                 subjects.map((value:SubjectType, i: number) => {
-                                        return <ListGroup.Item action id={(value?.id || '').toString()} onClick={(e)=>selectSubject(value?.id || 0)} onDoubleClick={()=>handleRenameItem(value?.id || 0)} eventKey={value?.id}><span className={renameItemId==value.id?"":"hide"}><TextField defaultValue={value?.name} onKeyDown={(e)=>handleKeyDown(i, e)} onChange={handleChangeItemName} style={{width: '70%'}} label="" /></span><span className={renameItemId==value.id?"hide":""}>{value?.name}</span><div className="right-panel"><span><i onClick={()=>handleRenameItem(value?.id || 0)} className={renameItemId!=value.id?"bi bi-pencil-fill":"hide"}></i><i onClick={()=>handleRemoveSubject(value?.id || null)} className={renameItemId!=value.id?"bi bi-trash3-fill":"hide"}></i><Button onClick={()=>cancelEdit()} className={renameItemId==value.id?"":"hide"} style={{fontSize:"11px", marginTop: '7px'}} variant="danger">отмена</Button></span></div></ListGroup.Item> 
+                                    return <ListGroup.Item action id={(value?.id || '').toString()} onClick={(e)=>selectSubject(value?.id || 0)} onDoubleClick={()=>handleRenameItem(value?.id || 0)} eventKey={value?.id}><span className={renameItemId==value.id?"":"hide"}><TextField defaultValue={value?.name} onKeyDown={(e)=>handleKeyDown(i, e)} onChange={handleChangeItemName} style={{width: '70%'}} label="" /></span><span className={renameItemId==value.id?"hide":""}>{value?.name}</span><div className="right-panel"><span><i onClick={()=>handleRenameItem(value?.id || 0)} className={renameItemId!=value.id?"bi bi-pencil-fill":"hide"}></i><i onClick={()=>handleRemoveSubject(value?.id || null)} className={renameItemId!=value.id?"bi bi-trash3-fill":"hide"}></i><Button onClick={()=>cancelEdit()} className={renameItemId==value.id?"":"hide"} style={{fontSize:"11px", marginTop: '7px'}} variant="danger">отмена</Button></span></div></ListGroup.Item> 
                                 })      
                             }
                         <InputGroup className={(showNewSubject)?"mb-3":"hide"}>
                             <Form.Control
+                                ref={textInput}
                                 onKeyDown={handleKeyDownSubject}
-                                onChange={handleChangeSubjectName}
                                 placeholder="имя новой темы"
-                                value={newSubjectName}
+                                defaultValue={newSubjectName}
                                 type="text"
                                 id="inputPassword5"
                                 aria-describedby="passwordHelpBlock"
