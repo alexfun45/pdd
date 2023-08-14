@@ -768,7 +768,7 @@ const TestPdd = (props: any) => {
                                 <div className="col-md-12">
                                     <div className="panel panel-primary">
                                             <div className="panel-heading lead">
-                                            ошибок <span id="resultErrors" className="label label-danger">{errors}</span> из <span id="resultCount" className="label label-default">{Options.num}</span>
+                                            ошибок <span id="resultErrors" className="label label-danger">{errors}</span> из <span id="resultCount" className="label label-default">{pdd_questions.length}</span>
                                         </div>
 
                                         <div className="panel-body">
