@@ -1196,6 +1196,10 @@
 
     protected function renameSubject(){
         $subjetcId = $this->data->id;
+        $newName = $this->data->newName;
+        $db = new SQLite3(DB."db.sqlite");
+        $db->exec("UPDATE subjects SET name='{$newName}' WHERE id={$subjetcId}");
+        $db->close();
     }
 
     }
