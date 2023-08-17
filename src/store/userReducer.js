@@ -5,7 +5,8 @@ import {
     FETCH_USER_BEGIN,
     FETCH_USER_SUCCESS,
     FETCH_USER_FAILURE,
-    LOGOUT_USER
+    LOGOUT_USER,
+    SET_USER_ROLE
   } from './actionTypes';
 
   function getRandomUserId(){
@@ -13,7 +14,7 @@ import {
   }
 
   const initialState = {
-    user: {
+    /*user: {
         id: getRandomUserId(),
         login: "unlogged",
         name: "",
@@ -23,8 +24,11 @@ import {
         reg_date:0,
         last_auth:0,
         isMobile: false,
-        settings: {}
-      },
+        settings: {},
+        accessToken: null
+      },*/
+    accessToken: null,
+    role: -1,
     isAuthenticated: null,
     loading: false,
     error: null
@@ -42,17 +46,18 @@ import {
         };
   
       case FETCH_USER_SUCCESS:
-        // All done: set loading "false".
-        // Also, replace the items with the ones from the server
-        
         return {
           ...state,
           loading: false,
-          user: action.payload,
+          accessToken: action.payload,
           isAuthenticated: true,
           error: null
         };
-  
+      case SET_USER_ROLE:
+        return {
+          ...state,
+            role: action.payload
+        }
       case FETCH_USER_FAILURE:
         // The request failed. It's done. So set loading to "false".
         // Save the error, so we can display it somewhere.
@@ -72,7 +77,7 @@ import {
         return {
           ...state,
           loading: false,
-          user: action.payload,
+          accessToken: action.payload,
           isAuthenticated: true,
           error: null
         }

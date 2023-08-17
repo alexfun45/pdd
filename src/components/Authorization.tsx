@@ -11,6 +11,7 @@ import request from '../utils/request'
 import * as actions from "../store/userActions";
 import { useDispatch } from "react-redux";
 import {AppContext} from '../app'
+import { gapi } from 'gapi-script';
 import store from '../store/store'
 
 type InputSingInTypes = {
@@ -40,7 +41,6 @@ type userType = {
 };
 
 export default () => {
-    const context = React.useContext(AppContext);
     let navigate = useNavigate();
     const [users, setUsers] = useState<userType[]>([]),
           [isForgot, setForgot] = useState(false),
@@ -92,16 +92,142 @@ export default () => {
         setForgot(false);
     }
 
+    const _onInit = (auth2:any) => {
+        console.log('init OK', auth2)
+      }
+      const _onError = (err:any) => {
+        console.log('error', err);
+      }
+
     useEffect(()=>{
         request({method: 'post', data: {action: 'getUsers'}}).then(response => {
             const {data} = response;
             setUsers(data);
         });
+
+        gapi.load('auth2', function() {
+            gapi.auth2
+              .init({ // не забудьте указать ваш ключ в .env
+                client_id:
+                    process.env.APP_GOOGLE_CLIENT_ID,
+              })
+              .then(_onInit, _onError)
+          });
+            //revokeAccess();
     }, []);
 
     const toHomePage = () => {
         navigate("/");
     }
+
+    const trySampleRequest = () => {
+        var accessToken = localStorage.getItem('oauth2-test-params');
+        if (accessToken) {
+          var xhr = new XMLHttpRequest();
+          xhr.open('GET',
+              'https://www.googleapis.com/drive/v3/about?fields=user&' +
+              'access_token=' + accessToken);
+          xhr.onreadystatechange = function (e) {
+            if (xhr.readyState === 4 && xhr.status === 200) {
+              console.log("response", xhr.response);
+            } else if (xhr.readyState === 4 && xhr.status === 401) {
+              // Token invalid, so prompt for user permission.
+              signIn();
+            }
+          };
+          xhr.send(null);
+        } else {
+            signIn();
+        }
+      }
+
+    function revokeAccess() {
+        // Google's OAuth 2.0 endpoint for revoking access tokens.
+        var revokeTokenEndpoint = 'https://oauth2.googleapis.com/revoke';
+      
+        // Create <form> element to use to POST data to the OAuth 2.0 endpoint.
+        var form = document.createElement('form');
+        form.setAttribute('method', 'post');
+        form.setAttribute('action', revokeTokenEndpoint);
+      
+        // Add access token to the form so it is set as value of 'token' parameter.
+        // This corresponds to the sample curl request, where the URL is:
+        //      https://oauth2.googleapis.com/revoke?token={token}
+        let accessToken = 'xJYSnBxr8_gdv0erGM0t7nd_0i9wm6sktH2d3nkzFJxfsX7KG2M79si4T0NNKGzk3mwNgY_7AL_83rbxRJaCgYKAcQSARMSFQHsvYlsaIpe61EUhTtT3tshvsICrw0163';
+        //let accessToken = localStorage.getItem('oauth2-test-params');
+        var tokenField = document.createElement('input');
+        tokenField.setAttribute('type', 'hidden');
+        tokenField.setAttribute('name', 'token');
+        tokenField.setAttribute('value', accessToken);
+        form.appendChild(tokenField);
+      
+        // Add form to page and submit it to actually revoke the token.
+        document.body.appendChild(form);
+        form.submit();
+      
+      }
+    
+
+    const signIn = () => {
+        // Google's OAuth 2.0 endpoint for requesting an access token
+        var oauth2Endpoint = 'https://accounts.google.com/o/oauth2/v2/auth';
+
+        // Create element to open OAuth 2.0 endpoint in new window.
+        var form = document.createElement('form');
+        form.setAttribute('method', 'GET'); // Send as a GET request.
+        form.setAttribute('action', oauth2Endpoint);
+
+        // Parameters to pass to OAuth 2.0 endpoint.
+        var params:any = {
+                    'client_id': process.env.APP_GOOGLE_CLIENT_ID,
+                    'redirect_uri': 'http://localhost/pdd/',
+                    'scope': 'https://www.googleapis.com/auth/drive.metadata.readonly',
+                    'state': 'try_sample_request',
+                    'include_granted_scopes': 'true',
+                    'response_type': 'token'};
+
+        // Add form parameters as hidden input values.
+        let p: any = "";
+        for (p in params) {
+            var input = document.createElement('input');
+            input.setAttribute('type', 'hidden');
+            input.setAttribute('name', p);
+            input.setAttribute('value', params[p]);
+            form.appendChild(input);
+        }
+
+        // Add form to page and submit it to open the OAuth 2.0 endpoint.
+        document.body.appendChild(form);
+        form.submit();
+
+    }
+
+    const signIn2 = () => {
+        const auth2 = gapi.auth2.getAuthInstance()
+        auth2.signIn().then(googleUser => {
+        
+          // метод возвращает объект пользователя
+          // где есть все необходимые нам поля
+          const profile = googleUser.getBasicProfile()
+          console.log('ID: ' + profile.getId()) // не посылайте подобную информацию напрямую, на ваш сервер!
+          console.log('Full Name: ' + profile.getName())
+          console.log('Given Name: ' + profile.getGivenName())
+          console.log('Family Name: ' + profile.getFamilyName())
+          console.log('Image URL: ' + profile.getImageUrl())
+          console.log('Email: ' + profile.getEmail())
+    
+          // токен
+          const id_token = googleUser.getAuthResponse().id_token
+          console.log('ID Token: ' + id_token)
+        })
+      }
+      
+      const signOut = () => {
+        const auth2 = gapi.auth2.getAuthInstance()
+        auth2.signOut().then(function() {
+          console.log('User signed out.')
+        })
+      }
 
     return (
         <>
@@ -164,8 +290,8 @@ export default () => {
                                     <div className="btn"><input onClick={handleForgotBtn} id="passforgot" value="Забыли пароль?" type="submit" /></div>
                                 </div>
                                 <input name="call" value="signin" type="hidden" />
-                                {/*<div className="auth-block" style={{textAlign: 'center'}}><div><img style={{maxWidth: '25px', float: 'left'}} src='./img/icons8-google-48.png' />Google</div></div>
-                            */}</form>
+                                <div className="auth-block" style={{textAlign: 'center'}}><div onClick={signIn}><img style={{maxWidth: '25px', float: 'left'}} src='./img/icons8-google-48.png' />Google</div></div>
+                            </form>
                         </Tab>
                         <Tab eventKey="signUp" title="Регистрация">
                             <form onSubmit={handleSubmit2(onSubmit2)} action="./admin.php" method="POST" id="signup" className="sign_up">

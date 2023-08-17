@@ -43,7 +43,6 @@ const mapStateToProps = (state:any) => {
   }
 
 const AdminPanel = (props: any) => {
-    const context = React.useContext(AppContext);
     const [key, setKey] = useState('tickets'),
           [menuItems, setMenuItems] = useState<any>([]),
           [allPages, setAllPages] = useState<any>([]),

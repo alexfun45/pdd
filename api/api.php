@@ -1,6 +1,8 @@
 <?php
     //ini_set('display_errors', TRUE);
     require_once("../init.php");
+    include_once LIB."tokenHandler.php";
+
     $IMAGE_PATH = __DIR__ . '/img/';
     $PAGE_DIR = __DIR__ . 'pages/';
     const PAGE_NUM = 30;
@@ -9,6 +11,23 @@
 
         var $PAGE_DIR = __DIR__ . 'pages/';
         var $data = array();
+
+        private function getTokenFromHeaders(){
+			$headers = getallheaders();
+			return $headers["X-Token"];		
+		}
+
+        private function verify_token(){
+			if(($this->action=="login" || $this->action=="refreshToken"))
+				return true;
+			$token = $this->getTokenFromHeaders();
+			if($id = tokenHandler::verify_token($token)){
+                $this->userId = $id;
+				return true;
+            }
+			else
+				return false;		
+		}		
 
         public function __construct(){
             session_start();
@@ -19,21 +38,97 @@
             //$this->db = new SQLite3(DB."db.sqlite");
         }
 
-        public function run(){
+        protected function getRole(){
             $db = new SQLite3(DB."db.sqlite");
-            $result = call_user_method($this->action, $this);
+            if($this->verify_token()){
+                $sql = "SELECT role FROM users WHERE id=:id";
+                $userId = tokenHandler::$tokenData->data->id;
+                $stmt = $db->prepare($sql);
+                $stmt->bindParam(':id', $userId);
+                $result = $stmt->execute();
+                
+                if($result!=false && $result!=null){
+                    $user = $result->fetchArray(SQLITE3_ASSOC);
+                    $db->close();
+                    return $user['role'];
+                }
+                else
+                    return false;    
+            }        
+        }
+
+        protected function signIn(){
+            //ini_set('display_errors', TRUE);
+            if(isset($this->data->login) && isset($this->data->password) && strlen($this->data->login)<128 && strlen($this->data->password)<128){
+                $db = new SQLite3(DB."db.sqlite");
+                $password = md5($this->data->password);
+                $sql = "SELECT id, login, role, name, email, confirmed FROM users WHERE login=:login AND password=:password";
+                $stmt = $db->prepare($sql);
+                $stmt->bindParam(':login', $this->data->login);
+                $stmt->bindParam(':password', $password);
+                $result = $stmt->execute();
+                
+                if($result!=false && $result!=null){
+                    $user = $result->fetchArray(SQLITE3_ASSOC);
+                    $auth_date = time();
+                    $db->exec("UPDATE users SET last_auth={$auth_date} WHERE id={$user['id']}");
+                    $stmt->close();
+                    $jwt = tokenHandler::getJWT($user);
+				    $refreshToken = tokenHandler::setNewRefreshToken($jwt);
+                    return array("accessToken"=>$jwt);
+                }
+                else
+                    return false;
+            }
+            else
+                return false;
+        }
+
+        public function google_auth(){
+            //ini_set('display_errors', TRUE);
+            if(isset($this->data->gtoken) && isset($this->data->user)){
+                $db = new SQLite3(DB."db.sqlite");
+                $email = $this->data->user->emailAddress;
+                $name = $this->data->user->displayName;
+                $result = $db->query("SELECT * FROM users WHERE email='$email'");
+                $res = $result->fetchArray(SQLITE3_ASSOC);
+                if($res!=false && $res!=null){
+                    $jwt = tokenHandler::getJWT($res);
+                    return array("accessToken"=>$jwt, "user"=>$res);
+                }
+                $db->exec("INSERT INTO users(login, name, password, email, role, token, confirmed, reg_date) VALUES('$email', '$name', '', '$email', '3', )");
+                $userId = $db->lastInsertRowID();
+                $user['login'] = $email;
+                $user['name'] = $name;
+                $user['surname'] = '';
+                $user['email'] = $email;
+                $user['id'] = $userId;
+                $jwt = tokenHandler::getJWT($user);
+                $db->close();
+                return array("accessToken"=>$jwt);
+            }
+        }
+
+        public function log(){
+            $db = new SQLite3(DB."db.sqlite");
             if($_COOKIE['userid'] && ($this->action=="getSettings" || $this->action=="getPage")){
                 $current_time = time();
                 $db->exec("UPDATE users SET action_time='{$current_time}' WHERE id={$_COOKIE['userid']}");
                 $db->close();
             }
-            echo json_encode(array("data"=>$result));
+        }
+
+        public function run(){
+            $this->verify_token();
+            $newToken = tokenHandler::$refreshToken;
+            $tokenError = tokenHandler::$code;
+            $result = call_user_method($this->action, $this);
+            echo json_encode(array("data"=>$result, "code"=>$tokenError, "info"=>tokenHandler::$info, "newToken"=>$newToken));
         }
 
         protected function getPage(){
             $db = new SQLite3(DB."db.sqlite");
             $id = $this->data->page_id;
-            $sql = "SELECT private from pages WHERE name=$id";
             $res = $db->query("SELECT title, private from pages WHERE name='$id'");
             $page = $res->fetchArray(SQLITE3_ASSOC);
             $page_filename = PAGES . $id . ".html";
@@ -665,7 +760,7 @@
         return $token;
     }
 
-    function signin(){
+    /*function signin(){
         if(login())
             header('Location: ./');
         else
@@ -674,7 +769,7 @@
 
     function authorize_confirmation(){
 
-    }
+    }*/
 
     protected function signup(){
         $token = $this->gen_token();

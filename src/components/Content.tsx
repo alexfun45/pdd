@@ -15,6 +15,28 @@ const mapStateToProps = (state:any) => {
     }
   }
 
+  function ParseUrl(){
+    var fragmentString = location.hash.substring(1);
+  
+    // Parse query string to see if page request is coming from OAuth 2.0 server.
+    var params: any = {};
+    var regex = /([^&=]+)=([^&]*)/g, m;
+    while (m = regex.exec(fragmentString)) {
+        params[decodeURIComponent(m[1])] = decodeURIComponent(m[2]);
+    }
+    console.log("params", params);
+    if (Object.keys(params).length > 0) {
+        console.log('oauth2-test-params', JSON.stringify(params));
+        console.log("state", params['state']);
+        //localStorage.setItem('oauth2-test-params', JSON.stringify(params) );
+        if (params['state'] && params['state'] == 'try_sample_request') {
+          return params;
+        //trySampleRequest();
+        }
+        return false;
+    }
+  }
+
 function Content(props: any){
     const context = React.useContext(AppContext);
     const {id = ''} = useParams(),
@@ -22,6 +44,7 @@ function Content(props: any){
     let navigate = useNavigate();
     
     useEffect(()=>{
+        
         if(context.settings.hasOwnProperty("start_page") && context.settings.start_page.name!="" && id=="")
             navigate("/"+context.settings.start_page.name);
     }, [context]);

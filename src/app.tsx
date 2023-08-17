@@ -1,9 +1,9 @@
 import React, {useState, useEffect} from "react";
-import { HashRouter, useLocation } from "react-router-dom" 
+import { HashRouter, BrowserRouter } from "react-router-dom" 
 import { createContext} from "react";
 //import "@fontsource/montserrat-alternates"
 import "@/css/docs18.css"
-import { Routes, Route, Navigate, useNavigation } from "react-router-dom";
+import { Routes, Route, Navigate, useNavigate  } from "react-router-dom";
 import routes from './routers'
 import Header from "./components/Header"
 import MobileHeader from './components/MobileHeader'
@@ -12,6 +12,7 @@ import request from './utils/request'
 import * as actions from "./store/userActions";
 import AdminRoute from './PrivateRoutes'
 import store from './store/store'
+import GoogleAuth from "./components/GoogleAuth";
 
 let defaultUser = {
       id: 0,
@@ -69,8 +70,31 @@ window.onload = function theme(){
   document.body.style.backgroundColor = window.localStorage.getItem('bgcolor');
 }
 
+let params: any = {};
+
+function ParseUrl(){
+  var fragmentString = location.hash.substring(1);
+
+  // Parse query string to see if page request is coming from OAuth 2.0 server
+  var regex = /([^&=]+)=([^&]*)/g, m;
+  while (m = regex.exec(fragmentString)) {
+      params[decodeURIComponent(m[1])] = decodeURIComponent(m[2]);
+  }
+  //console.log("params", params);
+  if (Object.keys(params).length > 0) {
+      //console.log('oauth2-test-params', JSON.stringify(params));
+      //console.log("state", params['state']);
+      //localStorage.setItem('oauth2-test-params', JSON.stringify(params) );
+      if (params['state'] && params['state'] == 'try_sample_request') {
+        return params;
+      //trySampleRequest();
+      }
+      return false;
+  }
+}
+
 export default function App(){
- 
+  
   const [isLogin, setLogin] = useState(false),
         [pageTitle, setPageTitle] = useState(""),
         [user, setUser] = useState<userType>(defaultUser),
@@ -99,6 +123,8 @@ export default function App(){
   }
 
   useEffect(()=>{
+    ParseUrl();
+    store.dispatch(actions.fetchUser());
     if(window.localStorage.getItem('backgroundImage')!=null)
       document.body.style.backgroundImage = window.localStorage.getItem('backgroundImage');
       request({method: "post", data: {action: "getSettings"}}).then(response=>{
@@ -118,39 +144,7 @@ export default function App(){
         }
         }
       });
-      /*if(window.localStorage.getItem('user')!=null && window.localStorage.getItem('user')!="false"){
-        let userData = JSON.parse(window.localStorage.getItem('user'));
-        setRole(userData.role);
-        setLogin(userData.logged);
-        setUser(userData);
-      } 
-      else{
-        request({method: 'post', data:{action: 'getUserRole'}}).then( response => {
-          const {data} = response;
-          if(data!=false){
-            setRole(data.role);
-            setLogin(data.logged);
-            setUser(data);
-            window.localStorage.setItem("user", JSON.stringify(data));
-            }
-          else{
-            setUser({
-              id: getRandomUserId(),
-              login: "unlogged",
-              name: "",
-              email: "",
-              confirmed: 0,
-              role: -1,
-              reg_date:0,
-              last_auth:0,
-              isMobile: false,
-              settings: {}
-            });
-          }
-          })
-      }*/
       window.addEventListener('resize', handleWindowSizeChange);
-      store.dispatch(actions.fetchUser());
     }, []);
 
     const handleWindowSizeChange = () => {
@@ -171,6 +165,7 @@ export default function App(){
             }
             <div id="maincontainer" className={(isMobile)?"containerWrapper mobileWrapper":"containerWrapper"}>
               <Routes>
+                
                   {
                    routes.map((route) => {
                     if (route.route) {
@@ -181,6 +176,7 @@ export default function App(){
                     } 
                   })
                 }
+                <Route path="*" element={<GoogleAuth params={params} />} />
               </Routes>
             </div>
             <Footer />

@@ -15,7 +15,8 @@ const AdminComponent = (props: any) => {
 
         const context = React.useContext(AppContext);
         const dispatch = useDispatch();
-        let user = props.data.user;
+        let user = props.data;
+        
         return (
             <div className="admin-panel-wrapper">
                 {(!props.data.isAuthenticated) ? (

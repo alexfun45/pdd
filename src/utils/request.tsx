@@ -1,5 +1,6 @@
 import axios, {AxiosRequestConfig} from 'axios'
-
+import store from '../store/store'
+import * as actions from '../store/userActions'
 
 /*declare module "axios" {
   export interface AxiosInstance {
@@ -24,15 +25,35 @@ const service = axios.create({
     maxBodyLength: 1000000
   })
 
-
-  service.interceptors.request.use(config=>{
-    return config;
-  });
+  service.interceptors.request.use(
+    config => {
+      // do something before request is sent
+      let state = store.getState();
+      //console.log("access", state.user.accessToken);
+      if (state.accessToken) {
+        // let each request carry token
+        // ['X-Token'] is a custom headers key
+        // please modify it according to the actual situation
+        config.headers['X-Token'] = state.accessToken
+      }
+      return config
+    },
+    error => {
+      // do something with request error
+      console.log(error) // for debug
+      return Promise.reject(error)
+    }
+  )
 
   service.interceptors.response.use(
     response => {
         const res = response.data;
-        const info = res.reqInfo;
+        if(res.code==201 && res.newToken){
+          localStorage.setItem("accessToken", res.newToken);
+          store.dispatch(actions.fetchUser());
+        }
+        if(res.code==50003 || res.code==50004)
+          store.dispatch(actions.fetchUserFailure());
         return res;
     }
   );
