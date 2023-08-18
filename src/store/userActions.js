@@ -52,7 +52,6 @@ export const LoginUserBegin = () => ({
 export const Login = ({login, password}) => {
   return async (dispatch) => {
     dispatch(fetchUserBegin());
-    //let user = await Profile.Login(login, password);
     let res = await AuthService.login(login, password);
     if(res!==false){
       dispatch(LoginUserSuccess(res));

@@ -71,8 +71,9 @@
                 $stmt->bindParam(':password', $password);
                 $result = $stmt->execute();
                 
-                if($result!=false && $result!=null){
+                if($result!=false && $result!=null && $user){
                     $user = $result->fetchArray(SQLITE3_ASSOC);
+                    if(!$user) return false;
                     $auth_date = time();
                     $db->exec("UPDATE users SET last_auth={$auth_date} WHERE id={$user['id']}");
                     $stmt->close();
@@ -85,6 +86,18 @@
             }
             else
                 return false;
+        }
+
+        public function get_rand_pass($length = 12){
+            mb_internal_encoding("UTF-8");
+            $str = 'qwertyuiopasdfghjklzxcvbnm!@#№%&*-+?0123456789';
+            $pass = '';
+            for($i=0;$i<$length;$i++){
+                $r = rand(0, strlen($str)-1);
+                $c = mb_substr($str, $r, 1);
+                $pass .= ($r<20)?strtoupper($c):$c;
+            }
+            return $pass;
         }
 
         public function google_auth(){
@@ -100,7 +113,9 @@
                     return array("accessToken"=>$jwt, "id"=>$res['id']);
                 }
                 $reg_date = time();
-                $db->exec("INSERT INTO users(login, name, password, email, role, token, confirmed, reg_date) VALUES('$email', '$name', '', '$email', '3', '', 1, {$reg_date})");
+                $pass = $this->get_rand_pass();
+                $md5_pass = md5($pass);
+                $db->exec("INSERT INTO users(login, name, password, email, role, token, confirmed, reg_date) VALUES('$email', '$name', '$md5_pass', '$email', 3, '', 1, {$reg_date})");
                 $userId = $db->lastInsertRowID();
                 $user['login'] = $email;
                 $user['name'] = $name;
@@ -108,6 +123,16 @@
                 $user['email'] = $email;
                 $user['id'] = $userId;
                 $jwt = tokenHandler::getJWT($user);
+                $to      = $email;
+                $subject = 'Информация для авторизации';
+                $message = 'Ваш учетные данные для входа в систему:<br/>';
+                $message .= ('логин: '.$email.'<br/>');
+                $message .= ('пароль: '.$pass.'<br/>');
+                $headers  = "From: robot@pddlife.ru\r\n";
+                $headers .= "MIME-Version: 1.0\r\n";
+                $headers .= "Content-Type: text/html; charset=UTF-8\r\n";
+                $message .= '<p>Спасибо за регистрацию на сайте www.pddlife.ru</p><p>Это письмо сформировано автоматически, отвечать на него не нужно.</p>';
+                mail($to, $subject, $message, $headers);
                 $db->close();
                 return array("accessToken"=>$jwt, "id"=>$userId);
             }
@@ -800,7 +825,7 @@
         $headers .= "MIME-Version: 1.0\r\n";
         $headers .= "Content-Type: text/html; charset=UTF-8\r\n";
         $message = '<p>Спасибо за регистрацию на сайте www.pddlife.ru</p><p>Для подтверждения регистрации перейдите по ссылке: '.$link.' </p><p>Это письмо сформировано автоматически, отвечать на него не нужно.</p>';
-        //mail($to, $subject, $message, $headers);
+        mail($to, $subject, $message, $headers);
         return $data;
     }
 

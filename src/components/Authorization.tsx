@@ -110,6 +110,7 @@ export default () => {
               })
               .then(_onInit, _onError)
           });
+            //console.log("GOOGLE_CLIENT_ID", process.env.APP_GOOGLE_CLIENT_ID);
             //revokeAccess();
     }, []);
 
@@ -173,11 +174,11 @@ export default () => {
         var form = document.createElement('form');
         form.setAttribute('method', 'GET'); // Send as a GET request.
         form.setAttribute('action', oauth2Endpoint);
-
+        
         // Parameters to pass to OAuth 2.0 endpoint.
         var params:any = {
                     'client_id': process.env.APP_GOOGLE_CLIENT_ID,
-                    'redirect_uri': 'http://localhost/pdd/',
+                    'redirect_uri': 'https://www.pddlife.ru/',
                     'scope': 'https://www.googleapis.com/auth/drive.metadata.readonly',
                     'state': 'try_sample_request',
                     'include_granted_scopes': 'true',
