@@ -3,9 +3,10 @@ import request from '../utils/request'
 class AuthService {
 
     static getUser(){
-        const accessToken = localStorage.getItem('accessToken');
+        const accessToken = localStorage.getItem('accessToken'),
+             id = localStorage.getItem('user_id');
         if(accessToken){
-            return accessToken;
+            return {accessToken: accessToken, id: id};
         }
         else
             return false;
@@ -19,8 +20,10 @@ class AuthService {
 
     static async login(login: string, password: string){
         return request({method: 'post', data:{action: 'signIn', data: {login: login, password: password}}}).then(response=>{
-            if(response.data.accessToken)
+            if(response.data.accessToken){
                 localStorage.setItem("accessToken", response.data.accessToken);
+                localStorage.setItem("user_id", response.data.id);
+            }
             return response.data;
         })
     }
@@ -28,10 +31,22 @@ class AuthService {
     static async google_signup(googleAccessToken: string, user: any){
         localStorage.setItem('oauth2-test-params', googleAccessToken);
         return await request({method: 'post', data: {action: 'google_auth', data:{gtoken: googleAccessToken, user: user}}}).then((response)=>{
-            if(response.data.accessToken)
+            if(response.data.accessToken){
                 localStorage.setItem("accessToken", response.data.accessToken);
+                localStorage.setItem("user_id", response.data.id);
+            }
             return response.data;
         })
+    }
+
+    static async signup(data: {login:string, name:string, password:string, email:string}){
+        return await request({method: "post", data: {action: "signup", data: data}}).then((response)=>{
+                if(response.data.accessToken){
+                    localStorage.setItem("accessToken", response.data.accessToken);
+                    localStorage.setItem("user_id", response.data.id);
+                }
+                return response.data;
+        });
     }
 
     static revokeAccess(accessToken:string) {
@@ -64,6 +79,7 @@ class AuthService {
         AuthService.revokeAccess(localStorage.getItem("oauth2-test-params"));
         localStorage.removeItem("accessToken");
         localStorage.removeItem("oauth2-test-params");
+        document.location.href = "./";
     }
 
     static async getUserRole(){

@@ -55,7 +55,7 @@ export const Login = ({login, password}) => {
     //let user = await Profile.Login(login, password);
     let res = await AuthService.login(login, password);
     if(res!==false){
-      dispatch(LoginUserSuccess(res.accessToken));
+      dispatch(LoginUserSuccess(res));
       document.location.href = "./"
     }
     else
@@ -68,7 +68,7 @@ export const GoogleSignUp = (googleToken, user) => {
     dispatch(fetchUserBegin());
       let res = await AuthService.google_signup(googleToken, user);
       if(res!==false){
-        dispatch(LoginUserSuccess(res.accessToken));
+        dispatch(LoginUserSuccess(res));
         document.location.href = "./"
       }
       else
@@ -76,9 +76,19 @@ export const GoogleSignUp = (googleToken, user) => {
   }
 }
 
-export const LoginUserSuccess = (accessToken) => ({
+export const SignUp = (data) => {
+  return async (dispatch) => {
+    let res = await AuthService.signup(data);
+    if(res!==false){
+      dispatch(LoginUserSuccess(res));
+      document.location.href = "./";
+    }
+  }
+}
+
+export const LoginUserSuccess = (data) => ({
   type: actions.LOGIN_USER_SUCCESS,
-  payload: accessToken
+  payload: data
 })
 
 export const LoginUserFailure = () => ({

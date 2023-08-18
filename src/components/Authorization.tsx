@@ -67,10 +67,7 @@ export default () => {
         });
      }*/
     const onSubmit2 = (data: {login2:string, name2: string, password2:string, email2: string}) => {
-        request({method: "post", data: {action: "signup", data: {
-                    login: data.login2, password: data.password2, name: data.name2, email: data.email2}}}).then((response)=>{
-                        document.location.href = "./#/confirm";
-                });
+            store.dispatch(actions.SignUp(data));
         }
 
     const onSubmit3 = (data: {email_recovery: string}) => {

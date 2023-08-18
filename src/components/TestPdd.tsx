@@ -12,7 +12,7 @@ import { connect } from 'react-redux';
 
 const mapStateToProps = (state:any) => {
     return {
-      user: state.user
+      user: state
     }
   }
 
@@ -433,7 +433,7 @@ const TestPdd = (props: any) => {
             if(props.options.settings===false)
                 Results.push({q_id: pdd_questions[currentQuestionIndex].id, success: 1});
             results.current[currentQuestionIndex] = 0;
-            Statistic[pdd_questions[currentQuestionIndex].id] = {ticket_id: selectedTicket, user_id: (props.user.id)?(props.user.id).toString():getRandomUserId(), elapsed_time: elapsed_time, correct: 0, testSession: testSession};
+            Statistic[pdd_questions[currentQuestionIndex].id] = {ticket_id: selectedTicket, user_id: (props.id)?(props.id).toString():getRandomUserId(), elapsed_time: elapsed_time, correct: 0, testSession: testSession};
         }
         elapsed_time = 0;
         question_answered++;

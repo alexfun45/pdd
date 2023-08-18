@@ -16,7 +16,7 @@ import { connect } from 'react-redux';
 
 const mapStateToProps = (state:any) => {
   return {
-    user: state.user
+    user: state
   }
 }
 
@@ -93,8 +93,11 @@ const Profile = (props: any) => {
     const context = React.useContext(AppContext);
 
     useEffect(()=>{
-      setUser(props.user);
-    }, [props.user]);
+      request({method: 'post', data: {action: "getUser"}}).then(response=>{
+        setUser(response.data);
+      })
+      
+    }, []);
     
     
     useEffect(()=>{

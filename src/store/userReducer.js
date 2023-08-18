@@ -28,6 +28,7 @@ import {
         accessToken: null
       },*/
     accessToken: null,
+    id: 0,
     role: -1,
     isAuthenticated: null,
     loading: false,
@@ -49,7 +50,8 @@ import {
         return {
           ...state,
           loading: false,
-          accessToken: action.payload,
+          accessToken: action.payload.accessToken,
+          id: action.payload.id,
           isAuthenticated: true,
           error: null
         };
@@ -77,7 +79,8 @@ import {
         return {
           ...state,
           loading: false,
-          accessToken: action.payload,
+          accessToken: action.payload.accessToken,
+          id: action.payload.id,
           isAuthenticated: true,
           error: null
         }

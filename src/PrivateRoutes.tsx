@@ -4,7 +4,7 @@ import { connect } from "react-redux";
 
   const mapStateToProps = (state:any) => ({
       isAuthenticated: state.isAuthenticated,
-      role: state.user.role
+      role: state.role
     });
 
 /*export const PrivateRouteHOC = (Component: any, auth: any) => {

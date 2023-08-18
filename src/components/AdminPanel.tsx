@@ -22,7 +22,6 @@ const Grade = lazy(() => import('./Grade/Grade'));
 
 import { connect } from 'react-redux';
 import request from '../utils/request'
-import {AppContext} from '../app'
 
 function TabTitle({tab_type, setpageTabtype, setKey, editPageName, setEditPageName}:{tab_type: number, setpageTabtype: React.Dispatch<React.SetStateAction<number>>, setKey: React.Dispatch<React.SetStateAction<string>>, editPageName: string, setEditPageName:React.Dispatch<React.SetStateAction<string>>}){
 
@@ -38,7 +37,7 @@ function TabTitle({tab_type, setpageTabtype, setKey, editPageName, setEditPageNa
 
 const mapStateToProps = (state:any) => {
     return {
-      auth: state.user
+      auth: state
     }
   }
 

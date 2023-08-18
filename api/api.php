@@ -40,6 +40,7 @@
 
         protected function getRole(){
             $db = new SQLite3(DB."db.sqlite");
+            //return tokenHandler::$tokenData;
             if($this->verify_token()){
                 $sql = "SELECT role FROM users WHERE id=:id";
                 $userId = tokenHandler::$tokenData->data->id;
@@ -54,7 +55,9 @@
                 }
                 else
                     return false;    
-            }        
+            }
+            else
+               return false;        
         }
 
         protected function signIn(){
@@ -75,7 +78,7 @@
                     $stmt->close();
                     $jwt = tokenHandler::getJWT($user);
 				    $refreshToken = tokenHandler::setNewRefreshToken($jwt);
-                    return array("accessToken"=>$jwt);
+                    return array("accessToken"=>$jwt, "id"=>$user['id']);
                 }
                 else
                     return false;
@@ -94,9 +97,10 @@
                 $res = $result->fetchArray(SQLITE3_ASSOC);
                 if($res!=false && $res!=null){
                     $jwt = tokenHandler::getJWT($res);
-                    return array("accessToken"=>$jwt, "user"=>$res);
+                    return array("accessToken"=>$jwt, "id"=>$res['id']);
                 }
-                $db->exec("INSERT INTO users(login, name, password, email, role, token, confirmed, reg_date) VALUES('$email', '$name', '', '$email', '3', )");
+                $reg_date = time();
+                $db->exec("INSERT INTO users(login, name, password, email, role, token, confirmed, reg_date) VALUES('$email', '$name', '', '$email', '3', '', 1, {$reg_date})");
                 $userId = $db->lastInsertRowID();
                 $user['login'] = $email;
                 $user['name'] = $name;
@@ -105,7 +109,7 @@
                 $user['id'] = $userId;
                 $jwt = tokenHandler::getJWT($user);
                 $db->close();
-                return array("accessToken"=>$jwt);
+                return array("accessToken"=>$jwt, "id"=>$userId);
             }
         }
 
@@ -119,7 +123,8 @@
         }
 
         public function run(){
-            $this->verify_token();
+            if($this->action!='signup')
+                $this->verify_token();
             $newToken = tokenHandler::$refreshToken;
             $tokenError = tokenHandler::$code;
             $result = call_user_method($this->action, $this);
@@ -642,29 +647,31 @@
     }
 
     function addNewUser($token = ''){
-        $login = $this->data->login;
-        $name = $this->data->name;
-        $email = $this->data->email;
-        $role = $this->data->role;
+        $login = $this->data->login2;
+        $name = $this->data->name2;
+        $email = $this->data->email2;
+        $role = $this->data->role2;
         $confirmed = ($token=='') ? 1:0;
         $reg_date = time();
         $role = (array_key_exists("role", $_POST)) ? $_POST['role'] : 3;
-        if(isset($login) && isset($this->data->password) && isset($role)){
+        if(isset($login) && isset($this->data->password2) && isset($role)){
             $db = new SQLite3(DB."db.sqlite");
-            $password = md5($this->data->password);
+            $password = md5($this->data->password2);
             $sql = "INSERT INTO users(login, name, password, email, role, token, confirmed, reg_date) VALUES('$login', '$name', '$password', '$email', '$role', '$token', '$confirmed', {$reg_date})";
             $db->exec($sql);
             $userId = $db->lastInsertRowID();
             $db->close();
-            return $userId;
+            $this->data->id = $userId;
+            $jwt = tokenHandler::getJWT($this->data);
+            return array("accessTooken"=>$jwt, "id"=>$userId);
         }
     }
 
     function editUser(){
         //ini_set('display_errors', TRUE);
-        $login = $this->data->login;
-        $name = $this->data->name;
-        $email = $this->data->email;
+        $login = $this->data->login2;
+        $name = $this->data->name2;
+        $email = $this->data->email2;
         $id = $this->data->id;
         $role = $this->data->role;
         $db = new SQLite3(DB."db.sqlite");
@@ -703,6 +710,16 @@
         unset($_SESSION['role']);
         unset($_COOKIE["login"]);
         unset($_COOKIE["password"]);
+    }
+
+    function getUser(){
+        //ini_set('display_errors', TRUE);
+        $db = new SQLite3(DB."db.sqlite");
+        $userId = tokenHandler::$tokenData->data->id;
+        $result = $db->query("SELECT id, login, name, surname, role, email, action_time, reg_date, last_auth from users where id={$userId}");
+        $row = $result->fetchArray(SQLITE3_ASSOC);
+        $db->close();
+        return $row;
     }
 
     function getUsers(){
@@ -772,17 +789,19 @@
     }*/
 
     protected function signup(){
+        //ini_set('display_errors', TRUE);
         $token = $this->gen_token();
-        $user_id = $this->addNewUser($token);
-        $link = "https://pddlife.ru/#/confirmation/".$user_id ."/".$token;
-        $to      = $this->data->email;
+        $data = $this->addNewUser($token);
+        $link = "https://pddlife.ru/#/confirmation/".$data['id'] ."/".$token;
+        $to      = $this->data->email2;
         $subject = 'Подтверждение регистрации';
         $message = 'Для подтверждения регистрации перейдите по ссылке:<br/>';
         $headers  = "From: robot@pddlife.ru\r\n";
         $headers .= "MIME-Version: 1.0\r\n";
         $headers .= "Content-Type: text/html; charset=UTF-8\r\n";
         $message = '<p>Спасибо за регистрацию на сайте www.pddlife.ru</p><p>Для подтверждения регистрации перейдите по ссылке: '.$link.' </p><p>Это письмо сформировано автоматически, отвечать на него не нужно.</p>';
-        mail($to, $subject, $message, $headers);
+        //mail($to, $subject, $message, $headers);
+        return $data;
     }
 
     protected function email_recovery(){
@@ -1130,13 +1149,14 @@
     }
 
     protected function saveStatistic(){
-        //ini_set('display_errors', TRUE);
+        ini_set('display_errors', TRUE);
         $db = new SQLite3(DB."db.sqlite");
         $stats = json_decode($this->data->stats);
+        $user_id = $this->data->user_id;
         foreach($stats as $q_id=>$stat){
             $elapsedTime = $stat->elapsed_time/1000;
             $time = time();
-            $db->exec("INSERT INTO statistic(timecreated, ticket_id, q_id, user_id, elapsed_time, correct, test_session) VALUES('$time', {$stat->ticket_id}, $q_id, {$stat->user_id}, {$elapsedTime}, {$stat->correct}, {$stat->testSession})");
+            $db->exec("INSERT INTO statistic(timecreated, ticket_id, q_id, user_id, elapsed_time, correct, test_session) VALUES('$time', {$stat->ticket_id}, $q_id, {$user_id}, {$elapsedTime}, {$stat->correct}, {$stat->testSession})");
         }
         $userId = $this->data->user_id;
         if($userId!=0){
@@ -1204,7 +1224,7 @@
         $avg_stat = array();
         $start_date = $this->data->start_date;
         $end_date = $this->data->end_date;
-        $result = $db->query("SELECT t2.q_id as 'q_id', '1' as _correct, t1.indx as 'indx', COUNT(DISTINCT t2.test_session) as 'человек прошло', AVG(t2.elapsed_time) as 'среднее время' FROM ticket_2_question as t1 INNER JOIN statistic as t2 ON t1.q_id=t2.q_id AND t2.ticket_id={$ticketId} WHERE t1.tickets_id={$ticketId} AND t2.correct=0 AND (DATETIME(t2.timecreated, 'unixepoch')>=datetime({$start_date}, 'unixepoch') AND DATETIME(t2.timecreated, 'unixepoch')<=datetime({$end_date}, 'unixepoch')) GROUP BY t2.q_id UNION ALL SELECT t2.q_id as 'q_id', '0' as correct, t1.indx as 'indx', COUNT(DISTINCT t2.test_session) as 'человек прошло', AVG(t2.elapsed_time) as 'среднее время' FROM ticket_2_question as t1 INNER JOIN statistic as t2 ON t1.q_id=t2.q_id WHERE t1.tickets_id={$ticketId} AND t2.correct=1 AND (DATETIME(t2.timecreated, 'unixepoch')>=datetime({$start_date}, 'unixepoch') AND DATETIME(t2.timecreated, 'unixepoch')<=datetime({$end_date}, 'unixepoch')) GROUP BY t2.q_id ORDER BY t1.indx");
+        $result = $db->query("SELECT t2.q_id as 'q_id', '1' as _correct, t1.indx as 'indx', COUNT(DISTINCT t2.test_session) as 'человек прошло', AVG(t2.elapsed_time) as 'среднее время' FROM ticket_2_question as t1 INNER JOIN statistic as t2 ON t1.q_id=t2.q_id AND t1.tickets_id={$ticketId} WHERE t2.correct=0 AND (DATETIME(t2.timecreated, 'unixepoch')>=datetime({$start_date}, 'unixepoch') AND DATETIME(t2.timecreated, 'unixepoch')<=datetime({$end_date}, 'unixepoch')) GROUP BY t2.q_id UNION ALL SELECT t2.q_id as 'q_id', '0' as correct, t1.indx as 'indx', COUNT(DISTINCT t2.test_session) as 'человек прошло', AVG(t2.elapsed_time) as 'среднее время' FROM ticket_2_question as t1 INNER JOIN statistic as t2 ON t1.q_id=t2.q_id WHERE t1.tickets_id={$ticketId} AND t2.correct=1 AND (DATETIME(t2.timecreated, 'unixepoch')>=datetime({$start_date}, 'unixepoch') AND DATETIME(t2.timecreated, 'unixepoch')<=datetime({$end_date}, 'unixepoch')) GROUP BY t2.q_id ORDER BY t1.indx");
         //$result = $db->query("SELECT * FROM (SELECT t2.q_id as 'q_id', '1' as _correct, t1.indx as 'indx', COUNT(DISTINCT t2.test_session) as 'человек прошло', AVG(t2.elapsed_time) as 'среднее время' FROM ticket_2_question as t1 INNER JOIN statistic as t2 ON t1.q_id=t2.q_id WHERE t1.tickets_id={$ticketId} AND t2.correct=0 AND (DATETIME(t2.timecreated, 'unixepoch')>=datetime({$start_date}, 'unixepoch') AND DATETIME(t2.timecreated, 'unixepoch')<=datetime({$end_date}, 'unixepoch')) GROUP BY t2.q_id UNION ALL SELECT t2.q_id as 'q_id', '0' as correct, t1.indx as 'indx', COUNT(DISTINCT t2.test_session) as 'человек прошло', AVG(t2.elapsed_time) as 'среднее время' FROM ticket_2_question as t1 INNER JOIN statistic as t2 ON t1.q_id=t2.q_id WHERE t1.tickets_id={$ticketId} AND t2.correct=1 AND (DATETIME(t2.timecreated, 'unixepoch')>=datetime({$start_date}, 'unixepoch') AND DATETIME(t2.timecreated, 'unixepoch')<=datetime({$end_date}, 'unixepoch')) GROUP BY t2.q_id) GROUP BY q_id");
         $i = 0;
         $correctIndx = 0;

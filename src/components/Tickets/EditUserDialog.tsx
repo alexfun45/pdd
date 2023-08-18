@@ -7,10 +7,10 @@ import request from '../../utils/request'
 
 type InputSignUpTypes = {
     id: number;
-    name: string;
-    login: string;
-    email: string;
-    password: string;
+    name2: string;
+    login2: string;
+    email2: string;
+    password2: string;
     role: number;
     state: number;
     cppassword: string;
@@ -18,12 +18,12 @@ type InputSignUpTypes = {
 
 type userType = {
     id: number;
-    name: string;
-    login: string;
-    email: string;
+    name2: string;
+    login2: string;
+    email2: string;
     role: number;
     state: number;
-    password: string;
+    password2: string;
 };
 
 export default ({showUserDialog, setUserDialog, selectedUser, users, setUsers}: {showUserDialog: string,setUserDialog: React.Dispatch<React.SetStateAction<string>>, selectedUser: any, users: any, setUsers: any}) => {
@@ -32,7 +32,7 @@ export default ({showUserDialog, setUserDialog, selectedUser, users, setUsers}: 
           [editedUser, setEditedUser] = useState(selectedUser);
     const { register: register, setValue, handleSubmit:handleSubmit, watch:watch, formState: { errors: errors } } = useForm<InputSignUpTypes>({
             mode: 'onBlur',
-            defaultValues: {login: "" || selectedUser.login}
+            defaultValues: {login2: "" || selectedUser.login}
         });
 
     useEffect(()=>{
@@ -42,15 +42,15 @@ export default ({showUserDialog, setUserDialog, selectedUser, users, setUsers}: 
     useEffect(()=>{
         setEditedUser(selectedUser);
         setValue("id", selectedUser.id);
-        setValue("name", selectedUser.name);
-        setValue("login", selectedUser.login);
-        setValue("email", selectedUser.email);
+        setValue("name2", selectedUser.name);
+        setValue("login2", selectedUser.login);
+        setValue("email2", selectedUser.email);
         setValue("role", selectedUser.role);
-        setValue("password", selectedUser.password);
+        setValue("password2", selectedUser.password);
         setValue("cppassword", selectedUser.password);
     }, [ selectedUser.login]);
 
-    const onSubmit = (data: {id: number; name: string, login:string, password:string, role: number, email: string, state: number}) => {
+    const onSubmit = (data: {id: number; name2: string, login2:string, password2:string, role: number, email2: string, state: number}) => {
         if(show=="create"){
             request({method: 'post', data: {action: 'addNewUser', data: data}});
             setUsers([...users, data]);
@@ -88,16 +88,16 @@ export default ({showUserDialog, setUserDialog, selectedUser, users, setUsers}: 
                     <Modal.Body>
                         <form onSubmit={handleSubmit(onSubmit)} action="./admin.php" method="POST" id="signup" className="sign_up">
                             <div className="input_field">
-                                    <input key={editedUser.name} defaultValue={editedUser.name} type="name" {
-                                        ...register("name", {
+                                    <input key={editedUser.name} defaultValue={editedUser.name} type="name2" {
+                                        ...register("name2", {
                                             required: "Поле обязательно",
                                             maxLength: 100,
                                             })}  placeholder="ФИО" className="input" />
-                                    {<p className="error-msg">{errors.name && errors.name.message}</p>}
+                                    {<p className="error-msg">{errors.name2 && errors.name2.message}</p>}
                                 </div>
                                 <div className="input_field">
-                                    <input type="login" {
-                                        ...register("login", {
+                                    <input type="login2" {
+                                        ...register("login2", {
                                             required: "Поле обязательно",
                                             maxLength: 50,
                                             pattern: {
@@ -108,7 +108,7 @@ export default ({showUserDialog, setUserDialog, selectedUser, users, setUsers}: 
                                                     isExists: v => isUserExists(v) || "логин занят"
                                                 }
                                             })}  placeholder="логин" className="input" />
-                                    {<p className="error-msg">{errors.login && errors.login.message}</p>}
+                                    {<p className="error-msg">{errors.login2 && errors.login2.message}</p>}
                                 </div>
                                 <div className="input_field">
                                     <Form.Select {
@@ -122,8 +122,8 @@ export default ({showUserDialog, setUserDialog, selectedUser, users, setUsers}: 
                                     </Form.Select>
                                 </div>
                                 <div className="input_field">
-                                    <input type="email" {
-                                        ...register("email", {
+                                    <input type="email2" {
+                                        ...register("email2", {
                                             required: "Поле обязательно",
                                             maxLength: 50,
                                             pattern: {
@@ -136,14 +136,14 @@ export default ({showUserDialog, setUserDialog, selectedUser, users, setUsers}: 
                                             }
                                         )}
                                         placeholder="e-mail" id="email" className="input" />
-                                        {<p className="error-msg">{errors.email && errors.email.message}</p>}
+                                        {<p className="error-msg">{errors.email2 && errors.email2.message}</p>}
                                 </div>
                                 {(show == "create") && (
                                     <>
                                         <div className="input_field">
-                                            <input type="password"
+                                            <input type="password2"
                                                 {...register(
-                                                    "password",{
+                                                    "password2",{
                                                         required: "Поле обязательно",
                                                         maxLength: 50,
                                                         minLength: {
@@ -157,7 +157,7 @@ export default ({showUserDialog, setUserDialog, selectedUser, users, setUsers}: 
                                                 )
                                             }
                                             placeholder="пароль" className="input" />
-                                            {<p className="error-msg">{errors.password && errors.password.message}</p>}
+                                            {<p className="error-msg">{errors.password2 && errors.password2.message}</p>}
                                         </div>
                                         <div className="input_field">
                                             <input type="cppassword"
@@ -165,7 +165,7 @@ export default ({showUserDialog, setUserDialog, selectedUser, users, setUsers}: 
                                                     "cppassword",{
                                                         required: "Поле обязательно",
                                                         validate: {
-                                                            isSame :(v: string) => { if(v!=watch('password')) return "пароли не совпадают" }
+                                                            isSame :(v: string) => { if(v!=watch('password2')) return "пароли не совпадают" }
                                                         } 
                                                     }
                                                 )
