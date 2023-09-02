@@ -118,10 +118,17 @@ export default () => {
                         {
                         Object.entries(gradeData).map((userData:any, indx)=>(
                             <TableRow>
-                                <TableCell style={{fontSize: '12px'}}><span onClick={(e)=>handleUserClick(userData[1])} className='btn-link'>{userData[0]}</span></TableCell>
+                                <TableCell style={{fontSize: '12px'}}>
+                                    <span onClick={(e)=>handleUserClick(userData[1])} className='btn-link'>{
+                                        Object.entries(userData[1]).map((d: any, i: number)=>{
+                                            if(i>0) return ;
+                                            return d[1].login;
+                                        })}
+                                    </span>
+                                </TableCell>
                                 <TableCell style={{fontSize: '12px', padding: '6px 8px'}}>{
                                     Object.entries(userData[1]).map((d: any, i: number)=>{
-                                        if(i>0) return;
+                                        if(i>0) return ;
                                         return d[1].time;
                                     })
                                     }

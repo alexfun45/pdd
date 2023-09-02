@@ -71,9 +71,9 @@
                 $stmt->bindParam(':password', $password);
                 $result = $stmt->execute();
                 
-                if($result!=false && $result!=null && $user){
+                if($result!=false && $result!=null){
                     $user = $result->fetchArray(SQLITE3_ASSOC);
-                    if(!$user) return false;
+                    if(!$user) return $user;
                     $auth_date = time();
                     $db->exec("UPDATE users SET last_auth={$auth_date} WHERE id={$user['id']}");
                     $stmt->close();
@@ -1194,6 +1194,7 @@
             }
         }
         $db->close();
+        echo $user_id;
     }
 
     protected function getGrade(){
@@ -1207,10 +1208,15 @@
             $ticket_name = $res['ticketname'];
             $login = (!empty($res['login']))?$res['login']:$user_id;
             $time = date("d-m-Y H:i", $res['last_time']);
-            $grades[$login][$ticket_name] = array("time"=>$time, 'failed'=>$res['num'], 'user_id'=>$user_id, 'session'=>$res['test_session']);
+            if($user_id!=1)
+                $grades[$login][$ticket_name] = array("time"=>$time, 'login'=>$login, 'failed'=>$res['num'], 'user_id'=>$user_id, 'session'=>$res['test_session']);
+        }
+        $data = array();
+        foreach($grades as $key=>$val){
+            $data[] = $val;
         }
         $db->close();
-        return $grades;
+        return $data;
     }
 
     protected function getUserGrade(){
