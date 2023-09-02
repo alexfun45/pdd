@@ -13,6 +13,7 @@ import { useDispatch } from "react-redux";
 import {AppContext} from '../app'
 import { gapi } from 'gapi-script';
 import store from '../store/store'
+import { v4 as uuidv4 } from 'uuid';
 
 type InputSingInTypes = {
     login: string; 
@@ -39,6 +40,7 @@ type userType = {
     role: number;
     password: string;
 };
+
 
 export default () => {
     let navigate = useNavigate();
@@ -112,61 +114,54 @@ export default () => {
           });
             //console.log("GOOGLE_CLIENT_ID", process.env.APP_GOOGLE_CLIENT_ID);
             //revokeAccess();
+            // @ts-ignore
+            /*YaAuthSuggest.init(
+                {
+                   client_id: '3cee11a46b26450aa09b34407a1dec42',
+                   response_type: 'token',
+                   redirect_uri: 'https://www.pddlife.ru'
+                },
+                'https://www.pddlife.ru',
+                {
+                    view: 'button',
+                    parentId: 'yandex-auth-block',
+                    buttonView: 'main',
+                    buttonTheme: 'light',
+                    buttonSize: 'm',
+                    buttonBorderRadius: 0
+                 }
+             )
+             .then(({
+                // @ts-ignore
+                handler:any
+                // @ts-ignore
+             }) => handler())   // @ts-ignore
+             .then(data => console.log('Сообщение с токеном', data))    // @ts-ignore
+             .catch(error => console.log('Обработка ошибки', error));   // @ts-ignore
+             */
     }, []);
 
     const toHomePage = () => {
         navigate("/");
     }
 
-    const trySampleRequest = () => {
-        var accessToken = localStorage.getItem('oauth2-test-params');
-        if (accessToken) {
-          var xhr = new XMLHttpRequest();
-          xhr.open('GET',
-              'https://www.googleapis.com/drive/v3/about?fields=user&' +
-              'access_token=' + accessToken);
-          xhr.onreadystatechange = function (e) {
-            if (xhr.readyState === 4 && xhr.status === 200) {
-              console.log("response", xhr.response);
-            } else if (xhr.readyState === 4 && xhr.status === 401) {
-              // Token invalid, so prompt for user permission.
-              signIn();
-            }
-          };
-          xhr.send(null);
-        } else {
-            signIn();
-        }
-      }
+    const signInYandex = () => {
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', 'https://oauth.yandex.ru/token', false);
+        xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+        //xhr.setRequestHeader('Content-Type', 'application/json');
+        var fd = new FormData();
+        const client_id = "765f489419044b84ba1a1daf2a11f55c",
+              client_secret = "90b169dd45c64552b2f916f2a3e82c0b";
+        fd.append(`Authorization: Basic <закодированная методом base64 строка ${btoa(client_id)}:${btoa(client_secret)}`, '');
+        fd.append('grant_type', 'authorization_code');
+        fd.append('grant_type', 'authorization_code');
+        fd.append('grant_type', 'authorization_code');
+        fd.append('grant_type', 'authorization_code');
+        fd.append('grant_type', 'authorization_code');
+    }
 
-    function revokeAccess() {
-        // Google's OAuth 2.0 endpoint for revoking access tokens.
-        var revokeTokenEndpoint = 'https://oauth2.googleapis.com/revoke';
-      
-        // Create <form> element to use to POST data to the OAuth 2.0 endpoint.
-        var form = document.createElement('form');
-        form.setAttribute('method', 'post');
-        form.setAttribute('action', revokeTokenEndpoint);
-      
-        // Add access token to the form so it is set as value of 'token' parameter.
-        // This corresponds to the sample curl request, where the URL is:
-        //      https://oauth2.googleapis.com/revoke?token={token}
-        let accessToken = 'xJYSnBxr8_gdv0erGM0t7nd_0i9wm6sktH2d3nkzFJxfsX7KG2M79si4T0NNKGzk3mwNgY_7AL_83rbxRJaCgYKAcQSARMSFQHsvYlsaIpe61EUhTtT3tshvsICrw0163';
-        //let accessToken = localStorage.getItem('oauth2-test-params');
-        var tokenField = document.createElement('input');
-        tokenField.setAttribute('type', 'hidden');
-        tokenField.setAttribute('name', 'token');
-        tokenField.setAttribute('value', accessToken);
-        form.appendChild(tokenField);
-      
-        // Add form to page and submit it to actually revoke the token.
-        document.body.appendChild(form);
-        form.submit();
-      
-      }
-    
-
-    const signIn = () => {
+    const signInGoogle = () => {
         // Google's OAuth 2.0 endpoint for requesting an access token
         var oauth2Endpoint = 'https://accounts.google.com/o/oauth2/v2/auth';
 
@@ -223,8 +218,17 @@ export default () => {
       const signOut = () => {
         const auth2 = gapi.auth2.getAuthInstance()
         auth2.signOut().then(function() {
-          console.log('User signed out.')
+          console.log('User signed out.');
         })
+      }
+
+      const getYaLink = () => {
+        let baseURL = "https://oauth.yandex.ru/authorize?client_id=",
+            client_id = "765f489419044b84ba1a1daf2a11f55c",
+            client_secret = "90b169dd45c64552b2f916f2a3e82c0b",
+            redirect_uri = "http://localhost/pdd/",
+            response_type = "code";
+        return baseURL +client_id + "&client_secret=" + client_secret+ "&redirect_uri="+redirect_uri + "&response_type="+response_type;
       }
 
     return (
@@ -288,7 +292,10 @@ export default () => {
                                     <div className="btn"><input onClick={handleForgotBtn} id="passforgot" value="Забыли пароль?" type="submit" /></div>
                                 </div>
                                 <input name="call" value="signin" type="hidden" />
-                                <div className="auth-block" style={{textAlign: 'center'}}><div onClick={signIn}><img style={{maxWidth: '25px', float: 'left'}} src='./img/icons8-google-48.png' />Google</div></div>
+                                <div className="auth-block" style={{textAlign: 'center'}}>
+                                    <div style={{display: 'inline-block'}} onClick={signInGoogle}><img style={{maxWidth: '25px', float: 'left'}} src='./img/icons8-google-48.png' />Google</div>
+                                    {/*<div style={{display: 'inline-block', width: '150px', height: 'auto'}} id="yandex-auth-block1"><a href={getYaLink()}>yandex</a></div>*/}
+                                </div>
                             </form>
                         </Tab>
                         <Tab eventKey="signUp" title="Регистрация">

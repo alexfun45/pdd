@@ -412,7 +412,7 @@ const TestPdd = (props: any) => {
     }
 
     function getRandomUserId(){
-        return "unreg_" + (new Date()).getTime();
+        return (new Date()).getTime();
     }
 
     function selectAnswer(selectedVar: any){
@@ -461,7 +461,7 @@ const TestPdd = (props: any) => {
         }
         else if(question_answered>=props.options.num || question_answered>=pdd_questions.length){
             if(props.options.settings===false){
-                request({method: 'post', data: {action: "saveStatistic", data: {"stats": JSON.stringify(Statistic), "user_id":(props.user.id)?props.user.id:0, "results": JSON.stringify(Results)}}});
+                request({method: 'post', data: {action: "saveStatistic", data: {"stats": JSON.stringify(Statistic), "user_id":(props.user.id)?props.user.id:getRandomUserId(), "results": JSON.stringify(Results)}}});
                 clearInterval(queTimer);
             }
             setEndTest(true);

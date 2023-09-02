@@ -48,10 +48,12 @@ const service = axios.create({
   service.interceptors.response.use(
     response => {
         const res = response.data;
+        //refresh token
         if(res.code==201 && res.newToken){
           localStorage.setItem("accessToken", res.newToken);
           store.dispatch(actions.fetchUser());
         }
+        // error token
         if(res.code==50003 || res.code==50004)
           store.dispatch(actions.fetchUserFailure());
         return res;

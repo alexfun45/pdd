@@ -6,7 +6,7 @@ import {useNavigate} from 'react-router-dom';
 import * as actions from '../store/userActions'
 
 export default (props: any) => {
-    
+    console.log("props", props);
     function trySampleRequest(params: any) {
         console.log("params", params);
         //var params = JSON.parse(localStorage.getItem('oauth2-test-params'));

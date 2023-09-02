@@ -7,6 +7,7 @@ import Confirmation from "./components/Confirmation"
 import AuthConfirm from "./components/AuthConfirm"
 import PasswordRecovery from "./components/PasswordRecovery"
 import GoogleAuth from "./components/GoogleAuth";
+import YaAuth from "./components/YaAuth";
 
 const routes = [
     {
@@ -34,6 +35,11 @@ const routes = [
         route: "google_auth/:state/:access_token",
         component: <GoogleAuth />,
         key: "google_auth"
+    },
+    {
+        route: "yauth",
+        component: <YaAuth />,
+        key: "yauth"
     },
     {
         route: "passwordrecovery/:email/:secret",

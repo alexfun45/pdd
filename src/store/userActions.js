@@ -54,8 +54,8 @@ export const Login = ({login, password}) => {
     dispatch(fetchUserBegin());
     let res = await AuthService.login(login, password);
     if(res!==false){
-      dispatch(LoginUserSuccess(res));
-      document.location.href = "./"
+      //dispatch(LoginUserSuccess(res));
+      //document.location.href = "./"
     }
     else
       dispatch(LoginUserFailure());
