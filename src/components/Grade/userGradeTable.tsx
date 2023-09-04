@@ -52,6 +52,7 @@ export default ({user_id, setUser, handleClickItem}: {user_id: number, setUser: 
                         failed = 0,
                         session = 0,
                         user_id = 0,
+                        ticket_id = 0,
                         isExist = false;
                                     
         for(let j=0, ticketNumber;j<data.length;j++){
@@ -62,21 +63,22 @@ export default ({user_id, setUser, handleClickItem}: {user_id: number, setUser: 
                     isExist = true;
                     failed = data[j][1].failed;
                     session = data[j][1].session;
+                    ticket_id = data[j][1].ticket_id;
                     user_id = data[j][1].user_id;
                     }
                 }  
             }
         if(isExist)
-            return <td><span onClick={()=>handleClickItem(user_id, session.toString())} className='btnItem'>{failed}</span></td>
+            return <td><span onClick={()=>handleClickItem(user_id, session.toString(), ticket_id)} className='btnItem'>{failed}</span></td>
         else
             return <td> </td>
     }
 
-    const getFailed = (ticketData: any, ticketIndx: number) => {
+    const getFailed = (ticketData: any, ticketIndx: number, ticketId: number) => {
         let ticketNumber = ticketData.ticket_name.match(regNumber);
         if(ticketNumber!=null){
             if(parseInt(ticketNumber[1])==(ticketIndx+1)){
-                return <TableCell style={{padding: '6px 8px'}} key={ticketData.session+ticketIndx}><span onClick={()=>handleClickItem(user_id, ticketData.session.toString())} className='btnItem'>{ticketData.failed}</span></TableCell>
+                return <TableCell style={{padding: '6px 8px'}} key={ticketData.session+ticketIndx}><span onClick={()=>handleClickItem(user_id, ticketData.session.toString(), ticketId)} className='btnItem'>{ticketData.failed}</span></TableCell>
                 }
             else
                 return <TableCell style={{padding: '6px 8px'}} key={ticketData.session+ticketIndx}> </TableCell>  
@@ -114,7 +116,7 @@ export default ({user_id, setUser, handleClickItem}: {user_id: number, setUser: 
                                 <TableCell className='v-title'>{ticket.time}</TableCell>
                                 {
                                  tickets.map((v, i)=>(
-                                    getFailed(ticket, i)
+                                    getFailed(ticket, i, ticket.ticket_id)
                                  ))   
                                 }
                             </TableRow>
