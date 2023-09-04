@@ -45,8 +45,8 @@ export default () => {
         });
     }, [order]);
 
-    const handleClickItem = (user_id: number, session: string) => {
-        request({method: 'post', data: {action: "getFailedQuestions", data: { user_id: user_id, testSession: session}}}).then(response => {
+    const handleClickItem = (user_id: number, session: string, ticketId: number) => {
+        request({method: 'post', data: {action: "getFailedQuestions", data: { user_id: user_id, testSession: session, ticketId: ticketId}}}).then(response => {
             const {data} = response;
             setfQuestions(data);
         });
@@ -67,13 +67,17 @@ export default () => {
     const regNumber = /[^\d]*?(\d+)/;
 
     const getFailedForTicket = (userData:statsInterface, ticketIndx: number) => {
+        //console.log("userData", userData);
+        //let {ticket_name, ticket_id, failed, user_id, session} = userData;
         let data:any =  Object.entries(userData),
                         failed = 0,
                         session = 0,
                         user_id = 0,
+                        ticket_id = 0,
+                        ticketNumber = '',
                         isExist = false;
                                     
-        for(let j=0, ticketNumber;j<data.length;j++){
+        for(let j=0;j<data.length;j++){
             if(data[j]==undefined) continue;
             ticketNumber = data[j][0].match(regNumber);
             if(ticketNumber!=null){
@@ -81,12 +85,13 @@ export default () => {
                     isExist = true;
                     failed = data[j][1].failed;
                     session = data[j][1].session;
+                    ticket_id = data[j][1].ticket_id;
                     user_id = data[j][1].user_id;
                     }
                 }  
             }
         if(isExist)
-            return <TableCell><span onClick={()=>handleClickItem(user_id, session.toString())} className='btnItem'>{failed}</span></TableCell>
+            return <TableCell><span onClick={()=>handleClickItem(user_id, session.toString(), ticket_id)} className='btnItem'>{failed}</span></TableCell>
         else
             return <TableCell></TableCell>
     }

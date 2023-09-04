@@ -1201,7 +1201,7 @@
         $db = new SQLite3(DB."db.sqlite");
         $userSql = (isset($this->data->user_id)) ? " WHERE t1.user_id={$this->data->user_id}" : "";
         $order = $this->data->order;
-        $result = $db->query("SELECT t1.user_id AS user_id, t1.q_id AS q_id, t2.login AS login, t1.test_session as test_session, t3.name AS ticketname, t1.timecreated AS timefinished, MAX(t1.timecreated) as last_time, SUM(t1.correct) AS num FROM statistic AS t1 INNER JOIN tickets AS t3 ON t1.ticket_id=t3.id LEFT JOIN users AS t2 ON t1.user_id=t2.id {$userSql} GROUP BY t1.user_id, t1.ticket_id, t1.test_session ORDER BY last_time {$order}");
+        $result = $db->query("SELECT t1.user_id AS user_id, t1.q_id AS q_id, t3.id as ticket_id, t2.login AS login, t1.test_session as test_session, t3.name AS ticketname, t1.timecreated AS timefinished, MAX(t1.timecreated) as last_time, SUM(t1.correct) AS num FROM statistic AS t1 INNER JOIN tickets AS t3 ON t1.ticket_id=t3.id LEFT JOIN users AS t2 ON t1.user_id=t2.id {$userSql} GROUP BY t1.user_id, t1.ticket_id, t1.test_session ORDER BY last_time {$order}");
         $grades = array();
         while($res = $result->fetchArray(SQLITE3_ASSOC)){
             $user_id = $res['user_id'];
@@ -1209,7 +1209,7 @@
             $login = (!empty($res['login']))?$res['login']:$user_id;
             $time = date("d-m-Y H:i", $res['last_time']);
             if($user_id!=1)
-                $grades[$login][$ticket_name] = array("time"=>$time, 'login'=>$login, 'failed'=>$res['num'], 'user_id'=>$user_id, 'session'=>$res['test_session']);
+                $grades[$login][$ticket_name] = array("time"=>$time, 'login'=>$login,'ticket_id'=>$res['ticket_id'], 'failed'=>$res['num'], 'user_id'=>$user_id, 'session'=>$res['test_session']);
         }
         $data = array();
         foreach($grades as $key=>$val){
@@ -1223,13 +1223,13 @@
         $db = new SQLite3(DB."db.sqlite");
         $user_id = $this->data->user_id;
         $order = $this->data->order;
-        $result = $db->query("SELECT t1.user_id AS user_id, t1.q_id AS q_id, t2.login AS login, t1.test_session as test_session, t3.name AS ticketname, t1.timecreated AS timefinished, SUM(t1.correct) AS num FROM statistic AS t1 INNER JOIN tickets AS t3 ON t1.ticket_id=t3.id LEFT JOIN users AS t2 ON t1.user_id=t2.id where user_id={$user_id} GROUP BY t1.test_session ORDER BY t1.timecreated {$order}");
+        $result = $db->query("SELECT t1.user_id AS user_id, t1.q_id AS q_id, t3.id as ticket_id, t2.login AS login, t1.test_session as test_session, t3.name AS ticketname, t1.timecreated AS timefinished, SUM(t1.correct) AS num FROM statistic AS t1 INNER JOIN tickets AS t3 ON t1.ticket_id=t3.id LEFT JOIN users AS t2 ON t1.user_id=t2.id where user_id={$user_id} GROUP BY t1.test_session ORDER BY t1.timecreated {$order}");
         $grades = array();
         while($res = $result->fetchArray(SQLITE3_ASSOC)){
             $user_id = $res['user_id'];
             $ticket_name = $res['ticketname'];
             $time = date("d-m-Y H:i", $res['timefinished']); 
-            $grades[] = array("time"=>$time, 'ticket_name'=>$ticket_name, 'failed'=>$res['num'], 'user_id'=>$user_id, 'session'=>$res['test_session']);
+            $grades[] = array("time"=>$time, 'ticket_name'=>$ticket_name, 'ticket_id'=>$res['ticket_id'], 'failed'=>$res['num'], 'user_id'=>$user_id, 'session'=>$res['test_session']);
         }
         return $grades;
     }
@@ -1238,9 +1238,10 @@
         //ini_set('display_errors', TRUE);
         $db = new SQLite3(DB."db.sqlite");
         $user_id = $this->data->q_id;
+        $ticketId = $this->data->ticketId;
         $test_session = $this->data->testSession;
         //$result = $db->query("SELECT t2.indx FROM statistic AS t1 INNER JOIN ticket_2_question AS t2 ON t1.ticket_id=t2.tickets_id AND t1.q_id=t2.q_id WHERE t1.test_session={$test_session} AND t1.correct=1");
-        $result = $db->query("SELECT t2.indx FROM statistic AS t1 INNER JOIN ticket_2_question AS t2 ON t1.q_id=t2.q_id WHERE t1.test_session={$test_session} AND t1.correct=1");
+        $result = $db->query("SELECT t2.indx FROM statistic AS t1 INNER JOIN ticket_2_question AS t2 ON t1.q_id=t2.q_id WHERE t1.test_session={$test_session} AND t1.correct=1 AND t2.tickets_id={$ticketId}");
         while($res = $result->fetchArray(SQLITE3_ASSOC)){
             $q[] = $res['indx'];
         }
