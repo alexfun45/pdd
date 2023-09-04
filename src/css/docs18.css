@@ -478,6 +478,14 @@ p{
     font-size: 12px;
   }
 
+  .title-input{
+    position: absolute;
+    top: 20px;
+    left: 24px;
+    width: 220px;
+    z-index: 1000000;
+  }
+
 .mobileWrapper{
     padding-top: 10vh;
 }

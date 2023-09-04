@@ -22,6 +22,7 @@ export default function PageEditor({editPageName, setEditPageName, mode}: {editP
 
     const [show, setShow] = useState(false),
           [pageName, setPageName] = useState(""),
+          [titlePage, setTitlePage] = useState(""),
           [saving, setSaving] = useState(false);
     const [model, setModel] = useState("");            
     const [validated, setValidated] = useState(false);
@@ -38,6 +39,7 @@ export default function PageEditor({editPageName, setEditPageName, mode}: {editP
           request({method: "post", data:{action: "getPage", data: {page_id: editPageName}}}).then(response => {
             const {data} = response;
             setModel(data.content);
+            setTitlePage(data.head_title);
           });
         }
         else
@@ -146,6 +148,7 @@ export default function PageEditor({editPageName, setEditPageName, mode}: {editP
         formData.delete('pagename');
         var html = $("<div />").append(content.clone()).html();
         formData.append('content', html);
+        formData.append('title', titlePage);
         if(mode==1)
           createPage();
         else
@@ -164,8 +167,13 @@ export default function PageEditor({editPageName, setEditPageName, mode}: {editP
     const createPage = () => {
       setEditPageName(pageName);
       formData.append('action', 'createPage');
+      formData.append('title', titlePage);
       formData.append('page', pageName);
       request({method: "post", headers: {"Content-Type": "multipart/form-data"}, data: formData});
+    }
+
+    const handleTitleChange = (e: any) => {
+      setTitlePage(e.target.value);
     }
 
     return (
@@ -197,6 +205,7 @@ export default function PageEditor({editPageName, setEditPageName, mode}: {editP
                   <Modal.Footer>
                   </Modal.Footer>
                 </Modal>
+            <Form.Control onChange={handleTitleChange} defaultValue={titlePage} className="title-input" type="text" placeholder="Заголовок"></Form.Control>
             <Button onClick={savePage} className="btn-dialog btn-success editor-btn" disabled={saving} type="submit">
               <Spinner
                 className={(!saving)?"hide":""}

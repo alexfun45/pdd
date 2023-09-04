@@ -159,11 +159,13 @@
         protected function getPage(){
             $db = new SQLite3(DB."db.sqlite");
             $id = $this->data->page_id;
-            $res = $db->query("SELECT title, private from pages WHERE name='$id'");
+            $res = $db->query("SELECT title, head_title, private from pages WHERE name='$id'");
             $page = $res->fetchArray(SQLITE3_ASSOC);
             $page_filename = PAGES . $id . ".html";
+            //$res = $db->query("SELECT title FROM title_page WHERE page_name='$id'");
+            //$head_title = $res->fetchArray(SQLITE3_ASSOC);
             $db->close();
-            return array("private"=>$page["private"], "title"=>$page["title"], "content"=>file_get_contents($page_filename));
+            return array("private"=>$page["private"], "title"=>$page["title"], "head_title"=>$page["head_title"], "content"=>file_get_contents($page_filename));
         }
 
         protected function getFooter(){
@@ -182,7 +184,19 @@
         }   
 
         protected function editPage(){
+            $db = new SQLite3(DB."db.sqlite");
             $page_name = $_POST['page'];
+            $title = $_POST['title'];
+            if($title!="")
+                $db->exec("UPDATE pages SET head_title='$title' WHERE name='$page_name'");
+            /*if($title!=""){
+                $res = $db->query("SELECT title from title_page WHERE page_name='$page_name'");
+                if($res!==false && ($res->fetchArray(SQLITE3_ASSOC)!=false)){
+                    $db->exec("UPDATE title_page SET title='$title' WHERE page_name='$page_name'");
+                }
+                else
+                    $db->exec("INSERT INTO title_page(page_name, title) VALUES('$page_name', '$title')");
+            }*/
             $page_filename = PAGES . $page_name . ".html";
             $files = $_FILES;
             foreach($files as $file){
@@ -190,6 +204,7 @@
                 $this->uploadFile($uploadFile);
             }
             file_put_contents($page_filename, $_POST['content']);
+            $db->close();
         }
 
         protected function privatePage(){
@@ -401,6 +416,25 @@
         $menu_id = $this->data->menu_id;
         $sql1 = "UPDATE ticket_2_question SET indx=$firstItemIndx WHERE q_id=$firstItemQId AND tickets_id=$firstTicketId";
         $sql2 = "UPDATE ticket_2_question SET indx=$secondItemIndx WHERE q_id=$secondItemQId AND tickets_id=$secondTicketId";
+        $db->query($sql1);
+        $db->query($sql2);
+        $db->close();
+        return $sql1;
+    }
+
+    protected function changeSubjectPos(){
+        ini_set('display_errors', TRUE);
+        $db = new SQLite3(DB."db.sqlite");
+        $tableName = $this->data->table;
+        $firstItemQId = $this->data->firstItem->id;
+        $secondItemQId = $this->data->secondItem->id;
+        $firstSubjectId = $this->data->secondItem->subject_id;
+        $secondSubjectId = $this->data->secondItem->subject_id;
+        $firstItemIndx = $this->data->firstItem->indx;
+        $secondItemIndx = $this->data->secondItem->indx;
+        $menu_id = $this->data->menu_id;
+        $sql1 = "UPDATE subject_2_question SET indx=$firstItemIndx WHERE q_id=$firstItemQId AND subject_id=$firstSubjectId";
+        $sql2 = "UPDATE subject_2_question SET indx=$secondItemIndx WHERE q_id=$secondItemQId AND subject_id=$secondSubjectId";
         $db->query($sql1);
         $db->query($sql2);
         $db->close();
@@ -909,6 +943,7 @@
     }
 
     protected function createPage(){
+        $db = new SQLite3(DB."db.sqlite");
         $files = $_FILES;
         foreach($files as $file){
             $uploadFile = array("file"=>$file);
@@ -916,11 +951,11 @@
         }
         $pageContent = $_POST['content'];
         $pageTitle = $_POST['page'];
+        $title = $_POST['title'];
         $pageName = $this->transliterate($_POST['page']);
         $pageName = substr($pageName, 0, 64);
         file_put_contents(PAGES.$pageName.".html", $pageContent);
-        $db = new SQLite3(DB."db.sqlite");
-        $db->exec("INSERT INTO pages(name, title) VALUES('$pageName', '$pageTitle')");
+        $db->exec("INSERT INTO pages(name, title, head_title) VALUES('$pageName', '$pageTitle', '$title')");
         $db->close();
     }
 

@@ -24,7 +24,6 @@ const mapStateToProps = (state:any) => {
     while (m = regex.exec(fragmentString)) {
         params[decodeURIComponent(m[1])] = decodeURIComponent(m[2]);
     }
-    console.log("params", params);
     if (Object.keys(params).length > 0) {
         console.log('oauth2-test-params', JSON.stringify(params));
         console.log("state", params['state']);
@@ -54,6 +53,10 @@ function Content(props: any){
         request({method: "post", data:{action: "getPage", data: {page_id: id}}}).then( response =>{
             const {data} = response;
             if(data.private==1 && !props.isAuth) navigate("/auth");
+            if(data.head_title!="" && data.head_title!=null)
+               document.title = data.head_title;
+            else
+                document.title = "ПДД онлайн 2023";
             let regexp = /(font\-)?size[=\:][\'\"]?\s?([^\'\";]*)[\'\"]?/sg,
                 content = data.content,
                 result = "";
