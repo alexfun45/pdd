@@ -249,7 +249,7 @@ export default () => {
             copySubjectQuestions[i].indx = topItemIndx;
             copySubjectQuestions.sort(sortArrayAsc);
             setSubjectQue(copySubjectQuestions);
-            request({method: "post", data: {action: "changeTicketPos", data: {firstItem: copySubjectQuestions[i-1], secondItem: copySubjectQuestions[i]}}}).then(response=>{
+            request({method: "post", data: {action: "changeSubjectPos", data: {firstItem: copySubjectQuestions[i-1], secondItem: copySubjectQuestions[i]}}}).then(response=>{
                 changePostionLock = false;
             });
         }
@@ -269,7 +269,7 @@ export default () => {
             copySubjectQuestions[i].indx = nextIndx;
             copySubjectQuestions.sort(sortArrayAsc);
             setSubjectQue(copySubjectQuestions);
-            request({method: "post", data: {action: "changeTicketPos", data: {firstItem: copySubjectQuestions[i+1], secondItem: copySubjectQuestions[i], subject_id:copySubjectQuestions[i].id}}}).then(response=>{
+            request({method: "post", data: {action: "changeSubjectPos", data: {firstItem: copySubjectQuestions[i+1], secondItem: copySubjectQuestions[i], subject_id:copySubjectQuestions[i].id}}}).then(response=>{
                 changePostionLock = false;
             });
         }
