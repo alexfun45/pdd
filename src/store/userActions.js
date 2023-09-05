@@ -1,6 +1,8 @@
 import * as actions from './actionTypes';
 import Profile from '../lib/profileManager'
 import AuthService from '../services/Auth'
+import store from './store'
+
 
 export function fetchUser() {
     return async (dispatch) => {

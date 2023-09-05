@@ -13,6 +13,12 @@ import * as actions from "./store/userActions";
 import AdminRoute from './PrivateRoutes'
 import store from './store/store'
 import GoogleAuth from "./components/GoogleAuth";
+import { connect } from "react-redux";
+
+const mapStateToProps = (state:any) => ({
+  isAuthenticated: state.isAuthenticated,
+  role: state.role
+});
 
 let defaultUser = {
       id: 0,
@@ -93,7 +99,7 @@ function ParseUrl(){
   }
 }
 
-export default function App(){
+const App = (props: any) => {
   
   const [isLogin, setLogin] = useState(false),
         [pageTitle, setPageTitle] = useState(""),
@@ -123,8 +129,8 @@ export default function App(){
   }
 
   useEffect(()=>{
-    ParseUrl();
     store.dispatch(actions.fetchUser());
+    ParseUrl();
     if(window.localStorage.getItem('backgroundImage')!=null)
       document.body.style.backgroundImage = window.localStorage.getItem('backgroundImage');
       request({method: "post", data: {action: "getSettings"}}).then(response=>{
@@ -163,27 +169,30 @@ export default function App(){
               :
                 <Header showLogo={settings.showLogo} />
             }
-            <div id="maincontainer" className={(isMobile)?"containerWrapper mobileWrapper":"containerWrapper"}>
-              <Routes>
-                
-                  {
-                   routes.map((route) => {
-                    if (route.route) {
-                      if(route.auth=="admin")
-                        return <Route path={route.route} key={route.key} element={<AdminRoute component={route.component}></AdminRoute>} />
-                      else 
-                        return <Route path={route.route} element={route.component} key={route.key} />
-                    } 
-                  })
-                }
-                <Route path="*" element={<GoogleAuth params={params} />} />
-              </Routes>
-            </div>
+              <div key={props.isAuthenticated} id="maincontainer" className={(isMobile)?"containerWrapper mobileWrapper":"containerWrapper"}>
+                <Routes>
+                    {
+                    routes.map((route) => {
+                      if (route.route) {
+                        if(route.auth=="admin")
+                          return <Route path={route.route} key={route.key} element={<AdminRoute component={route.component}></AdminRoute>} />
+                        else 
+                          return <Route path={route.route} element={route.component} key={route.key} />
+                      } 
+                    })
+                  }
+                  <Route path="*" element={<GoogleAuth params={params} />} />
+                </Routes>
+              </div>
+          
             <Footer />
           </HashRouter>
           
         </AppContext.Provider>
     )
 }
+export default connect(
+  mapStateToProps,
+)(App);
 
 export {AppContext};
