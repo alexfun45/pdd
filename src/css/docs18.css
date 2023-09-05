@@ -387,6 +387,10 @@ p{
     margin-top: 5px;
 }
 
+label{
+    margin-bottom: 0px !important;
+}
+
 .label{
     display: inline;
     padding: .4em .6em .3em;

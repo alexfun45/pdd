@@ -1147,6 +1147,7 @@
         $bgcolor_tickets = $_POST['bgcolor_tickets'];
         $examTitle = $_POST['exam_title'];
         $start_page = $_POST['start_page'];
+        $show_exam_title = $_POST['show_exam_title'];
         sleep(1);
         if($bgcolor)
             $db->exec("UPDATE settings SET value='$bgcolor' WHERE config_name='background-color'");
@@ -1164,6 +1165,9 @@
             $db->exec("UPDATE settings SET value='$image_title_exam_mobile' WHERE config_name='image_title_exam_mobile'");
         if($showLogo=="0" || $showLogo=="1"){
             $db->exec("UPDATE settings SET value='$showLogo' WHERE config_name='showLogo'");
+        }
+        if($show_exam_title=="0" || $show_exam_title=="1"){
+            $db->exec("UPDATE settings SET value='$show_exam_title' WHERE config_name='show_exam_title'");
         }
         if($shuffle_tickets=="0" || $shuffle_tickets=="1")
             $db->exec("UPDATE settings SET value='$shuffle_tickets' WHERE config_name='shuffle_tickets'");

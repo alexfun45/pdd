@@ -759,8 +759,21 @@ const TestPdd = (props: any) => {
                 </div>
             )
             }
-            <div style={{marginTop: 0}} className={(pdd_questions.length>0 && context.settings.show_exam_title=='1')?"row testrow":"hide"}>
-                <div className="slide-wrapper" style={{width: (requiredWidth+"px")}}>
+            <div style={{marginTop: 0}} className={(pdd_questions.length>0 && !props.options.settings && !props.options.recommended && context.settings.show_exam_title=='1')?"row testrow":"hide"}>
+            <div className="slide-wrapper" style={{width: (requiredWidth+"px")}}>
+                        <i onClick={toPrevPage} className={start?"bi bi-caret-left arrow-btn arrow-left-btn":"hide"}></i>
+                        <div className="button-slider">
+                            <div key={selectedTicket} id="buttonPanel" style={{left: leftShift+"px"}} className={(!start && props.options.settings)?"hide":"btn-group btn-group-xs"}>
+                                {
+                                    <BtnQuestion key={selectedTicket} results={results.current} qpages={qpages} goToPage={goToPage} currentQuestionIndex={currentQuestionIndex}/>
+                                }  
+                            </div>
+                        </div>
+                    <i onClick={toNextPage} className={start?"bi bi-caret-right arrow-btn arrow-right-btn":"hide"}></i>
+                </div>                
+            </div>
+            <div className={(pdd_questions.length>0 && (props.options.recommended || props.options.settings))?"row testrow":"hide"}>
+            <div className="slide-wrapper" style={{width: (requiredWidth+"px")}}>
                         <i onClick={toPrevPage} className={start?"bi bi-caret-left arrow-btn arrow-left-btn":"hide"}></i>
                         <div className="button-slider">
                             <div key={selectedTicket} id="buttonPanel" style={{left: leftShift+"px"}} className={(!start && props.options.settings)?"hide":"btn-group btn-group-xs"}>
@@ -771,10 +784,10 @@ const TestPdd = (props: any) => {
                         </div>
                     <i onClick={toNextPage} className={start?"bi bi-caret-right arrow-btn arrow-right-btn":"hide"}></i>
                 </div>
-                { (currentQuestion!=undefined && !context.isMobile && props.options.recommended) && (
+                { (currentQuestion!=undefined && !context.isMobile) && (
                             <Watch start={start} setEndTest={setEndTest} endTest={endTest} pause={testPause} _continue={continueTest} iterator={iterator} startTime={startTime} btnView="icon"/>
                 )}
-                { (currentQuestion!=undefined && context.isMobile && props.options.recommended) && (
+                { (currentQuestion!=undefined && context.isMobile) && (
                             <Watch start={start} setEndTest={setEndTest} endTest={endTest} pause={testPause} _continue={continueTest} iterator={iterator} startTime={startTime} btnView="button" />  
                 )}
             </div>
