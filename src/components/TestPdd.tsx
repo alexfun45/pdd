@@ -378,7 +378,6 @@ const TestPdd = (props: any) => {
 		        getQuestions({...Options, selectedTicket:selectedTicket, selectedSubject: selectedSubject, recommended: props.options.recommended, user_id:props.user.id, settings: false, subject: props.options.subjects}, setQuestion);
             */
             getQuestions({...Options, selectedTicket:selectedTicket, selectedSubject: selectedSubject, recommended: props.options.recommended, user_id:props.user.id,subject: props.options.subjects, settings: false}).then((result)=>{
-                console.log("result", result);
                 if(result!==false){
                     setStart(true);
                     queTimer = setInterval(()=>{
@@ -389,8 +388,13 @@ const TestPdd = (props: any) => {
             })
                 
         }
-        else
-            getQuestions(Options).then(()=>setQuestion());
+        else{
+            getQuestions(Options).then(()=>{
+                setStart(true);
+                setQuestion();
+            });
+            
+        }
     }
 
     function handleStartTest(){
@@ -579,8 +583,32 @@ const TestPdd = (props: any) => {
             {(props.options.settings===false && !props.options.recommended && !props.options.subjects) && (
                 <div style={{marginTop: 0}} className={(props.options.settings===false && !props.options.recommended && !props.options.subjects)?"row testrow":"hide"}>
                     <div className="exam-title">
-                        <label>{context.settings.exam_title}</label>
-                        <FormControl key={selectedTicket} className="form-ticket" sx={{m: 1, minWidth: 120, marginTop: '5px', verticalAlign: 'middle', '& > .MuiPaper-root':{top: '60px', maxHeight: 'calc(100% - 62px)'}}}>
+                        {(context.settings.show_exam_title=='1') && (
+                            <label>{context.settings.exam_title}</label>
+                        )}
+                        {(context.settings.show_exam_title=='0') && (
+                            <div className="slide-wrapper" style={{width: (requiredWidth+"px")}}>
+                                    <i onClick={toPrevPage} className={start?"bi bi-caret-left arrow-btn arrow-left-btn":"hide"}></i>
+                                    <div className="button-slider">
+                                        <div key={selectedTicket} id="buttonPanel" style={{left: leftShift+"px"}} className={(!start && props.options.settings)?"hide":"btn-group btn-group-xs"}>
+                                            {
+                                                <BtnQuestion key={selectedTicket} results={results.current} qpages={qpages} goToPage={goToPage} currentQuestionIndex={currentQuestionIndex}/>
+                                            }  
+                                        </div>
+                                    </div>
+                                <i onClick={toNextPage} className={start?"bi bi-caret-right arrow-btn arrow-right-btn":"hide"}></i>
+                            </div>
+                        )}
+                        { (currentQuestion!=undefined && context.isMobile) && (
+                            <Watch start={start} setEndTest={setEndTest} endTest={endTest} pause={testPause} _continue={continueTest} iterator={iterator} startTime={startTime} btnView="button" />
+                        )}
+                         { (!context.isMobile && currentQuestion!==undefined && !endTest) && (
+                                <>
+                                    <Watch start={start} setEndTest={setEndTest} endTest={endTest} pause={testPause} _continue={continueTest} iterator={iterator} startTime={startTime} btnView="icon"/>  
+                                    <input onClick={startTest} id="buttonSchoolSetName" type="submit" className={(start || props.options.settings===true || context.isMobile)?"hide":"btn btn-start"} value="Начать" />
+                                </>
+                            )} 
+                        <FormControl key={selectedTicket} className="form-ticket" sx={{m: 1, minWidth: 120, verticalAlign: 'middle', '& > .MuiPaper-root':{top: '60px', maxHeight: 'calc(100% - 62px)'}}}>
                             <Select
                                 disabled={start?true:false}
                                 labelId="demo-simple-select-helper-label"
@@ -595,9 +623,7 @@ const TestPdd = (props: any) => {
                                     }
                             </Select>
                         </FormControl>
-                        { (currentQuestion!=undefined && context.isMobile) && (
-                            <Watch start={start} setEndTest={setEndTest} endTest={endTest} pause={testPause} _continue={continueTest} iterator={iterator} startTime={startTime} btnView="button" />  
-                        )}
+                        
                     </div>
                 </div>
                 )}
@@ -620,6 +646,9 @@ const TestPdd = (props: any) => {
                                         }
                                 </Select>
                             </FormControl>
+                            { (currentQuestion!=undefined && !context.isMobile) && (
+                                <Watch start={start} setEndTest={setEndTest} endTest={endTest} pause={testPause} _continue={continueTest} iterator={iterator} startTime={startTime} btnView="icon"/>
+                            )}
                             { (currentQuestion!=undefined && context.isMobile) && (
                                 <Watch start={start} setEndTest={setEndTest} endTest={endTest} pause={testPause} _continue={continueTest} iterator={iterator} startTime={startTime} btnView="button" />  
                             )}
@@ -730,39 +759,25 @@ const TestPdd = (props: any) => {
                 </div>
             )
             }
-            <div style={{marginTop: 0}} className={(pdd_questions.length>0)?"row testrow":"hide"}>
+            <div style={{marginTop: 0}} className={(pdd_questions.length>0 && context.settings.show_exam_title=='1')?"row testrow":"hide"}>
                 <div className="slide-wrapper" style={{width: (requiredWidth+"px")}}>
-                    <i onClick={toPrevPage} className={start?"bi bi-caret-left arrow-btn arrow-left-btn":"hide"}></i>
-                    <div className="button-slider">
-                        <div key={selectedTicket} id="buttonPanel" style={{left: leftShift+"px"}} className={(!start && props.options.settings)?"hide":"btn-group btn-group-xs"}>
-                            {
-                                <BtnQuestion key={selectedTicket} results={results.current} qpages={qpages} goToPage={goToPage} currentQuestionIndex={currentQuestionIndex}/>
-                            }
-                            
+                        <i onClick={toPrevPage} className={start?"bi bi-caret-left arrow-btn arrow-left-btn":"hide"}></i>
+                        <div className="button-slider">
+                            <div key={selectedTicket} id="buttonPanel" style={{left: leftShift+"px"}} className={(!start && props.options.settings)?"hide":"btn-group btn-group-xs"}>
+                                {
+                                    <BtnQuestion key={selectedTicket} results={results.current} qpages={qpages} goToPage={goToPage} currentQuestionIndex={currentQuestionIndex}/>
+                                }  
+                            </div>
                         </div>
-                       
-                    </div>
                     <i onClick={toNextPage} className={start?"bi bi-caret-right arrow-btn arrow-right-btn":"hide"}></i>
                 </div>
-                { (!context.isMobile && currentQuestion!==undefined && !endTest) && (
-                                <>
-                                    <Watch start={start} setEndTest={setEndTest} endTest={endTest} pause={testPause} _continue={continueTest} iterator={iterator} startTime={startTime} btnView="icon"/>  
-                                    <input onClick={startTest} id="buttonSchoolSetName" type="submit" className={(start || props.options.settings===true || context.isMobile)?"hide":"btn btn-start"} value="Начать" />
-                                </>
-                            )} 
+                { (currentQuestion!=undefined && !context.isMobile && props.options.recommended) && (
+                            <Watch start={start} setEndTest={setEndTest} endTest={endTest} pause={testPause} _continue={continueTest} iterator={iterator} startTime={startTime} btnView="icon"/>
+                )}
+                { (currentQuestion!=undefined && context.isMobile && props.options.recommended) && (
+                            <Watch start={start} setEndTest={setEndTest} endTest={endTest} pause={testPause} _continue={continueTest} iterator={iterator} startTime={startTime} btnView="button" />  
+                )}
             </div>
-            { (!context.isMobile) && (
-            <div style={{marginTop: 0, position: 'relative', top: '-15px'}} className="row testrow centered-row hide">
-                <div className="col-lg-8 col-md-8 col-sm-8">    
-
-                    <div style={{marginTop: 0}} className="row testrow">
-                        <div className="col-md-12 col-sm-12 myheader">
-                       
-                        </div>
-                    </div>
-                </div>
-            </div>
-            )}
             <div style={{marginTop: 0}} className="row testrow">
                     <div className={(endTest===true)?"row":"hide row"}>
                                 <div className="col-md-12">

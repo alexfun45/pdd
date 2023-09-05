@@ -22,10 +22,12 @@ export default ({allPages = []} : any) => {
             'showLogo': '1',
             'start_page': {id: 1, name: 'OOO', title: 'Общие правила'},
             'exam_title': '',
+            'show_exam_title': '0',
             'shuffle_tickets': '0'
         }),
         [loading, setLoading] = useState(false),
         [start_page, setStartPage] = useState(null),
+        [showTicketTitle, setShowTitle] = useState(false),
         [titleExam, setExamTitle] = useState(),
         [state, setState] = useState<any>({
             displayColorPicker: false,
@@ -248,6 +250,12 @@ export default ({allPages = []} : any) => {
           }
         }
 
+      const handleShowTitle = (e: any) => {
+        let checked = (e.target.checked)?'1':'0';
+        setSettings({...settings, 'show_exam_title':checked});
+        formData.append('show_exam_title', checked);
+      }
+
       const Update = () =>{
         request({method: "post", data: {action: "update"}});
       }
@@ -338,6 +346,10 @@ export default ({allPages = []} : any) => {
             <tr>
               <td>Заголовок выбора билета</td>
               <td><TextField style={{width: '100%', backgroundColor: '#FFF'}} onChange={handleChangeTitle} value={titleExam} /></td>
+            </tr>
+            <tr>
+              <td>Показывать заголовок</td>
+              <td><input onChange={handleShowTitle} type="checkbox" checked={(settings['show_exam_title']=='1')} /></td>
             </tr>
             <tr>
               <td>Перемешивать билеты</td>

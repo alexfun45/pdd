@@ -1509,7 +1509,7 @@ div.suggestPopupContent div table tbody tr td.item-selected{
         text-align: center;
         overflow-wrap: break-word;
         position:relative;
-        height: 40px;
+        height: 50px;
         vertical-align: middle;
     }
 
@@ -1626,6 +1626,9 @@ div.suggestPopupContent div table tbody tr td.item-selected{
     .exam-title{
         font-weight: bold;
         line-height: 50px;
+        display: inline-block;
+        line-height: 70px;
+        height: 70px;
     }
 
     .exam-title > label{
