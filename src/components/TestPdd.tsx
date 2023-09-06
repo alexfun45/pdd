@@ -151,7 +151,7 @@ const Watch = ({start, setEndTest, endTest, pause, _continue, iterator=1, startT
     }, [startTime])
     
     useEffect(()=>{
-        if(start===true && endTest===false){
+        if(start===true && endTest===false && Timer==0){
             setTime("0:00");
             Timer = setInterval(startTimer, 1000);
             }
