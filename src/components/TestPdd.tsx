@@ -594,9 +594,7 @@ const TestPdd = (props: any) => {
                                 <i onClick={toNextPage} className={start?"bi bi-caret-right arrow-btn arrow-right-btn":"hide"}></i>
                             </div>
                         )}
-                        { (currentQuestion!=undefined && context.isMobile) && (
-                            <Watch start={start} setEndTest={setEndTest} endTest={endTest} pause={testPause} _continue={continueTest} iterator={iterator} startTime={startTime} btnView="button" />
-                        )}
+                        
                          { (!context.isMobile && currentQuestion!==undefined && !endTest) && (
                                 <>
                                     <Watch start={start} setEndTest={setEndTest} endTest={endTest} pause={testPause} _continue={continueTest} iterator={iterator} startTime={startTime} btnView="icon"/>  
@@ -618,7 +616,9 @@ const TestPdd = (props: any) => {
                                     }
                             </Select>
                         </FormControl>
-                        
+                        { (currentQuestion!=undefined && context.isMobile) && (
+                            <Watch start={start} setEndTest={setEndTest} endTest={endTest} pause={testPause} _continue={continueTest} iterator={iterator} startTime={startTime} btnView="button" />
+                        )}
                     </div>
                 </div>
                 )}
