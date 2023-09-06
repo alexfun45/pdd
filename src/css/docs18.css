@@ -1631,7 +1631,6 @@ div.suggestPopupContent div table tbody tr td.item-selected{
         font-weight: bold;
         line-height: 50px;
         display: inline-block;
-        line-height: 70px;
         height: 70px;
     }
 
@@ -2241,4 +2240,13 @@ div.suggestPopupContent div table tbody tr td.item-selected{
     flex-direction: row;
     align-items: center;
     justify-content: center;
+  }
+
+  .content-block{
+    position: absolute;
+    top: 5px;
+    right: 0;
+    width: 200px;
+    height: auto;
+    border-left:#605a5a 1px solid;
   }

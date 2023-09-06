@@ -256,11 +256,11 @@ const TestPdd = (props: any) => {
     }, [props.options.settings, props.options.subjects, props.options.recommended, context.settings]);
 
     useEffect(()=>{
-        if(props.options.recommended && context.user){
+        if(props.options.recommended && props.user.id!=0){
             resetTest();
             startTest();
         }
-    }, [props.options.recommended, context.user.id]);
+    }, [props.options.recommended, props.user.id]);
 
     useEffect(()=>{
         variantBackgroundColor = context.settings['background-color'];
@@ -372,11 +372,6 @@ const TestPdd = (props: any) => {
         setEndTest(false);
         testSession = (new Date()).getTime() + Math.floor(1000*Math.random());
         if(props.options.settings===false){
-            /*if(props.options.recommended)
-                getQuestions({...Options, recommended: props.options.recommended, user_id:props.user.id, settings: false}, setQuestion);
-            else
-		        getQuestions({...Options, selectedTicket:selectedTicket, selectedSubject: selectedSubject, recommended: props.options.recommended, user_id:props.user.id, settings: false, subject: props.options.subjects}, setQuestion);
-            */
             getQuestions({...Options, selectedTicket:selectedTicket, selectedSubject: selectedSubject, recommended: props.options.recommended, user_id:props.user.id,subject: props.options.subjects, settings: false}).then((result)=>{
                 if(result!==false){
                     setStart(true);
@@ -772,22 +767,23 @@ const TestPdd = (props: any) => {
                     <i onClick={toNextPage} className={start?"bi bi-caret-right arrow-btn arrow-right-btn":"hide"}></i>
                 </div>                
             </div>
-            <div className={(pdd_questions.length>0 && (props.options.recommended || props.options.settings))?"row testrow":"hide"}>
-            <div className="slide-wrapper" style={{width: (requiredWidth+"px")}}>
+           
+            <div className={(pdd_questions.length>0 && (props.options.recommended || props.options.settings || props.options.subjects))?"row testrow":"hide"}>
+            <div key={qpages.length} className="slide-wrapper" style={{width: (requiredWidth+"px")}}>
                         <i onClick={toPrevPage} className={start?"bi bi-caret-left arrow-btn arrow-left-btn":"hide"}></i>
                         <div className="button-slider">
-                            <div key={selectedTicket} id="buttonPanel" style={{left: leftShift+"px"}} className={(!start && props.options.settings)?"hide":"btn-group btn-group-xs"}>
+                            <div key={qpages.length} id="buttonPanel" style={{left: leftShift+"px"}} className={(!start && props.options.settings)?"hide":"btn-group btn-group-xs"}>
                                 {
-                                    <BtnQuestion key={selectedTicket} results={results.current} qpages={qpages} goToPage={goToPage} currentQuestionIndex={currentQuestionIndex}/>
+                                    <BtnQuestion key={pdd_questions.length} results={results.current} qpages={pdd_questions} goToPage={goToPage} currentQuestionIndex={currentQuestionIndex}/>
                                 }  
                             </div>
                         </div>
                     <i onClick={toNextPage} className={start?"bi bi-caret-right arrow-btn arrow-right-btn":"hide"}></i>
                 </div>
-                { (currentQuestion!=undefined && !context.isMobile) && (
+                { (currentQuestion!=undefined && !context.isMobile && !props.options.subjects) && (
                             <Watch start={start} setEndTest={setEndTest} endTest={endTest} pause={testPause} _continue={continueTest} iterator={iterator} startTime={startTime} btnView="icon"/>
                 )}
-                { (currentQuestion!=undefined && context.isMobile) && (
+                { (currentQuestion!=undefined && context.isMobile && !props.options.subjects) && (
                             <Watch start={start} setEndTest={setEndTest} endTest={endTest} pause={testPause} _continue={continueTest} iterator={iterator} startTime={startTime} btnView="button" />  
                 )}
             </div>
@@ -830,15 +826,17 @@ const TestPdd = (props: any) => {
                                         </div>
                                         <div className="panel-result">
                                         {(!props.options.settings) && (
-                                            <p>
+                                            <div>
                                                 <table className="result_table">
-                                                    <tr><th>№</th><th>Вопрос</th><th>Комментарий</th></tr>
-                                                    { errors_array.map((v, i)=>(
-                                                        <tr><td>{parseInt(v.ticket)+1}</td><td>{v.title}</td><td>{v.comment}</td></tr>
-                                                        ))
-                                                    }
+                                                    <tbody>
+                                                        <tr><th>№</th><th>Вопрос</th><th>Комментарий</th></tr>
+                                                        { errors_array.map((v, i)=>(
+                                                            <tr><td>{parseInt(v.ticket)+1}</td><td>{v.title}</td><td>{v.comment}</td></tr>
+                                                            ))
+                                                        }
+                                                    </tbody>
                                                 </table>
-                                            </p>
+                                            </div>
                                         )}
                                     </div> 
                                 </div>

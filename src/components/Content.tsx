@@ -3,11 +3,14 @@ import { useParams } from "react-router-dom";
 import request from '../utils/request'
 import {AppContext} from '../app'
 import { useNavigate } from "react-router-dom";
+import $ from 'jquery';
 import { connect } from 'react-redux';
 
 interface ContentProps {
     id: string
 } 
+
+let scrollValue = 0;
 
 const mapStateToProps = (state:any) => {
     return {
@@ -43,7 +46,6 @@ function Content(props: any){
     let navigate = useNavigate();
     
     useEffect(()=>{
-        
         if(context.settings.hasOwnProperty("start_page") && context.settings.start_page.name!="" && id=="")
             navigate("/"+context.settings.start_page.name);
     }, [context]);
@@ -60,6 +62,17 @@ function Content(props: any){
             let regexp = /(font\-)?size[=\:][\'\"]?\s?([^\'\";]*)[\'\"]?/sg,
                 content = data.content,
                 result = "";
+            let jqueryContent = $(content),
+                h1Exist = false,
+                contentBlock = $("<ul class='content-block'></ul>");
+            //console.log("content", content);
+            jqueryContent.find("h2").each(function(this: HTMLElement){
+                console.log("h2");
+                //contentBlock.append(`<li>${$(this).text()}</li>`);
+                h1Exist = true;
+            })
+            //if(h1Exist)
+                //$("#maincontainer").append(contentBlock);
             context.setPageTitle(data.title);
             if(content){
                 result = content.replace(regexp, (match: string, fullform: string, fontsize: string)=>{ 
@@ -75,6 +88,29 @@ function Content(props: any){
             setContent(result);
         });
     }, [props.isAuth, id]);
+
+
+    useEffect(()=>{
+
+        window.addEventListener('scroll', function(e: any) {
+            var el = e.target;
+            scrollValue = el.scrollTop;
+          }, true);
+          /*window.onbeforeunload = (event) => {
+            const e = event || window.event;
+            // Cancel the event
+            e.preventDefault();
+          }*/
+          window.addEventListener("hashchange", function(e) {
+            if(scrollValue>0){
+                console.log("hash change 1");
+                document.location.href = document.location.href;
+                e.preventDefault();
+                scrollValue = 0;
+                window.scrollTo(0, 0);
+            }
+        }, false)
+    }, [])
 
     return (
         <div className="container">
