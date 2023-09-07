@@ -646,7 +646,10 @@ const TestPdd = (props: any) => {
                                 <Watch start={start} setEndTest={setEndTest} endTest={endTest} pause={testPause} _continue={continueTest} iterator={iterator} startTime={startTime} btnView="icon"/>
                         )}
                         { (currentQuestion!=undefined && context.isMobile) && (
-                                <Watch start={start} setEndTest={setEndTest} endTest={endTest} pause={testPause} _continue={continueTest} iterator={iterator} startTime={startTime} btnView="button" />  
+                                <>
+                                    <br />
+                                    <Watch start={start} setEndTest={setEndTest} endTest={endTest} pause={testPause} _continue={continueTest} iterator={iterator} startTime={startTime} btnView="button" />  
+                                </>
                             )}
                         <FormControl key={selectedSubject} className="form-ticket" sx={{m: 1, minWidth: 120, marginTop: '5px', verticalAlign: 'middle', '& > .MuiPaper-root':{top: '60px', maxHeight: 'calc(100% - 62px)'}}}>
                                 <Select
@@ -750,12 +753,12 @@ const TestPdd = (props: any) => {
                 <br/>
             )
             }
-            <div className="checkbox">
+            <div style={{marginBottom: !context.isMobile?'30px':''}} className="checkbox">
                 <label>
                     <input disabled={start} id="btnConfDoubleClick" onChange={(e)=>handleChangeOption(e, 'dblclick')} checked={Options.dblclick} type="checkbox"/> Двойной клик
                 </label>&nbsp;&nbsp;&nbsp;
             </div>
-            <div className="checkbox">
+            <div style={{marginBottom:!context.isMobile?'30px':''}} className="checkbox">
                 <label>
                     <input disabled={start} id="btnConfRandomVariants" onChange={(e)=>handleChangeOption(e, 'random')} checked={Options.random} type="checkbox"/> Перемешивать вопросы
                 </label>
@@ -802,7 +805,10 @@ const TestPdd = (props: any) => {
                             <Watch start={start} setEndTest={setEndTest} endTest={endTest} pause={testPause} _continue={continueTest} iterator={iterator} startTime={startTime} btnView="icon"/>
                 )}
                 { (currentQuestion!=undefined && context.isMobile && !props.options.subjects) && (
-                            <Watch start={start} setEndTest={setEndTest} endTest={endTest} pause={testPause} _continue={continueTest} iterator={iterator} startTime={startTime} btnView="button" />  
+                    <>
+                        <br />
+                        <Watch start={start} setEndTest={setEndTest} endTest={endTest} pause={testPause} _continue={continueTest} iterator={iterator} startTime={startTime} btnView="button" />  
+                    </>
                 )}
             </div>
             <div style={{marginTop: 0}} className="row testrow">
