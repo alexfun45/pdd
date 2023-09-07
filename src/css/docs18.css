@@ -1514,6 +1514,7 @@ div.suggestPopupContent div table tbody tr td.item-selected{
         overflow-wrap: break-word;
         position:relative;
         height: 50px;
+        line-height: 50px;
         vertical-align: middle;
     }
 
@@ -1992,7 +1993,6 @@ div.suggestPopupContent div table tbody tr td.item-selected{
     width: 100% !important;
     margin-right: 0;
     margin-left: 0;
-    line-height: 40px;
   }
 
   .col-lg-8.col-md-8.col-sm-8{
@@ -2240,6 +2240,7 @@ div.suggestPopupContent div table tbody tr td.item-selected{
     flex-direction: row;
     align-items: center;
     justify-content: center;
+    margin-bottom: 10px;
   }
 
   .content-block{
