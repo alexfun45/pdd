@@ -460,7 +460,10 @@ const TestPdd = (props: any) => {
         }
         else if(question_answered>=props.options.num || question_answered>=pdd_questions.length){
             if(props.options.settings===false){
-                request({method: 'post', data: {action: "saveStatistic", data: {"stats": JSON.stringify(Statistic), "user_id":(props.user.id)?props.user.id:getRandomUserId(), "results": JSON.stringify(Results)}}});
+                if(!props.options.recommended && !props.options.recommended && !props.options.subjects)
+                    request({method: 'post', data: {action: "saveStatistic", data: {"stats": JSON.stringify(Statistic), "user_id":(props.user.id)?props.user.id:getRandomUserId(), "results": JSON.stringify(Results)}}});
+                else if(props.options.recommended)
+                    request({method: 'post', data: {action: "save_recommended", data: {"user_id":(props.user.id)?props.user.id:getRandomUserId(), "results": JSON.stringify(Results)}}});
                 clearInterval(queTimer);
             }
             setEndTest(true);
@@ -518,7 +521,7 @@ const TestPdd = (props: any) => {
         clearInterval(Timer);
         Timer = 0;
         page = 0;
-        qNum = 0;
+        //qNum = 0;
         results.current = [];
         errors = 0;
         timer = 0;
@@ -532,6 +535,9 @@ const TestPdd = (props: any) => {
     }
 
     const toNextPage = () => {
+        console.log("qNum", qNum);
+        console.log("numPageItems", numPageItems);
+        console.log("page", page);
         if((qNum-(numPageItems*(page+1)))>0){
             page+=1;
             setLeftShift(-page*requiredWidth);
@@ -625,7 +631,23 @@ const TestPdd = (props: any) => {
             <div style={{marginTop: 0}} className={(props.options.settings===false && !props.options.recommended && props.options.subjects)?"row testrow":"hide"}>
                 { (props.options.settings===false && !props.options.recommended && props.options.subjects) && (
                     <>
-                        <label>Выбор темы:</label>
+                        <div className="slide-wrapper" style={{width: (requiredWidth+"px")}}>
+                            <i onClick={toPrevPage} className={start?"bi bi-caret-left arrow-btn arrow-left-btn":"hide"}></i>
+                            <div className="button-slider">
+                                <div id="buttonPanel" style={{left: leftShift+"px"}} className={(!start && props.options.settings)?"hide":"btn-group btn-group-xs"}>
+                                    {
+                                        <BtnQuestion results={results.current} qpages={pdd_questions} goToPage={goToPage} currentQuestionIndex={currentQuestionIndex}/>
+                                    }  
+                                </div>
+                            </div>
+                            <i onClick={toNextPage} className={start?"bi bi-caret-right arrow-btn arrow-right-btn":"hide"}></i>
+                        </div>
+                        { (currentQuestion!=undefined && !context.isMobile) && (
+                                <Watch start={start} setEndTest={setEndTest} endTest={endTest} pause={testPause} _continue={continueTest} iterator={iterator} startTime={startTime} btnView="icon"/>
+                        )}
+                        { (currentQuestion!=undefined && context.isMobile) && (
+                                <Watch start={start} setEndTest={setEndTest} endTest={endTest} pause={testPause} _continue={continueTest} iterator={iterator} startTime={startTime} btnView="button" />  
+                            )}
                         <FormControl key={selectedSubject} className="form-ticket" sx={{m: 1, minWidth: 120, marginTop: '5px', verticalAlign: 'middle', '& > .MuiPaper-root':{top: '60px', maxHeight: 'calc(100% - 62px)'}}}>
                                 <Select
                                     disabled={start?true:false}
@@ -641,12 +663,8 @@ const TestPdd = (props: any) => {
                                         }
                                 </Select>
                             </FormControl>
-                            { (currentQuestion!=undefined && !context.isMobile) && (
-                                <Watch start={start} setEndTest={setEndTest} endTest={endTest} pause={testPause} _continue={continueTest} iterator={iterator} startTime={startTime} btnView="icon"/>
-                            )}
-                            { (currentQuestion!=undefined && context.isMobile) && (
-                                <Watch start={start} setEndTest={setEndTest} endTest={endTest} pause={testPause} _continue={continueTest} iterator={iterator} startTime={startTime} btnView="button" />  
-                            )}
+                            
+                            
                         </>
                     )}
                     <div style={{marginBottom: '4px'}}><h3>{subjectName}</h3></div>
@@ -768,8 +786,8 @@ const TestPdd = (props: any) => {
                 </div>                
             </div>
            
-            <div className={(pdd_questions.length>0 && (props.options.recommended || props.options.settings || props.options.subjects))?"row testrow":"hide"}>
-            <div key={qpages.length} className="slide-wrapper" style={{width: (requiredWidth+"px")}}>
+            <div className={(pdd_questions.length>0 && (props.options.recommended || props.options.settings) && !props.options.subjects)?"row testrow":"hide"}>
+                <div key={qpages.length} className="slide-wrapper" style={{width: (requiredWidth+"px")}}>
                         <i onClick={toPrevPage} className={start?"bi bi-caret-left arrow-btn arrow-left-btn":"hide"}></i>
                         <div className="button-slider">
                             <div key={qpages.length} id="buttonPanel" style={{left: leftShift+"px"}} className={(!start && props.options.settings)?"hide":"btn-group btn-group-xs"}>

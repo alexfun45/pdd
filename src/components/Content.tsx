@@ -95,10 +95,10 @@ function Content(props: any){
                     ci++;
                 });
                 
-                if(h1Exist)
-                    $("#maincontainer").append(contentBlock);
+                //if(h1Exist)
+                    //$("#maincontainer").append(contentBlock);
             jqueryContent.wrap("<div></div>");
-            setContent(jqueryContent.wrap("<div></div>").html());
+            setContent(result);
         });
     }, [props.isAuth, id]);
 
