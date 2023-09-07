@@ -1212,16 +1212,8 @@
         $db->close();
     }
 
-    protected function saveStatistic(){
-        ini_set('display_errors', TRUE);
+    protected function save_recommended(){
         $db = new SQLite3(DB."db.sqlite");
-        $stats = json_decode($this->data->stats);
-        $user_id = $this->data->user_id;
-        foreach($stats as $q_id=>$stat){
-            $elapsedTime = $stat->elapsed_time/1000;
-            $time = time();
-            $db->exec("INSERT INTO statistic(timecreated, ticket_id, q_id, user_id, elapsed_time, correct, test_session) VALUES('$time', {$stat->ticket_id}, $q_id, {$user_id}, {$elapsedTime}, {$stat->correct}, {$stat->testSession})");
-        }
         $userId = $this->data->user_id;
         if($userId!=0){
             $results = json_decode($this->data->results);
@@ -1232,6 +1224,20 @@
                     $db->exec("INSERT OR IGNORE INTO recommended_questions(user_id, q_id) VALUES({$userId}, {$q_id})");
             }
         }
+        $db->close();
+    }
+
+    protected function saveStatistic(){
+        //ini_set('display_errors', TRUE);
+        $db = new SQLite3(DB."db.sqlite");
+        $stats = json_decode($this->data->stats);
+        $user_id = $this->data->user_id;
+        foreach($stats as $q_id=>$stat){
+            $elapsedTime = $stat->elapsed_time/1000;
+            $time = time();
+            $db->exec("INSERT INTO statistic(timecreated, ticket_id, q_id, user_id, elapsed_time, correct, test_session) VALUES('$time', {$stat->ticket_id}, $q_id, {$user_id}, {$elapsedTime}, {$stat->correct}, {$stat->testSession})");
+        }
+        $this->save_recommended();
         $db->close();
         echo $user_id;
     }
