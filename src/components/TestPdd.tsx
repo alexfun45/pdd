@@ -754,7 +754,7 @@ const TestPdd = (props: any) => {
                 </div>
             )
             }
-            <div style={{marginTop: 0}} className={(pdd_questions.length>0 && !props.options.settings && !props.options.recommended && context.settings.show_exam_title=='1')?"row testrow":"hide"}>
+            <div style={{marginTop: 0}} className={(pdd_questions.length>0 && !props.options.settings && !props.options.recommended && context.settings.show_exam_title=='1' && !props.options.subjects)?"row testrow":"hide"}>
             <div className="slide-wrapper" style={{width: (requiredWidth+"px")}}>
                         <i onClick={toPrevPage} className={start?"bi bi-caret-left arrow-btn arrow-left-btn":"hide"}></i>
                         <div className="button-slider">

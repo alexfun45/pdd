@@ -2244,9 +2244,22 @@ div.suggestPopupContent div table tbody tr td.item-selected{
 
   .content-block{
     position: absolute;
-    top: 5px;
+    top: 20px;
     right: 0;
-    width: 200px;
+    width: 260px;
     height: auto;
+    color: #646363;
     border-left:#605a5a 1px solid;
+  }
+
+  .content-block > li{
+    margin-bottom: 10px;
+    font-size: 14px;
+    cursor: pointer;
+  }
+
+  .title-content{
+    font-size: 16px;
+    text-decoration: underline;
+    font-weight: bold;
   }

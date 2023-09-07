@@ -62,17 +62,13 @@ function Content(props: any){
             let regexp = /(font\-)?size[=\:][\'\"]?\s?([^\'\";]*)[\'\"]?/sg,
                 content = data.content,
                 result = "";
-            let jqueryContent = $(content),
-                h1Exist = false,
-                contentBlock = $("<ul class='content-block'></ul>");
-            //console.log("content", content);
-            jqueryContent.find("h2").each(function(this: HTMLElement){
-                console.log("h2");
-                //contentBlock.append(`<li>${$(this).text()}</li>`);
-                h1Exist = true;
-            })
-            //if(h1Exist)
-                //$("#maincontainer").append(contentBlock);
+            
+            
+            $(document).on('click', '.contentItem', function(this: HTMLElement){
+                const cid = 'citem'+$(this).attr('id');
+                $('#' + cid)[0].scrollIntoView(true);
+            });
+            
             context.setPageTitle(data.title);
             if(content){
                 result = content.replace(regexp, (match: string, fullform: string, fontsize: string)=>{ 
@@ -85,7 +81,24 @@ function Content(props: any){
                     return fontStyleName+"3vh";
              });
             }
-            setContent(result);
+
+            let jqueryContent = $(result),
+                h1Exist = false,
+                ci = 0,
+                contentBlock = $("<ul class='content-block'><li class='title-content'>Содержание</li></ul>");
+                //console.log("jqueryContent", jqueryContent);  
+                jqueryContent.filter("h1").each(function(this: HTMLElement){
+                    $(this).attr('id', 'citem'+ci);
+                    let contentItem = $(this).find('b').text();
+                    contentBlock.append(`<li class='contentItem' id='${ci}'>${contentItem}</li>`);
+                    h1Exist = true;
+                    ci++;
+                });
+                
+                if(h1Exist)
+                    $("#maincontainer").append(contentBlock);
+            jqueryContent.wrap("<div></div>");
+            setContent(jqueryContent.wrap("<div></div>").html());
         });
     }, [props.isAuth, id]);
 
@@ -103,7 +116,6 @@ function Content(props: any){
           }*/
           window.addEventListener("hashchange", function(e) {
             if(scrollValue>0){
-                console.log("hash change 1");
                 document.location.href = document.location.href;
                 e.preventDefault();
                 scrollValue = 0;
