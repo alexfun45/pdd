@@ -2268,6 +2268,6 @@ div.suggestPopupContent div table tbody tr td.item-selected{
     z-index: 100000;
   }
 
-  .pageWrapper h1, div#isPasted{
+  .pageWrapper h1, h2, h3, h4, h5, div#isPasted{
     width: 100%;
   }
