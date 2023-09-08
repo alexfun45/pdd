@@ -82,29 +82,33 @@ function Content(props: any){
                     return fontStyleName+"3vh";
              });
             }
-        let jqueryContent = $(result),
-            h1Exist = false,
-            ci = 0,
-            contentBlock = $("<ul class='content-block'><li class='title-content'>Содержание</li></ul>");  
-            jqueryContent.filter("h1, h2, h3, h4, h5").each(function(this: HTMLElement){
-                let contentItem = $(this).find('b');
-                if(!contentItem.length) return;
-                $(this).attr('id', 'citem'+ci);
-                contentBlock.append(`<li class='contentItem' id='${ci}'>${contentItem.text()}</li>`);
-                h1Exist = true;
-                ci++;
-            });
-            
-        if(h1Exist)
-            $("#maincontainer").append(contentBlock);
-        else
+        if(!context.isMobile){
             $("#maincontainer").find(".content-block").remove();
-        //jqueryContent.slice(0).wrapAll("<div></div>");
-        let wrapper = $("<div/>");
-        wrapper.append(jqueryContent);
-        console.log("wrapper", wrapper);
-        setContent(wrapper.html());
-            
+            let jqueryContent = $(result),
+                h1Exist = false,
+                ci = 0,
+                contentBlock = $("<ul class='content-block'><li class='title-content'>Содержание</li></ul>");  
+                jqueryContent.filter("h1, h2, h3, h4, h5").each(function(this: HTMLElement){
+                    let contentItem = $(this).find('b');
+                    if(!contentItem.length) return;
+                    $(this).attr('id', 'citem'+ci);
+                    contentBlock.append(`<li class='contentItem' id='${ci}'>${contentItem.text()}</li>`);
+                    h1Exist = true;
+                    ci++;
+                });
+                
+            if(h1Exist)
+                $("#maincontainer").append(contentBlock);
+            else
+                $("#maincontainer").find(".content-block").remove();
+            //jqueryContent.slice(0).wrapAll("<div></div>");
+            let wrapper = $("<div/>");
+            wrapper.append(jqueryContent);
+            setContent(wrapper.html());
+        }
+        else{
+            setContent(result);
+        }
         });
     }, [props.isAuth, id]);
 
