@@ -39,6 +39,8 @@ const mapStateToProps = (state:any) => {
     }
   }
 
+let result = "";
+
 function Content(props: any){
     const context = React.useContext(AppContext);
     const {id = ''} = useParams(),
@@ -51,7 +53,7 @@ function Content(props: any){
     }, [context]);
 
     useEffect(()=>{
-        if(id=="") return;
+        if(id=="" && props.isAuth!=0) return;
         request({method: "post", data:{action: "getPage", data: {page_id: id}}}).then( response =>{
             const {data} = response;
             if(data.private==1 && !props.isAuth) navigate("/auth");
@@ -60,8 +62,7 @@ function Content(props: any){
             else
                 document.title = "ПДД онлайн 2023";
             let regexp = /(font\-)?size[=\:][\'\"]?\s?([^\'\";]*)[\'\"]?/sg,
-                content = data.content,
-                result = "";
+                content = data.content;
             
             
             $(document).on('click', '.contentItem', function(this: HTMLElement){
@@ -81,27 +82,35 @@ function Content(props: any){
                     return fontStyleName+"3vh";
              });
             }
-
-            let jqueryContent = $(result),
-                h1Exist = false,
-                ci = 0,
-                contentBlock = $("<ul class='content-block'><li class='title-content'>Содержание</li></ul>");
-                //console.log("jqueryContent", jqueryContent);  
-                jqueryContent.filter("h1").each(function(this: HTMLElement){
-                    $(this).attr('id', 'citem'+ci);
-                    let contentItem = $(this).find('b').text();
-                    contentBlock.append(`<li class='contentItem' id='${ci}'>${contentItem}</li>`);
-                    h1Exist = true;
-                    ci++;
-                });
-                
-                //if(h1Exist)
-                    //$("#maincontainer").append(contentBlock);
-            jqueryContent.wrap("<div></div>");
-            setContent(result);
+        let jqueryContent = $(result),
+            h1Exist = false,
+            ci = 0,
+            contentBlock = $("<ul class='content-block'><li class='title-content'>Содержание</li></ul>");  
+            jqueryContent.filter("h1").each(function(this: HTMLElement){
+                let contentItem = $(this).find('b');
+                if(!contentItem.length) return;
+                $(this).attr('id', 'citem'+ci);
+                contentBlock.append(`<li class='contentItem' id='${ci}'>${contentItem.text()}</li>`);
+                h1Exist = true;
+                ci++;
+            });
+            
+        if(h1Exist)
+            $("#maincontainer").append(contentBlock);
+        else
+            $("#maincontainer").find(".content-block").remove();
+        //jqueryContent.slice(0).wrapAll("<div></div>");
+        let wrapper = $("<div/>");
+        wrapper.append(jqueryContent);
+        console.log("wrapper", wrapper);
+        setContent(wrapper.html());
+            
         });
     }, [props.isAuth, id]);
 
+    useEffect(()=>{
+       
+    }, [__content])
 
     useEffect(()=>{
 

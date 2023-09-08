@@ -54,6 +54,7 @@ const AdminPanel = (props: any) => {
             setMenuItems(data.menus);
             setAllPages(data.pages);
         });
+        $("#maincontainer").find(".content-block").remove();
     }, []);
     useEffect(()=>{
         if(pageTabtype==0)
