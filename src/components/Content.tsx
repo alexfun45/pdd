@@ -1,5 +1,6 @@
 import React, {useState, useEffect} from "react";
 import { useParams } from "react-router-dom";
+import Form from 'react-bootstrap/Form';
 import request from '../utils/request'
 import {AppContext} from '../app'
 import { useNavigate } from "react-router-dom";
@@ -67,7 +68,11 @@ function Content(props: any){
             
             $(document).on('click', '.contentItem', function(this: HTMLElement){
                 const cid = 'citem'+$(this).attr('id');
-                $('#' + cid)[0].scrollIntoView(true);
+                $('#' + cid)[0].scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'nearest',
+                    inline: 'start'
+                  });
             });
             
             context.setPageTitle(data.title);
@@ -135,10 +140,21 @@ function Content(props: any){
                 window.scrollTo(0, 0);
             }
         }, false)
-    }, [])
+    }, []);
+
+    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        const value:string = e.currentTarget.search_text.value;
+        navigate("/search", {state: {'search_text': value}});
+    }
 
     return (
-        <div className="container">
+        <div key="container_block" className="container">
+            <div className="searchBlock">
+                <Form onSubmit={handleSubmit}>
+                        <Form.Control name="search_text" type="text" placeholder="поиск по страницам" />
+                    </Form>
+                </div>
             <div className="row">
                 <div className="pageWrapper" dangerouslySetInnerHTML={{__html:__content || ""}}></div>
             </div>

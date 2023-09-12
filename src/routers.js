@@ -8,18 +8,10 @@ import AuthConfirm from "./components/AuthConfirm"
 import PasswordRecovery from "./components/PasswordRecovery"
 import GoogleAuth from "./components/GoogleAuth";
 import YaAuth from "./components/YaAuth";
+import Search from "./components/Search"
 
 const routes = [
-    {
-        route: "/",
-        component: <Content/>,
-        key: "/"
-    },
-    {
-        route: "/:id",
-        component: <Content key=":id"/>,
-        key: "content"
-    },
+   
     {
         route: "admin",
         component: AdminPanel,
@@ -52,6 +44,11 @@ const routes = [
         key: "textpdd"
     },
     {
+        route: "search",
+        component: <Search/>,
+        key: "search"
+    },
+    {
         route: "subjects",
         component: <TestPdd start={true} options={{num: 400, max_error:2, subjects: true, random: false, recommended: false, max: 1000, dblclick: false, settings: false}} />,
         key: "subjects"
@@ -81,6 +78,16 @@ const routes = [
         route: "confirmation/:userid/:secret",
         component: <AuthConfirm />,
         key: "authorize_confirmation"
+    },
+    {
+        route: "/",
+        component: <Content/>,
+        key: "/"
+    },
+    {
+        route: "/:id",
+        component: <Content key=":id"/>,
+        key: "content"
     }
 ];
 
