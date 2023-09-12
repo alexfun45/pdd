@@ -2,6 +2,7 @@ import {useEffect, useState} from 'react'
 import { useLocation } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import request from '../utils/request'
+import $ from 'jquery';
 
 type ResultType = {
     name: string;
@@ -28,6 +29,8 @@ export default () => {
     const goToPage = (pageName: string) => {
         navigate("/"+pageName);
     }
+
+    $("#maincontainer").find(".content-block").remove();
 
     return (
         <div key="search" className="container-block">

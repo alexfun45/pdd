@@ -139,7 +139,22 @@ function Content(props: any){
                 scrollValue = 0;
                 window.scrollTo(0, 0);
             }
-        }, false)
+        }, false);
+
+        $(".search-title").on("click", function(this: HTMLElement){
+            $(".searchBlock").addClass("open");
+            $(".searchBlock").find("input").focus();
+        });
+
+        $(".search-icon").on("click", function(this: HTMLElement){
+            $(".searchBlock").addClass("open");
+            $(".searchBlock").find("input").focus();
+        });
+
+        $(document).on("click", function(e: any){
+            if($(e.target).closest(".searchBlock").length==0)
+                $(".searchBlock").removeClass("open");
+        })
     }, []);
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -151,10 +166,14 @@ function Content(props: any){
     return (
         <div key="container_block" className="container">
             <div className="searchBlock">
-                <Form onSubmit={handleSubmit}>
-                        <Form.Control name="search_text" type="text" placeholder="поиск по страницам" />
+                <div>
+                    <span className="search-title">Поиск</span>
+                    <Form className="search-form" onSubmit={handleSubmit}>
+                            <Form.Control className="search-text" name="search_text" type="text" placeholder="поиск по страницам" />
+                            <i className="bi bi-search search-icon"></i>
                     </Form>
                 </div>
+            </div>
             <div className="row">
                 <div className="pageWrapper" dangerouslySetInnerHTML={{__html:__content || ""}}></div>
             </div>
