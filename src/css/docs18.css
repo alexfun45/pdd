@@ -2299,7 +2299,7 @@ div.suggestPopupContent div table tbody tr td.item-selected{
     display: block;
     text-align: left;
     font-size: 14px;
-    max-height: 100%;
+    max-height: 84%;
     overflow-y: auto;
     scrollbar-width: thin;
     scrollbar-color: hsl(0 0% 50%);

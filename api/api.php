@@ -1394,6 +1394,32 @@
         $db->close();
     }
 
+    protected function search(){
+        //ini_set('display_errors', TRUE);
+        $search = $this->data->searchText;
+        $db = new SQLite3(DB."db.sqlite");
+        $result = $db->query("SELECT * FROM pages");
+        $results = array();
+        while($res = $result->fetchArray(SQLITE3_ASSOC)){
+            $name = $res['name'];
+            $title = $res['title'];
+            $page_file_path = PAGES . $name . '.html';
+            if(file_exists($page_file_path)){
+                $content = file_get_contents($page_file_path);
+                $pos = mb_stripos($content, $search);
+                if($pos!==false){
+                    //$pos = ($pos>=200) ? ($pos-200):0;
+                    $finded_fragment = mb_substr($content, $pos, 300, 'UTF-8');
+                    $finded_fragment = preg_replace("/font-size:\s*([\d]+)px/siu", "font-size: 12px", $finded_fragment);
+                    $finded_fragment = preg_replace("/<img.*\/?>/siu", "", $finded_fragment);
+                    $results[] = array('fragment'=>$finded_fragment, 'name'=>$name, 'title'=>$title);
+                }
+            }
+        }
+        $db->close();
+        return $results;
+    }
+
     }
     $app = new Application();
     $app->run();
