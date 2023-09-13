@@ -56,7 +56,8 @@ export default (props) => {
           dialogsInBody: true,
           plugins: ["hello"],
           //fontNames: [ 'Serif', 'Sans', 'Arial', 'Arial Black', 'Courier', 'Courier New', 'Times New Roman', 'Verdana', 'Roboto', 'Comic Sans MS', 'Helvetica', 'Impact', 'Lucida Grande', 'Sacramento'],
-          'fontNames': ['Serif', 'Sans', 'Arial', 'Courier', 'Times New Roman', 'Verdana', 'Roboto', 'Comic Sans MS', 'Helvetica', 'Impact', 'Lucida Grande', 'Sacramento'],
+          'fontNames': ['Sans-Serif', 'Sans', 'Arial', 'Courier', 'Times New Roman', 'Verdana', 'Roboto', 'Comic Sans MS', 'Helvetica', 'Impact', 'Lucida Grande', 'Sacramento'],
+          fontNamesIgnoreCheck: [ 'Sans-Serif', 'Sans', 'Arial',  'Courier', 'Times New Roman','Verdana', 'Comic Sans MS', 'Helvetica', 'Impact', 'Lucida Grande', 'Sacramento'],
           popover: {
             image: [
                 ['custom', ['imageAttributes']],
@@ -72,6 +73,7 @@ export default (props) => {
       },
           toolbar: [
             ['style', ['style']],
+            ['fontname', ['fontname']],
             //['fontNames', ['Arial', 'Arial Black', 'Comic Sans MS', 'Courier New', 'Sans-serif', 'Helvetica', 'Impact', 'Tahoma', 'Times New Roman', 'Verdana', 'Roboto']],
             ['font', ['fontsize', 'bold', 'underline', 'clear']],
             ['color', ['color']],
