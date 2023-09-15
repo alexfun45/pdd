@@ -6,8 +6,8 @@ import Spinner from 'react-bootstrap/Spinner';
 import {useState, useEffect} from "react";
 import request from '../utils/request'
 import $ from 'jquery'
-import SummerEditor from './SummerEditor'
-
+//import SummerEditor from './SummerEditor'
+import QuillEditor from './QuillEditor';
 
 const screenHeight = window.screen.height*0.6;
 type typeImagesArrayrray = {
@@ -216,7 +216,8 @@ export default function PageEditor({editPageName, setEditPageName, mode}: {editP
                 aria-hidden="true"
               />Сохранить</Button>
               <div className="editorWrapper">
-                <SummerEditor model={model} setModel={setModel} formData={formData} imageNames={imageNames} />
+                <QuillEditor model={model} setModel={setModel} formData={formData} imageNames={imageNames}/>
+                {/*<SummerEditor model={model} setModel={setModel} formData={formData} imageNames={imageNames} />*/}
               </div>
             {/*<FroalaEditor
                 tag='textarea'

@@ -94,7 +94,7 @@ function Content(props: any){
                 ci = 0,
                 contentBlock = $("<ul class='content-block'><li class='title-content'>Содержание</li></ul>");  
                 jqueryContent.filter("h1, h2, h3, h4, h5").each(function(this: HTMLElement){
-                    let contentItem = $(this).find('b');
+                    let contentItem = $(this).find('strong, b');
                     if(!contentItem.length) return;
                     $(this).attr('id', 'citem'+ci);
                     contentBlock.append(`<li class='contentItem' id='${ci}'>${contentItem.text()}</li>`);

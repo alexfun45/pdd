@@ -17,6 +17,10 @@ body {
     background-size: cover;
 }
 
+*{
+    font-family:'Times New Roman', Times, serif;
+}
+
 table{
     max-width: 100%;
 }
@@ -36,6 +40,16 @@ p{
 
 .editorWrapper{
     all: unset;
+    display: block;
+    height: 100%;
+}
+
+.quill{
+    height: 100%;
+}
+
+.ql-editor{
+    background-color: #F5F5F5  !important;
 }
 
 .content{
@@ -73,6 +87,7 @@ p{
 }
 
 .pageWrapper{
+    width: 100%;
     max-width: 96%;
     display: flex;
     flex-wrap: wrap;
@@ -487,7 +502,7 @@ label{
     top: 20px;
     left: 24px;
     width: 220px;
-    z-index: 1000000;
+    z-index: 10;
   }
 
 .mobileWrapper{
@@ -2395,3 +2410,69 @@ div.suggestPopupContent div table tbody tr td.item-selected{
     padding: 10px 15px;
     margin-right: 23px;
   }
+
+.ql-snow .ql-picker.ql-size .ql-picker-label::before, 
+.ql-snow .ql-picker.ql-size .ql-picker-item::before {
+  content: attr(data-value) !important;
+}
+
+.ql-snow .ql-picker.ql-font .ql-picker-label::before,
+.ql-snow .ql-picker.ql-font .ql-picker-item::before {
+    content: attr(data-value) !important;
+}
+
+.ql-align-left{
+    text-align: left;
+}
+
+.ql-align-right{
+    text-align: right;
+}
+
+.ql-align-center{
+    text-align: center;
+}
+
+.ql-editor .ql-video{
+    pointer-events: none;
+}
+
+.ql-font-Sans{
+    font-family: "Sans";
+}
+
+.ql-font-Arial{
+    font-family: "Arial";
+}
+
+.ql-font-Courier{
+    font-family: 'Courier New', Courier, monospace;
+}
+
+.ql-editor{
+    font-family: 'Times New Roman', Times, serif;
+}
+
+.ql-font-Verdana{
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+}
+
+.ql-font-Comic{
+    font-family: "Comic Sans MS";
+}
+
+.ql-font-Helvetica{
+    font-family: "Helvetica";
+}
+
+.ql-font-Impact{
+    font-family: "Impact";
+}
+
+.ql-font-Lucida{
+    font-family: "Lucida Grande";
+}
+
+.ql-font-Sacramento{
+    font-family: "Sacramento";
+}

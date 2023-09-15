@@ -46,6 +46,8 @@ export default (props) => {
     props.formData.append("opt", "test");
     props.formData.append(img[0].name, img[0]);
     props.imageNames.push(img[0].name);
+    console.log("img[0].name", img[0].name);
+    console.log("img[0]", img[0]);
   }
     return (
       <ReactSummernote
@@ -58,6 +60,7 @@ export default (props) => {
           //fontNames: [ 'Serif', 'Sans', 'Arial', 'Arial Black', 'Courier', 'Courier New', 'Times New Roman', 'Verdana', 'Roboto', 'Comic Sans MS', 'Helvetica', 'Impact', 'Lucida Grande', 'Sacramento'],
           'fontNames': ['Sans-Serif', 'Sans', 'Arial', 'Courier', 'Times New Roman', 'Verdana', 'Roboto', 'Comic Sans MS', 'Helvetica', 'Impact', 'Lucida Grande', 'Sacramento'],
           fontNamesIgnoreCheck: [ 'Sans-Serif', 'Sans', 'Arial',  'Courier', 'Times New Roman','Verdana', 'Comic Sans MS', 'Helvetica', 'Impact', 'Lucida Grande', 'Sacramento'],
+          fontSizes: ['8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24', '25', '26', '27', '28', '29', '30'],
           popover: {
             image: [
                 ['custom', ['imageAttributes']],
@@ -77,7 +80,7 @@ export default (props) => {
             //['fontNames', ['Arial', 'Arial Black', 'Comic Sans MS', 'Courier New', 'Sans-serif', 'Helvetica', 'Impact', 'Tahoma', 'Times New Roman', 'Verdana', 'Roboto']],
             ['font', ['fontsize', 'bold', 'underline', 'clear']],
             ['color', ['color']],
-            ['fontname', ['fontname']],
+            //['fontname', ['fontname']],
             ['para', ['ul', 'ol', 'paragraph', 'height']],
             ['table', ['table']],
             ['insert', ['link', 'picture', 'video']],
