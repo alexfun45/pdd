@@ -118,8 +118,13 @@ function Content(props: any){
     }, [props.isAuth, id]);
 
     useEffect(()=>{
-       
-    }, [__content])
+        if(__content=="") return;
+        $('.pageWrapper').children(":first")[0].scrollIntoView({
+            behavior: 'smooth',
+            block: 'nearest',
+            inline: 'start'
+          });
+    }, [__content]);
 
     useEffect(()=>{
 

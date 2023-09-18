@@ -55,7 +55,6 @@ export default ({model, setModel, formData, imageNames}) => {
             var reader = new FileReader();
             reader.onloadend = function() {
                 const editor = editorRef.current.getEditor();
-                console.log("getSelection", editor.getSelection());
                 editor.insertEmbed(editor.getSelection().index, "image", reader.result);
             }
             reader.readAsDataURL(input.files[0]);
