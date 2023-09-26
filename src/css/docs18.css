@@ -156,8 +156,13 @@ p{
     -ms-overflow-style: none;
     scrollbar-width: none;
 }
+
+.container{
+    max-width: calc(100% - 485px);
+}
+
 .mobileWrapper .container{
-    width: 100%;
+    width: 100% !important;
 }
 
 .container::-webkit-scrollbar {
@@ -2492,10 +2497,13 @@ div.suggestPopupContent div table tbody tr td.item-selected{
     }
 }*/
 
-.container{
-    max-width: calc(100% - 485px) !important;
-}
+@media screen and (max-width: 1010px){
 
+    .content-block{
+        display: none;
+    }
+    
+}
 
 @media screen and (min-width: 1200px){
 
