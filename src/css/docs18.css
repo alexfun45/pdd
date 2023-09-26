@@ -291,7 +291,7 @@ p{
 .top-level-menu{
     width: 100%;
     /*border-bottom: 1px solid #e7e7e7;*/
-    text-align: center;
+    text-align: left;
 }
 
 .top-level-menu  .homeIcon{
@@ -372,7 +372,6 @@ p{
 }
 
 .menubtn{
-    padding: 15px 15px !important;
     line-height: 20px;
     background-color: transparent !important;
     display: inline-block !important;
@@ -385,7 +384,6 @@ p{
 }
 
 .group-menu-btn button{
-    padding: 15px 15px !important;
     line-height: 20px;
     background-color: transparent;
     display: inline-block !important;
@@ -1493,7 +1491,10 @@ div.suggestPopupContent div table tbody tr td.item-selected{
         margin-right: 5px;
         margin-left: 5px;
         border-radius: 5px !important;
+        font-size: 0.9vw;
     }
+
+   
     
     #buttonPanel.btn-group-sm > button , #buttonPanel1 > button, #buttonPanel2 > button, #buttonPanel3 > button , #buttonPanel4 > button {
         width: 35px;
@@ -2475,4 +2476,96 @@ div.suggestPopupContent div table tbody tr td.item-selected{
 
 .ql-font-Sacramento{
     font-family: "Sacramento";
+}
+
+/*@media screen and (min-width: 1790px){
+
+    .container{
+        max-width: 1500px !important;
+    }
+}
+
+@media screen and (min-width: 1770px){
+
+    .container{
+        max-width: 1400px !important;
+    }
+}*/
+
+.container{
+    max-width: calc(100% - 485px) !important;
+}
+
+
+@media screen and (min-width: 1200px){
+
+    .top-level-menu{
+        padding-left: 100px;
+    }
+        
+    .top-level-menu .homeIcon > img{
+        max-width: 78px;
+    }  
+
+    .menubtn{
+        padding: 15px 15px;
+    }
+
+    .group-menu-btn button{
+        padding: 15px 15px; 
+    }
+
+}
+
+@media screen and (max-width: 1190px){
+
+    .top-level-menu{
+        padding-left: 45px;
+    }
+    
+    .top-level-menu .homeIcon > img{
+        max-width: 40px;
+    }  
+
+    .menubtn{
+        padding: 15px 7px;
+    }
+
+    .group-menu-btn button{
+        padding: 15px 7px; 
+    }
+}
+
+@media screen and (max-width: 600px){
+
+    .top-level-menu{
+        padding-left: 50px;
+    }
+    
+    .top-level-menu .homeIcon > img{
+        max-width: 30px;
+    }  
+
+    .menubtn{
+        padding: 15px 3px;
+    }
+
+    .group-menu-btn button{
+        padding: 15px 3px;
+    }
+}
+
+@media screen and (max-width: 1580px){
+
+    .admin-panel-wrapper{
+        top: 25px;
+    }
+
+    .searchBlock{
+        top: 24px;
+    }
+
+    .content-block{
+        top: 85px;
+    }
 }
