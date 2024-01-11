@@ -1231,15 +1231,24 @@
         //ini_set('display_errors', TRUE);
         $db = new SQLite3(DB."db.sqlite");
         $stats = json_decode($this->data->stats);
+        $results = json_decode($this->data->results); 
         $user_id = $this->data->user_id;
-        foreach($stats as $q_id=>$stat){
+        for($i=0;$i<count($results);$i++){
+            $elapsedTime = $stats->{$results[$i]->q_id}->elapsed_time/1000;
+            $ticket_id = $stats->{$results[$i]->q_id}->ticket_id;
+            $q_id = $results[$i]->q_id;
+            $success = ($results[$i]->success==1)?0:1;
+            $testSession = $stats->{$results[$i]->q_id}->testSession;
+            $time = time();
+            $db->exec("INSERT INTO statistic(timecreated, ticket_id, q_id, user_id, elapsed_time, correct, test_session) VALUES('$time', {$ticket_id}, {$q_id}, {$user_id}, {$elapsedTime}, {$success}, {$testSession})");
+        }
+        /*foreach($stats as $q_id=>$stat){
             $elapsedTime = $stat->elapsed_time/1000;
             $time = time();
             $db->exec("INSERT INTO statistic(timecreated, ticket_id, q_id, user_id, elapsed_time, correct, test_session) VALUES('$time', {$stat->ticket_id}, $q_id, {$user_id}, {$elapsedTime}, {$stat->correct}, {$stat->testSession})");
-        }
+        }*/
         $this->save_recommended();
         $db->close();
-        echo $user_id;
     }
 
     protected function getGrade(){
@@ -1253,7 +1262,7 @@
             $ticket_name = $res['ticketname'];
             $login = (!empty($res['login']))?$res['login']:$user_id;
             $time = date("d-m-Y H:i", $res['last_time']);
-            if($user_id!=1)
+            //if($user_id!=1)
                 $grades[$login][$ticket_name] = array("time"=>$time, 'login'=>$login,'ticket_id'=>$res['ticket_id'], 'failed'=>$res['num'], 'user_id'=>$user_id, 'session'=>$res['test_session']);
         }
         $data = array();
@@ -1286,9 +1295,12 @@
         $ticketId = $this->data->ticketId;
         $test_session = $this->data->testSession;
         //$result = $db->query("SELECT t2.indx FROM statistic AS t1 INNER JOIN ticket_2_question AS t2 ON t1.ticket_id=t2.tickets_id AND t1.q_id=t2.q_id WHERE t1.test_session={$test_session} AND t1.correct=1");
-        $result = $db->query("SELECT t2.indx FROM statistic AS t1 INNER JOIN ticket_2_question AS t2 ON t1.q_id=t2.q_id WHERE t1.test_session={$test_session} AND t1.correct=1 AND t2.tickets_id={$ticketId}");
+        $result = $db->query("SELECT t1.correct FROM statistic AS t1 INNER JOIN ticket_2_question AS t2 ON t1.q_id=t2.q_id WHERE t1.test_session={$test_session} AND t2.tickets_id={$ticketId}");
+        $qestion_index = 0;
         while($res = $result->fetchArray(SQLITE3_ASSOC)){
-            $q[] = $res['indx'];
+            if($res['correct']==1)
+                $q[] = $qestion_index+1;
+            $qestion_index++;
         }
         $db->close();
         return $q;
